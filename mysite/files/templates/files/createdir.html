@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+	<metacharset = "UTF-8">
+	<title>Create New Directory</title>
+</head>
+<body>
+{{res}}
+<form method="post" action="/files/newdrct/" enctype="multipart/form-data">
+	{%csrf_token%}
+	{{form}}
+	<!--<input type="file" name="file" />
+	<br/><br/><br/>-->
+	<input type="submit" value="submit" />
+</form>
+
+</body>
+</html>

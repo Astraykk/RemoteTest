@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+	<metacharset = "UTF-8">
+	<title>index</title>
+</head>
+<body>
+{{res}}
+	<a href="{% url 'files:create_dir' %}">
+		New directory
+	</a>
+	<br>
+	<a href="{% url 'files:upload' %}">
+		Upload
+	</a>
+	<br>
+	<ul>
+		{% for item in fileobjects %}
+			{% if item.is_folder %}
+				<li><a href="{% url 'files:browse' %}?&amp;dir={{ item.filename|urlencode }}"><strong>{{ item.filename }}</strong></a></li>
+			{% else %}
+				<li>{{ item.filename }}</li>
+				{% endif %}
+		{% endfor %}
+	</ul>
+	<br>
+	
+</html>

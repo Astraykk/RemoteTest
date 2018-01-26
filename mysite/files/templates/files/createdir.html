@@ -6,13 +6,13 @@
 </head>
 <body>
 {{res}}
-<form method="post" action="/files/newdrct/" enctype="multipart/form-data">
+<form method="post" action="{{ query_string }}" enctype="multipart/form-data">
 	{%csrf_token%}
 	{{form}}
 	<!--<input type="file" name="file" />
 	<br/><br/><br/>-->
 	<input type="submit" value="submit" />
 </form>
-
+{{ query_string }}
 </body>
 </html>

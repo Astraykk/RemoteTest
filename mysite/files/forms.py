@@ -12,7 +12,7 @@ from filebrowser.utils import convert_filename
 
 class UploadFileForm(forms.Form):
 
-	#title = forms.CharField(max_length=50)
+	# title = forms.CharField(max_length=50)
 	
 	file = forms.FileField()
 	
@@ -27,5 +27,19 @@ class CreateDirForm(forms.Form):
 		max_length=50, min_length=3)), 
 		label=_(u'Name'), 
 		help_text=_(u'Only letters, numbers, underscores, spaces and hyphens are allowed.'), 
+		required=True
+		)
+
+
+class ChangeForm(forms.Form):
+	"""
+	Form for creating a folder.
+	"""
+
+	name = forms.CharField(
+		widget=forms.TextInput(attrs=dict({'class': 'vTextField'},
+		max_length=50, min_length=3)),
+		label=_(u'Name'),
+		help_text=_(u'Only letters, numbers, underscores, spaces and hyphens are allowed.'),
 		required=True
 		)

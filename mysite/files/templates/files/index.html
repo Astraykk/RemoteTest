@@ -6,7 +6,24 @@
 </head>
 <body>
 {{res}}
-	<a href="{% url 'files:create_dir' %}">
+
+	<!--Breadcrumbs-->
+	<div id="navigation">
+		<table>
+			<tr>
+				<td><a href="{% url 'files:browse' %}">Home</a></td>
+				{% for item in breadcrumbs %}
+					<td><a href="{% url 'files:browse' %}?&amp;dir={{ item.1 }}">{{item.0}}</a></td>
+				{% endfor %}
+			</tr>
+		</table>
+	</div>
+
+	{% load files_tags %}
+	<!--Toolbar-->
+	<a href="{% url 'files:create_dir' %}{% query_string 'dir' %}">
+	<!--<a href="{% url 'files:create_dir' %}?dir={{ query_dir }}">-->
+		<!--add tag-->
 		New directory
 	</a>
 	<br>
@@ -14,15 +31,42 @@
 		Upload
 	</a>
 	<br>
-	<ul>
+
+	<!--File list-->
+	<table>
+		<thead>
+			<tr>
+				<th>Filename</th>
+				<th>size</th>
+				<th>date</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
 		{% for item in fileobjects %}
-			{% if item.is_folder %}
-				<li><a href="{% url 'files:browse' %}?&amp;dir={{ item.filename|urlencode }}"><strong>{{ item.filename }}</strong></a></li>
-			{% else %}
-				<li>{{ item.filename }}</li>
+		<tr>
+			<!--Filename-->
+			<td>
+				{% if item.is_folder %}
+					<a href="{% url 'files:browse' %}?&amp;dir={{ item.path_relative_directory|urlencode }}">
+					<strong>{{ item.filename }}</strong></a>
+				{% else %}
+					{{ item.filename }}
 				{% endif %}
+			</td>
+			<!--size-->
+			<td>{% if item.filesize %}{{ item.filesize|filesizeformat }}{% else %}&mdash;{% endif %}</td>
+			<!--date-->
+			<td>{{ item.datetime|date:"N j, Y" }}</td>
+			<!--detail-->
+			<td><a href="{% url 'files:detail' %}?dir={{ query_dir }}&amp;filename={{ item.filename|urlencode }}">
+				<!--add tag-->
+				<strong>Details</strong>
+				</a></td>
+		</tr>
 		{% endfor %}
-	</ul>
+		</tbody>
+	</table>
 	<br>
 	
 </html>

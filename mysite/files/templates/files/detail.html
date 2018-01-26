@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+	<metacharset = "UTF-8">
+	<title>File details</title>
+</head>
+<body>
+    <h1>{{ fileobject.filename }}</h1>
+    {% load files_tags %}
+    <form method="post" action="{% query_string 'dir' %}" enctype="multipart/form-data">
+	    {%csrf_token%}
+	    {{form}}
+        <input type="submit" value="submit" />
+    </form>
+
+    <table>
+		<tr>
+			<td>File Size:</td>
+			<td>{% if fileobject.filesize %}{{ fileobject.filesize|filesizeformat }}{% else %}&mdash;{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Date:</td>
+			<td>{{ fileobject.datetime|date:"N j, Y" }}</td>
+		</tr>
+	</table>
+</body>

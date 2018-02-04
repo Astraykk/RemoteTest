@@ -1,12 +1,25 @@
-<!DOCTYPE html>
-<html lang = "en">
-<head>
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_modify grp_tags files_tags %}
 	<metacharset = "UTF-8">
-	<title>File details</title>
-</head>
-<body>
-    <h1>{{ fileobject.filename }}</h1>
-    {% load files_tags %}
+	{% block title %}Index{% endblock %}
+	<!--<title>index</title>-->
+	<!--Breadcrumbs-->
+
+{% block content_title %}
+    <h1>File Management</h1>
+{% endblock %}
+
+{% block breadcrumbs %}
+<ul class="grp-horizontal-list">
+	<li><a href="{% url 'files:browse' %}">Home</a></li>
+	{% for item in breadcrumbs %}
+		<li><a href="{% url 'files:browse' %}?&amp;dir={{ item.1 }}">{{item.0}}</a></li>
+	{% endfor %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<div id="grp-content-container">
     <form method="post" action="{% query_string 'dir' %}" enctype="multipart/form-data">
 	    {%csrf_token%}
 	    {{form}}
@@ -23,4 +36,15 @@
 			<td>{{ fileobject.datetime|date:"N j, Y" }}</td>
 		</tr>
 	</table>
-</body>
+
+    <footer class="grp-module grp-submit-row grp-fixed-footer">
+        <header style="display:none"><h1>Submit Options</h1></header>
+        <ul>
+            <li class="grp-float-left"><a href="{% url 'files:f_delete' %}{% query_string 'dir' %}" class="grp-button grp-delete-link">Delete</a></li>
+            <li class="grp-float-right"><a href="{% url 'files:f_download' %}{% query_string 'dir' %}" class="grp-button">Download</a></li>
+        </ul>
+    </footer>
+    <a href="{% url 'files:f_delete' %}{% query_string 'dir' %}">Delete</a>
+    <a href="{% url 'files:f_download' %}{% query_string 'dir' %}">Download</a>
+
+    {% endblock %}

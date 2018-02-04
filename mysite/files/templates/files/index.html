@@ -1,36 +1,39 @@
-<!DOCTYPE html>
-<html lang = "en">
-<head>
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_modify grp_tags files_tags %}
 	<metacharset = "UTF-8">
-	<title>index</title>
-</head>
-<body>
-{{res}}
-
+	{% block title %}Index{% endblock %}
+	<!--<title>index</title>-->
 	<!--Breadcrumbs-->
-	<div id="navigation">
-		<table>
-			<tr>
-				<td><a href="{% url 'files:browse' %}">Home</a></td>
-				{% for item in breadcrumbs %}
-					<td><a href="{% url 'files:browse' %}?&amp;dir={{ item.1 }}">{{item.0}}</a></td>
-				{% endfor %}
-			</tr>
-		</table>
-	</div>
 
-	{% load files_tags %}
+{% block content_title %}
+    <h1>File Management</h1>
+{% endblock %}
+
+{% block breadcrumbs %}
+<ul class="grp-horizontal-list">
+	<li><a href="{% url 'files:browse' %}">Home</a></li>
+	{% for item in breadcrumbs %}
+		<li><a href="{% url 'files:browse' %}?&amp;dir={{ item.1 }}">{{item.0}}</a></li>
+	{% endfor %}
+</ul>
+{% endblock %}
+
+{% block object-tools %}
+<ul class="grp-object-tools">
+	<!--{% block object-tools-items %}-->
+		<li><a href="{% url 'files:create_dir' %}{% query_string 'dir' %}">
+			New directory</a></li>
+		<li><a href="{% url 'files:upload' %}" class="grp-state-focus">
+			Upload
+		</a></li>
+	<!--{% endblock %}-->
+</ul>
+{% endblock %}
+
+{% block content %}
+{{res}}
 	<!--Toolbar-->
-	<a href="{% url 'files:create_dir' %}{% query_string 'dir' %}">
-	<!--<a href="{% url 'files:create_dir' %}?dir={{ query_dir }}">-->
-		<!--add tag-->
-		New directory
-	</a>
-	<br>
-	<a href="{% url 'files:upload' %}">
-		Upload
-	</a>
-	<br>
+
 
 	<!--File list-->
 	<table>
@@ -68,5 +71,5 @@
 		</tbody>
 	</table>
 	<br>
-	
+{% endblock %}
 </html>

@@ -10,6 +10,7 @@ urlpatterns = [
 	url(r'^index/$', views.myFBsite.file_browse, name='browse'),
 	url(r'^newdrct/$', views.myFBsite.create_dir, name='create_dir'),
 	url(r'^detail/$', views.myFBsite.detail, name='detail'),
-
+	url(r'^delete/$', views.myFBsite.delete, name='f_delete'),
+	url(r'^download/$', views.myFBsite.download, name='f_download'),
 	# url(r'^success/$', views.success, name='success'),
 ]

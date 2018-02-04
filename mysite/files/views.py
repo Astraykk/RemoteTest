@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.files.storage import DefaultStorage, default_storage, FileSystemStorage
+from django.http import StreamingHttpResponse
 
 from .forms import UploadFileForm
 
@@ -46,6 +47,8 @@ def get_Breadcrumbs(query):
 			temp_path = os.path.join(temp_path, item)
 			breadcrumbs.append([item, temp_path])
 	return breadcrumbs
+
+
 
 
 class MyFileBrowser(object):
@@ -101,27 +104,42 @@ class MyFileBrowser(object):
 			'form': form,
 		})
 
-
-	'''
 	def delete(self, request):
-		"Delete existing File/Directory."
+		"""Delete existing File/Directory."""
+		print(1)
 		query = request.GET
 		path = u'%s' % os.path.join(self.directory, query.get('dir', ''))
-		fileobject = FileObject(os.path.join(path, query.get('filename', '')), site=self)
-
+		print(path)
+		fileobject = FileObject(os.path.join(path, query.get('filename', '')))
+		print(fileobject)
 		if request.GET:
 			try:
-				signals.filebrowser_pre_delete.send(sender=request, path=fileobject.path, name=fileobject.filename, site=self)
-				fileobject.delete_versions()
 				fileobject.delete()
-				signals.filebrowser_post_delete.send(sender=request, path=fileobject.path, name=fileobject.filename, site=self)
-				messages.add_message(request, messages.SUCCESS, _('Successfully deleted %s') % fileobject.filename)
+				print(1)
 			except OSError:
 				# TODO: define error-message
 				pass
-		redirect_url = reverse("files:browse") + query_helper(query, "", "filename,filetype")
+		redirect_url = reverse("files:browse") + '?dir=' + query.get('dir', '')
 		return HttpResponseRedirect(redirect_url)
-		'''
+
+	def download(self, request):
+		query = request.GET
+		file_path = u'%s' % os.path.join(site.directory, query.get('dir', ''), query.get('filename', ''))
+
+		def file_iterator(file_name, chunk_size=512):
+			with open(file_name) as f:
+				while True:
+					c = f.read(chunk_size)
+					if c:
+						yield c
+					else:
+						break
+
+		response = StreamingHttpResponse(file_iterator(file_path))
+		response['Content-Type'] = 'application/octet-stream'
+		response['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_path)
+
+		return response
 
 	def upload(self, request):
 		pass
@@ -137,10 +155,10 @@ class MyFileBrowser(object):
 			form = ChangeForm(request.POST)
 			# print(form.cleaned_data['name'])
 			if form.is_valid():
-				print(1, form.cleaned_data['name'])
-				fileobject.filename = form.cleaned_data['name']
+				new_name = form.cleaned_data['name']
+				self.storage.move(fileobject.path, os.path.join(fileobject.head, new_name))
 				# return HttpResponse('upload succed!')
-			redirect_url = reverse("files:browse")
+			redirect_url = reverse("files:browse")+'?dir='+query.get('dir', '')
 			return HttpResponseRedirect(redirect_url)
 		else:
 			form = ChangeForm()

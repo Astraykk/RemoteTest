@@ -83,6 +83,5 @@ def string_to_list(string):
             if arg == '':
                 continue
             args.append(arg)
-    print(args)
     return args
 

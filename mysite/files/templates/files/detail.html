@@ -1,4 +1,33 @@
 {% extends "admin/base_site.html" %}
+
+<!-- JAVASCRIPTS -->
+{% block javascripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+    (function($){
+        $(document).ready(function() {
+            $("div#grp-content-container .grp-collapse").grp_collapsible({
+                on_init: function(elem, options) {
+                    // open collapse (and all collapse parents) in case of errors
+                    if (elem.find("ul.grp-errorlist").length > 0) {
+                        elem.removeClass("grp-closed")
+                            .addClass("grp-open");
+                        elem.parents(".grp-collapse")
+                            .removeClass("grp-closed")
+                            .addClass("grp-open");
+                    }
+                }
+            });
+            // remove edit module if no actions are given
+            if ($("select#id_custom_action").find("option").length <= 1) {
+                $("fieldset#fieldset_edit").hide();
+            }
+        });
+    })(grp.jQuery);
+    </script>
+    {{ media }}
+{% endblock %}
+
 {% load i18n admin_static admin_modify grp_tags files_tags %}
 	<metacharset = "UTF-8">
 	{% block title %}Index{% endblock %}
@@ -6,7 +35,7 @@
 	<!--Breadcrumbs-->
 
 {% block content_title %}
-    <h1>File Management</h1>
+    <h1>{{ fileobject.filename }}</h1>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -22,29 +51,77 @@
 <div id="grp-content-container">
     <form method="post" action="{% query_string 'dir' %}" enctype="multipart/form-data">
 	    {%csrf_token%}
-	    {{form}}
-        <input type="submit" value="submit" />
+        <fieldset class="grp-module">
+            <div class="grp-row {% if form.name.errors %}grp-errors{% endif %}">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label class="required" for="id_name">{{ form.name.label }}</label></div>
+                    <div class="c-2">
+                        {{ form.name }}
+                        {% if form.name.errors %}<ul class="errorlist">{{ form.name.errors }}</ul>{% endif %}
+                        {% if form.name.help_text %}<p class="grp-help">{{ form.name.help_text|safe }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        {% if fileobject.filetype == "Folder" %}
+        <fieldset class="grp-module grp-collapse grp-open">
+            <h2 class="grp-collapse-handler">Folder Information</h2>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label>Date</label></div>
+                    <div class="c-2">
+                        <p class="grp-text">
+                            {{ fileobject.datetime|date:"N j, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        {% endif %}
+        {% if fileobject.filetype != "Folder" %}
+        <fieldset class="grp-module grp-collapse grp-open">
+            <h2 class="grp-collapse-handler">File Information</h2>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label>URL</label></div>
+                    <div class="c-2">
+                        <p class="grp-text">
+                            <a href="{{ fileobject.url }}">{{ fileobject.url }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label>Filesize</label></div>
+                    <div class="c-2">
+                        <p class="grp-text">
+                            {{ fileobject.filesize|filesizeformat }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="grp-row">
+                <div class="l-2c-fluid l-d-4">
+                    <div class="c-1"><label>Date</label></div>
+                    <div class="c-2">
+                        <p class="grp-text">
+                            {{ fileobject.datetime|date:"N j, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+            {% endif %}
+        <footer class="grp-module grp-submit-row grp-fixed-footer">
+            <header style="display:none"><h1>Submit Options</h1></header>
+            <ul>
+                <li class="grp-float-left"><a href="{% url 'files:f_delete' %}{% query_string 'dir' %}" class="grp-button grp-delete-link">Delete</a></li>
+                <li class="grp-float-right"><input type="submit" value="submit" class="grp-button" /></li>
+                <li class="grp-float-right"><a href="{% url 'files:f_download' %}{% query_string 'dir' %}" class="grp-button">Download</a></li>
+            </ul>
+        </footer>
     </form>
-
-    <table>
-		<tr>
-			<td>File Size:</td>
-			<td>{% if fileobject.filesize %}{{ fileobject.filesize|filesizeformat }}{% else %}&mdash;{% endif %}</td>
-        </tr>
-        <tr>
-            <td>Date:</td>
-			<td>{{ fileobject.datetime|date:"N j, Y" }}</td>
-		</tr>
-	</table>
-
-    <footer class="grp-module grp-submit-row grp-fixed-footer">
-        <header style="display:none"><h1>Submit Options</h1></header>
-        <ul>
-            <li class="grp-float-left"><a href="{% url 'files:f_delete' %}{% query_string 'dir' %}" class="grp-button grp-delete-link">Delete</a></li>
-            <li class="grp-float-right"><a href="{% url 'files:f_download' %}{% query_string 'dir' %}" class="grp-button">Download</a></li>
-        </ul>
-    </footer>
-    <a href="{% url 'files:f_delete' %}{% query_string 'dir' %}">Delete</a>
-    <a href="{% url 'files:f_download' %}{% query_string 'dir' %}">Download</a>
 
     {% endblock %}

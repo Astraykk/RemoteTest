@@ -34,7 +34,9 @@ def upload_file(request):
 	else:
 		form = UploadFileForm()
 	return render(request, 'files/upload.html', {
-			'form': form
+			'form': form,
+			'query': query,
+			'breadcrumbs': get_Breadcrumbs(query.get('dir', ''))
 		})
 
 
@@ -79,6 +81,22 @@ class MyFileBrowser(object):
 			'fileobjects': fileobjects
 			})
 
+	def upload_file(self, request):
+		query = request.GET
+		query_dir = query.get('dir', '')
+		if request.method == 'POST':
+			form = UploadFileForm(request.POST, request.FILES)
+			if form.is_valid():
+				handle_uploaded_file(request.FILES['file'])
+				return HttpResponse('upload succed!')
+		else:
+			form = UploadFileForm()
+		return render(request, 'files/upload.html', {
+			'form': form,
+			'query': query,
+			'breadcrumbs': get_Breadcrumbs(query.get('dir', ''))
+		})
+
 	def create_dir(self, request):
 		
 		from .forms import CreateDirForm
@@ -102,6 +120,8 @@ class MyFileBrowser(object):
 		# return HttpResponse("You can create new directory here.")
 		return render(request, 'files/createdir.html', {
 			'form': form,
+			'query': query,
+			'breadcrumbs': get_Breadcrumbs(query.get('dir', ''))
 		})
 
 	def delete(self, request):

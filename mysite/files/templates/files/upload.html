@@ -1,26 +1,42 @@
-<!DOCTYPE html>
-<html lang = "en">
-<head>
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_modify grp_tags files_tags %}
 	<metacharset = "UTF-8">
-	<title>upload file</title>
-</head>
-<body>
+	{% block title %}Index{% endblock %}
+	<!--<title>index</title>-->
+	<!--Breadcrumbs-->
 
-<form method="post" action="/files/upload/" enctype="multipart/form-data">
-	{%csrf_token%}
-	{{form}}
-	<!--<input type="file" name="file" />
-	<br/><br/><br/>-->
-	<input type="submit" value="submit" />
-</form>
-<br/>
-{{res}}
-<ul>
-	{% for item in filelisting.listing %}
-	<li>
-		{{item}}
-	</li>
+{% block content_title %}
+    <h1>New Directory</h1>
+{% endblock %}
+
+{% block breadcrumbs %}
+<ul class="grp-horizontal-list">
+	<li><a href="{% url 'files:browse' %}">Home</a></li>
+	{% for item in breadcrumbs %}
+		<li><a href="{% url 'files:browse' %}?&amp;dir={{ item.1 }}">{{item.0}}</a></li>
 	{% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{{ query_string }}" enctype="multipart/form-data">
+	{%csrf_token%}
+	<fieldset class="grp-module">
+		<div class="grp-row {% if form.name.errors %}grp-errors{% endif %}">
+			<div class="l-2c-fluid l-d-4">
+				<div class="c-1"><label class="required" for="id_name">Upload</label></div>
+				<div class="c-2">
+					{{ form }}
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	<footer class="grp-module grp-submit-row grp-fixed-footer">
+            <header style="display:none"><h1>Submit Options</h1></header>
+            <ul>
+                <li class="grp-float-right"><input type="submit" value="submit" class="grp-button" /></li>
+                <li class="grp-float-left"><a href="{% url 'files:browse' %}{% query_string 'dir' %}" class="grp-button">Cancel</a></li>
+            </ul>
+	</footer>
+</form>
+{% endblock %}

@@ -57,6 +57,7 @@
                     <div class="c-1"><label class="required" for="id_name">{{ form.name.label }}</label></div>
                     <div class="c-2">
                         {{ form.name }}
+                        <input type="submit" value="submit" class="grp-button" />
                         {% if form.name.errors %}<ul class="errorlist">{{ form.name.errors }}</ul>{% endif %}
                         {% if form.name.help_text %}<p class="grp-help">{{ form.name.help_text|safe }}</p>{% endif %}
                     </div>
@@ -118,7 +119,7 @@
             <header style="display:none"><h1>Submit Options</h1></header>
             <ul>
                 <li class="grp-float-left"><a href="{% url 'files:f_delete' %}{% query_string 'dir' %}" class="grp-button grp-delete-link">Delete</a></li>
-                <li class="grp-float-right"><input type="submit" value="submit" class="grp-button" /></li>
+                <!--<li class="grp-float-right"><input type="submit" value="submit" class="grp-button" /></li>-->
                 <li class="grp-float-right"><a href="{% url 'files:f_download' %}{% query_string 'dir' %}" class="grp-button">Download</a></li>
             </ul>
         </footer>

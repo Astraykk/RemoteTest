@@ -88,7 +88,8 @@ class MyFileBrowser(object):
 			form = UploadFileForm(request.POST, request.FILES)
 			if form.is_valid():
 				handle_uploaded_file(request.FILES['file'])
-				return HttpResponse('upload succed!')
+				redirect_url = reverse("files:browse") + '?dir=' + query.get('dir', '')
+				return HttpResponseRedirect(redirect_url)
 		else:
 			form = UploadFileForm()
 		return render(request, 'files/upload.html', {

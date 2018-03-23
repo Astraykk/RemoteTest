@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
 	url(r'^polls/', include('polls.urls')),
 	url(r'^files/', include('files.urls')),
+	url(r'^maintest/', include('maintest.urls')),
 	url(r'^admin/', admin.site.urls),
 ]

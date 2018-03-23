@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <!--{% load static %}-->
+      {% load static %}
       <meta charset="utf-8">
       <title>Learning Bootstrap!</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,13 +13,17 @@
       <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
       <!--Local source-->
       <!--<link type="text/css" rel="stylesheet" href={% static "filebrowser/bootstrap-4.0.0-dist/css/bootstrap.min.css" %}>-->
-
    </head>
+
    <body>
-   <script>
-       var a = 1;
-       document.write(a);
-   </script>
+   <!--<p id="demo">???</p>-->
+   <!--<script language="javascript" type="text/javascript" src={% static "maintest/js/treeview_prep.js" %}></script>-->
+
+   <!--<script>-->
+    <!--document.getElementById("demo").innerHTML={{ obj|safe }};-->
+    <!--console.log({{ obj|safe }});-->
+   <!--</script>-->
+
       <div class="page-header">
           <h1>&nbsp;Test for Bootstrap
               <small>subtitle</small>
@@ -136,6 +140,7 @@
                            style="background-color: #dedef8;box-shadow:
                            inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
                           <p>file tree</p>
+                          <div id="tree"></div>
                       </div>
                   </div>
                   <div class="row">
@@ -242,8 +247,10 @@
               </div>
           </div>
       </div>
+   <script>
+   $('#tree').treeview({data: {{ obj|safe}}});
 
-
+   </script>
 
    </body>
 </html>

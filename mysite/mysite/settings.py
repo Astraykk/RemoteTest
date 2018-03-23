@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'filebrowser',
     'polls.apps.PollsConfig',
     'files.apps.FilesConfig',
+    'maintest.apps.MaintestConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

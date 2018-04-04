@@ -66,7 +66,7 @@ def arithmetic_app(request):
 	operatorFile = "/home/keylab/work/virtualenv/web/work/django-tutorial/mysite/maintest/myTest/operator"
 	dataDict = data_parser(dataFile)
 	operator = operator_parser(operatorFile)['operator']
-	result = "result"
+	result = 26
 	# result = app_execution(dataDict["data1"], dataDict["data2"], operator)
 	return HttpResponse(result)
 

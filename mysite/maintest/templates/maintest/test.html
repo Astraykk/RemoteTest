@@ -1,283 +1,275 @@
 <!DOCTYPE html>
-<html>
-<head>
-    {% load static %}
-    <meta charset="utf-8">
-    <title>Learning Bootstrap!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!--bootstrap-treeview-->
-    <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>
-    <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
-    <!--Local source-->
-    <!--<link type="text/css" rel="stylesheet" href={% static "filebrowser/bootstrap-4.0.0-dist/css/bootstrap.min.css" %}>-->
-    <script type="text/javascript">
-function loadXMLDoc()
-{
-var xmlhttp;
-if (window.XMLHttpRequest)
-  {// code for IE7+, Firefox, Chrome, Opera, Safari
-  xmlhttp=new XMLHttpRequest();
-  }
-else
-  {// code for IE6, IE5
-  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-  }
-xmlhttp.onreadystatechange=function()
-  {
-  if (xmlhttp.readyState==4 && xmlhttp.status==200)
-    {
-    document.getElementById("myAjax").innerHTML=xmlhttp.responseText;
-    }
-  }
-//xmlhttp.open("GET","http://127.0.0.1:8000/maintest/arith_result/",true);
-xmlhttp.open("GET","{% url 'maintest:arith_result' %}",true);
-xmlhttp.send();
-}
-</script>
+<html lang="zh-CN">
+</hea>
+  {% load static %}
+  <meta charset="utf-8">
+  <title>Test App in Bootstrap!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>
+  <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+  <!--Local source-->
+  <!--<link type="text/css" rel="stylesheet" href={% static "filebrowser/bootstrap-4.0.0-dist/css/bootstrap.min.css" %}>-->
+  <script type="text/javascript" src="{% static "maintest/js/maintest_js.js" %}"></script>
 </head>
 
-   <body>
-   <!--<p id="demo">???</p>-->
-   <!--<script language="javascript" type="text/javascript" src={% static "maintest/js/treeview_prep.js" %}></script>-->
+<body>
+<!--<p id="demo">???</p>-->
+<!--<script language="javascript" type="text/javascript" src={% static "maintest/js/treeview_prep.js" %}></script>-->
 
-   <!--<script>-->
-    <!--document.getElementById("demo").innerHTML={{ obj|safe }};-->
-    <!--console.log({{ obj|safe }});-->
-   <!--</script>-->
+<!--<script>-->
+<!--document.getElementById("demo").innerHTML={{ obj|safe }};-->
+<!--console.log({{ obj|safe }});-->
+<!--</script>-->
 
-      <div class="page-header">
-          <h1>&nbsp;Test for Bootstrap
-              <small>subtitle</small>
-          </h1>
+<div class="page-header">
+  <h1>&nbsp;Chip-Test App
+    <small>testing</small>
+  </h1>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+      <!--<nav class="navbar navbar-default nav-expand" role="navigation" >-->
+      <!--<div class="container-fluid">-->
+      <!--<div class="navbar-header">-->
+      <!--&lt;!&ndash;<button type="button" class="navbar-toggler">&ndash;&gt;-->
+      <!--<button type="button" class="navbar-toggler" data-toggle="collapse"-->
+      <!--data-target="#example-navbar-collapse" aria-controls="example-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">-->
+      <!--<span class="caret"></span>-->
+      <!--</button>-->
+      <!--<a class="navbar-brand" href="#">菜鸟教程</a>-->
+      <!--</div>-->
+      <!--<div class="collapse" id="example-navbar-collapse">-->
+      <!--<ul class="nav navbar-nav">-->
+      <!--<li><a href="#">iOS</a></li>-->
+      <!--<li><a href="#">SVN</a></li>-->
+      <!--<li class="dropdown">-->
+      <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">-->
+      <!--Java <b class="caret"></b>-->
+      <!--</a>-->
+      <!--<ul class="dropdown-menu">-->
+      <!--<li><a href="#">jmeter</a></li>-->
+      <!--<li><a href="#">EJB</a></li>-->
+      <!--<li><a href="#">Jasper Report</a></li>-->
+      <!--<li class="divider"></li>-->
+      <!--<li><a href="#">分离的链接</a></li>-->
+      <!--<li class="divider"></li>-->
+      <!--<li><a href="#">另一个分离的链接</a></li>-->
+      <!--</ul>-->
+      <!--</li>-->
+      <!--</ul>-->
+      <!--</div>-->
+      <!--</div>-->
+      <!--</nav>-->
+    </div>
+    <div class="col-md-9">
+      <div class="col-md-8">
+        <!--Toolbar-->
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1"
+                      data-toggle="dropdown">
+                project <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" data-toggle="modal" href="#strat-project-modal">New project</a>
+                </li>
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#">Open project</a>
+                </li>
+                <li role="presentation" class="disabled">
+                  <a role="menuitem" tabindex="-1" href="#">Save</a>
+                </li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation" class="dropdown-header">下拉菜单标题</li>
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#">分离的链接</a>
+                </li>
+              </ul>
+            </div>
+            <button type="button" class="btn btn-primary" href="/maintest/test/"><span
+                class="glyphicon glyphicon-file"></span> file
+            </button>
+            <button type="button" class="btn btn-success"><span
+                class="glyphicon glyphicon-pencil"></span> edit
+            </button>
+            <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-cog"></span>
+              tool
+            </button>
+            <button type="button" class="btn btn-warning"><span
+                class="glyphicon glyphicon-eye-open"></span> view
+            </button>
+            <button type="button" class="btn btn-default">
+              <span class="glyphicon glyphicon-user"></span> User
+            </button>
+            <div class="modal fade" id="strat-project-modal" tabindex="-1" role="dialog"
+                 aria-labelledby="projectModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">
+                      &times;
+                    </button>
+                    <h4 class="modal-title" id="projectModalLabel">Start new test project</h4>
+                  </div>
+                  <div class="modal-body" id="s-p-body">
+                    {% include "maintest/include/s_p_template.html" %}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">close
+                    </button>
+                    <button type="button" class="btn btn-primary pull-right">Submit</button>
+                  </div>
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal -->
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="container">
-          <div class="row">
-              <div class="col-md-3">
-                  <!--<nav class="navbar navbar-default nav-expand" role="navigation" >-->
-                      <!--<div class="container-fluid">-->
-                          <!--<div class="navbar-header">-->
-                              <!--&lt;!&ndash;<button type="button" class="navbar-toggler">&ndash;&gt;-->
-                              <!--<button type="button" class="navbar-toggler" data-toggle="collapse"-->
-                                      <!--data-target="#example-navbar-collapse" aria-controls="example-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">-->
-                                  <!--<span class="caret"></span>-->
-                              <!--</button>-->
-                              <!--<a class="navbar-brand" href="#">菜鸟教程</a>-->
-                          <!--</div>-->
-                          <!--<div class="collapse" id="example-navbar-collapse">-->
-                              <!--<ul class="nav navbar-nav">-->
-                                  <!--<li><a href="#">iOS</a></li>-->
-                                  <!--<li><a href="#">SVN</a></li>-->
-                                  <!--<li class="dropdown">-->
-                                      <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">-->
-                                          <!--Java <b class="caret"></b>-->
-                                      <!--</a>-->
-                                      <!--<ul class="dropdown-menu">-->
-                                          <!--<li><a href="#">jmeter</a></li>-->
-                                          <!--<li><a href="#">EJB</a></li>-->
-                                          <!--<li><a href="#">Jasper Report</a></li>-->
-                                          <!--<li class="divider"></li>-->
-                                          <!--<li><a href="#">分离的链接</a></li>-->
-                                          <!--<li class="divider"></li>-->
-                                          <!--<li><a href="#">另一个分离的链接</a></li>-->
-                                      <!--</ul>-->
-                                  <!--</li>-->
-                              <!--</ul>-->
-                          <!--</div>-->
-                      <!--</div>-->
-                  <!--</nav>-->
-              </div>
-              <div class="col-md-9">
-                  <!--<table class="table table-bordered table-hover" style="background-color: #dedef8">-->
-                      <!--<tbody>-->
-                          <!--<tr>-->
-                              <!--<td></td>-->
-                          <!--</tr>-->
-                      <!--</tbody>-->
-                  <!--</table>-->
-                  <div class="col-md-8">
-                      <!--Toolbar-->
-                      <div class="btn-toolbar" role="toolbar">
-                          <div class="btn-group">
-                              <div class="btn-group">
-                                  <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1"
-                                          data-toggle="dropdown">
-                                      project <span class="caret"></span>
-                                  </button>
-                                  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                      <li role="presentation">
-                                          <a role="menuitem" tabindex="-1" href="#">New project</a>
-                                      </li>
-                                      <li role="presentation">
-                                          <a role="menuitem" tabindex="-1" href="#">Open project</a>
-                                      </li>
-                                      <li role="presentation" class="disabled">
-                                          <a role="menuitem" tabindex="-1" href="#">Save</a>
-                                      </li>
-                                      <li role="presentation" class="divider"></li>
-                                      <li role="presentation" class="dropdown-header">下拉菜单标题</li>
-                                      <li role="presentation">
-                                          <a role="menuitem" tabindex="-1" href="#">分离的链接</a>
-                                      </li>
-                                  </ul>
-                              </div>
-                              <button type="button" class="btn btn-primary" href="/maintest/test/"><span
-                                      class="glyphicon glyphicon-file"></span> file
-                              </button>
-                              <button type="button" class="btn btn-success"><span
-                                      class="glyphicon glyphicon-pencil"></span> edit
-                              </button>
-                              <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-cog"></span>
-                                  tool
-                              </button>
-                              <button type="button" class="btn btn-warning"><span
-                                      class="glyphicon glyphicon-eye-open"></span> view
-                              </button>
-                              <button type="button" class="btn btn-default">
-                                  <span class="glyphicon glyphicon-user"></span> User
-                              </button>
-                          </div>
-                  </div>
-                  </div>
-                  <div class="col-lg-4">
-                      <!--Search bar-->
-                      <div class="input-group">
-                          <input type="text" class="form-control">
-                          <span class="input-group-btn">
+      <div class="col-md-4">
+        <!--Search bar-->
+        <div class="input-group">
+          <input type="text" class="form-control">
+          <span class="input-group-btn">
                         <button class="btn btn-default" type="button">Search!</button>
                     </span>
-                      </div><!-- /input-group -->
-                  </div><!-- /.col-lg-6 -->
-              </div>
+        </div><!-- /input-group -->
+      </div><!-- /.col-lg-6 -->
+    </div>
+  </div>
+  <br>
+
+  <div class="row">
+    <div class="col-md-3"
+         style="background-color: #dedef8;box-shadow:
+                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+      <h4>tool window</h4>
+      <div class="row">
+        <div class="col-md-12"
+             style="background-color: #dedef8;box-shadow:
+                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+          <p>file tree</p>
+          <div id="tree"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12"
+             style="background-color: #dedef8;box-shadow:
+                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+          <p>stream</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9"
+         style="background-color: #dedef8;box-shadow:
+                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+      <!--load the selected file an edit it here-->
+      <div class="row">
+        <div class="col-md-12"
+             style="background-color: #dedef8;box-shadow:
+                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+          <form role="form">
+            <div class="form-group">
+              <label for="name">edit area</label>
+              <!--<input type="text" class="form-control" id="name" placeholder="selected file">-->
+              <textarea class="form-control" rows="3" placeholder="Edit your file here">dddddd</textarea>
+            </div>
+            <button type="submit" class="btn btn-default">submit</button>
+          </form>
+          <br>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12"
+             style="background-color: #ffffff;box-shadow:
+                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+          <h4>control area 标签式的导航菜单</h4>
+          <ul id="myTab" class="nav nav-tabs">
+            <li class="active">
+              <a href="#console" data-toggle="tab">Console</a>
+            </li>
+            <li><a href="#results" data-toggle="tab">Results</a></li>
+            <li><a href="#">Terminal</a></li>
+            <li><a href="#">Info</a></li>
+            <li><a href="#">Error</a></li>
+            <li><a href="#">Warning</a></li>
+          </ul>
+          <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="console">
+              <p>在这里嵌入控制台窗口。</p>
+            </div>
+            <div class="tab-pane fade" id="results">
+              <p>在这里嵌入测试结果窗口。</p>
+            </div>
+          </div>
+          <br>
+          <!--<div id="myModal">-->
+          <h4>Select a window to open</h4>
+          <!-- 按钮触发模态框 -->
+          <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">开始演示模态框
+          </button>
+          <br><br>
+          <!-- 模态框（Modal） -->
+          <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+               aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"
+                          aria-hidden="true">
+                    &times;
+                  </button>
+                  <h4 class="modal-title" id="myModalLabel">Search window</h4>
+                </div>
+                <div class="modal-body">Type the window to open.</div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">close
+                  </button>
+                  <button type="button" class="btn btn-primary">Submit</button>
+                </div>
+              </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+          </div>
+          <!--</div>-->
+          <br>
+          <div class="progress progress-striped">
+            <div class="progress-bar progress-bar-success" role="progressbar"
+                 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                 style="width: 90%;">
+              <span class="sr-only">90% 完成（成功）</span>
+            </div>
           </div>
           <br>
 
-          <div class="row">
-              <div class="col-md-3"
-                   style="background-color: #dedef8;box-shadow:
-                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                  <h4>tool window</h4>
-                  <div class="row">
-                      <div class="col-md-12"
-                           style="background-color: #dedef8;box-shadow:
-                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                          <p>file tree</p>
-                          <div id="tree"></div>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="col-md-12"
-                           style="background-color: #dedef8;box-shadow:
-                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                          <p>stream</p>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-md-9"
-                   style="background-color: #dedef8;box-shadow:
-                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                  <!--load the selected file an edit it here-->
-                  <div class="row">
-                      <div class="col-md-12"
-                           style="background-color: #dedef8;box-shadow:
-                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                          <form role="form">
-                              <div class="form-group">
-                                  <label for="name">edit area</label>
-                                  <!--<input type="text" class="form-control" id="name" placeholder="selected file">-->
-                                  <textarea class="form-control" rows="3" placeholder="Edit your file here"></textarea>
-                              </div>
-                              <button type="submit" class="btn btn-default">submit</button>
-                          </form>
-                          <br>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="col-md-12"
-                           style="background-color: #ffffff;box-shadow:
-                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                          <h4>control area 标签式的导航菜单</h4>
-                          <ul id="myTab" class="nav nav-tabs">
-                              <li class="active">
-                                  <a href="#console" data-toggle="tab">Console</a>
-                              </li>
-                              <li><a href="#results" data-toggle="tab">Results</a></li>
-                              <li><a href="#">Terminal</a></li>
-                              <li><a href="#">Info</a></li>
-                              <li><a href="#">Error</a></li>
-                              <li><a href="#">Warning</a></li>
-                          </ul>
-                          <div id="myTabContent" class="tab-content">
-                              <div class="tab-pane fade in active" id="console">
-                                  <p>在这里嵌入控制台窗口。</p>
-                              </div>
-                              <div class="tab-pane fade" id="results">
-                                  <p>在这里嵌入测试结果窗口。</p>
-                              </div>
-                          </div>
-                          <br>
-                          <!--<div id="myModal">-->
-                              <h4>Select a window to open</h4>
-                              <!-- 按钮触发模态框 -->
-                              <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">开始演示模态框
-                              </button>
-                              <br><br>
-                              <!-- 模态框（Modal） -->
-                              <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-                                   aria-labelledby="myModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog">
-                                      <div class="modal-content">
-                                          <div class="modal-header">
-                                              <button type="button" class="close" data-dismiss="modal"
-                                                      aria-hidden="true">
-                                                  &times;
-                                              </button>
-                                              <h4 class="modal-title" id="myModalLabel">Search window</h4>
-                                          </div>
-                                          <div class="modal-body">Type the window to open.</div>
-                                          <div class="modal-footer">
-                                              <button type="button" class="btn btn-default" data-dismiss="modal">close
-                                              </button>
-                                              <button type="button" class="btn btn-primary">Submit</button>
-                                          </div>
-                                      </div><!-- /.modal-content -->
-                                  </div><!-- /.modal -->
-                              </div>
-                          <!--</div>-->
-                          <br>
-                          <div class="progress progress-striped">
-                              <div class="progress-bar progress-bar-success" role="progressbar"
-                                   aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                   style="width: 90%;">
-                                  <span class="sr-only">90% 完成（成功）</span>
-                              </div>
-                          </div>
-                          <br>
-
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="col-md-12"
-                           style="background-color: #dedef8;box-shadow:
-                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-                          <h4>view waveform</h4>
-                          <!--<img src={% static "filebrowser/111.png" %} class="img-rounded">-->
-                          <!--<img src="test_waveform.png" class="img-rounded img-responsive">-->
-                          <button type="button" onclick="loadXMLDoc()">Calculate</button>
-                          <div id="myAjax"></div>
-                          <!--<a href="{% url 'maintest:arith_result' %}">arith_result</a>-->
-                          <br>
-                      </div>
-                  </div>
-              </div>
-          </div>
+        </div>
       </div>
-   <script>
+      <div class="row">
+        <div class="col-md-12"
+             style="background-color: #dedef8;box-shadow:
+                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+          <h4>Calculator Application Test</h4>
+          <!--<img src={% static "filebrowser/111.png" %} class="img-rounded">-->
+          <!--<img src="test_waveform.png" class="img-rounded img-responsive">-->
+          <button type="button" onclick="loadXMLDoc()">Calculate</button>
+          <div id="myAjax"></div>
+          <!--<a href="{% url 'maintest:arith_result' %}">arith_result</a>-->
+          <br>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
    $('#tree').treeview({data: {{ obj|safe}}});
+</script>
 
-   </script>
-
-   </body>
+</body>
 </html>

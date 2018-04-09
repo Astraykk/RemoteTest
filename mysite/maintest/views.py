@@ -56,7 +56,7 @@ def operator_parser(file):
 
 
 def app_execution(data1, data2, operator):
-	return_value = os.popen('/path/to/arithmetic_intr_mmap_test_app'+ data1 + data2 + operator).read()
+	return_value = os.popen('sudo /BR0101/arith_math/arithmetic_intr_mmap_test_app' + data1 + data2 + operator).read()
 	return return_value
 
 
@@ -66,7 +66,7 @@ def arithmetic_app(request):
 	operatorFile = "/home/keylab/work/virtualenv/web/work/django-tutorial/mysite/maintest/myTest/operator"
 	dataDict = data_parser(dataFile)
 	operator = operator_parser(operatorFile)['operator']
-	result = 26
+	result = app_execution(dataDict['data1'], dataDict['data2'], operator)
 	# result = app_execution(dataDict["data1"], dataDict["data2"], operator)
 	return HttpResponse(result)
 
@@ -95,8 +95,8 @@ def treeview_parser(root=''):
 def test(request):
 	List = ['key', 'value']
 	Dict = {'site': 'aaa', 'author': 'bbb'}
-	print(site.directory)
-	print(treeview_parser())
+	# print(site.directory)
+	# print(treeview_parser())
 	# obj = [
 	# 	{
 	# 		"text": "Parent 1",
@@ -130,7 +130,7 @@ def test(request):
 	# 		"text": "Parent 5"
 	# 	}
 	# ]
-	obj = treeview_parser()
+	obj = treeview_parser("myTest")
 	return render(request, 'maintest/test.html', {
 		'List': json.dumps(List),
 		'obj': json.dumps(obj),

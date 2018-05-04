@@ -1,0 +1,22 @@
+
+
+.glyphicon-remove {
+	color: red;
+	font-size: 15px;
+	text-align: center;
+}
+
+.glyphicon-ok {
+	color: green;
+	font-size: 15px;
+	text-align: center;
+}
+
+.row {
+    padding: 10px;
+}
+
+ul {
+    line-height: 80%;
+}
+

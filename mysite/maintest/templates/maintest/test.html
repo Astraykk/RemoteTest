@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-</hea>
+</head>
   {% load static %}
   <meta charset="utf-8">
   <title>Test App in Bootstrap!</title>
@@ -11,20 +11,91 @@
 
   <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>
   <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
-  <!--Local source-->
-  <!--<link type="text/css" rel="stylesheet" href={% static "filebrowser/bootstrap-4.0.0-dist/css/bootstrap.min.css" %}>-->
-  <script type="text/javascript" src="{% static "maintest/js/maintest_js.js" %}"></script>
+
+  <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
+  <script>
+    var currentTVPath = '';  //delete when class MainTest available.
+
+    $(document).ready(function()
+    {
+      $("#typical-test").click(function()  //to delete
+      {
+        html = '<form>Location:<input type="text" id="t-p-path"></form>';
+        $("#s-p-body").html(html);
+      });
+      $("#submit-t-p-path").click(function() //submit path to be opened
+      {
+        currentTVPath = $('#t-p-path').val();
+        loadTreeview(currentTVPath);
+        $('#strat-project-modal').modal('hide')
+      });
+      $("#refresh_tree").click(function()  //refresh the file tree
+      {
+        loadTreeview(currentTVPath);
+      });
+    });
+
+    function generateFileTree(data){
+      $("#tree").treeview({
+        data: data,
+        enableLinks: true
+      });
+      $('#tree').treeview('collapseAll', { silent: true });
+    }
+
+
+    function loadTreeview(path){
+        $.ajax({
+        url: "{% url 'maintest:tv_ajax' %}",
+        async: true,
+        data: {dir:path},
+        success: function(data){
+          generateFileTree(data);
+        }
+      });
+      console.log('refreshed');
+      //json = $.parseJSON(htmlobj.responseText);
+      //$("#tree").treeview({data:json});
+    }
+  </script>
+  <script>
+    $(document).ready(function(){
+      $(".expand-icon").click(function(){
+        console.log('hello2');
+        console.log($(this).attr("data-nodeid"));
+        console.log('hello3');
+        //$(this).nextElementSibling.attr("class", "glyphicon-folder-open");
+      });
+    });
+  </script>
+  <script>
+    $(document).ready(function(){
+      $("#submit-edit-text").click(function(){
+        console.log('start editing file');
+        var text = $("#edit-text").val();
+        var data = {
+          text: text,
+          path: "{{file_path}}"
+        };
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'maintest:save_file' %}",
+          data: data,
+          success: function(data){
+            console.log(data);
+            if(data == 'Success!')
+              alert("修改成功!");
+            else
+              alert("修改失败QAQ!\n" + data);
+          }
+        });
+      });
+    });
+  </script>
 </head>
 
 <body>
-<!--<p id="demo">???</p>-->
-<!--<script language="javascript" type="text/javascript" src={% static "maintest/js/treeview_prep.js" %}></script>-->
-
-<!--<script>-->
-<!--document.getElementById("demo").innerHTML={{ obj|safe }};-->
-<!--console.log({{ obj|safe }});-->
-<!--</script>-->
-
 <div class="page-header">
   <h1>&nbsp;Chip-Test App
     <small>testing</small>
@@ -108,6 +179,7 @@
             <button type="button" class="btn btn-default">
               <span class="glyphicon glyphicon-user"></span> User
             </button>
+
             <div class="modal fade" id="strat-project-modal" tabindex="-1" role="dialog"
                  aria-labelledby="projectModalLabel" aria-hidden="true">
               <div class="modal-dialog">
@@ -120,13 +192,15 @@
                     <h4 class="modal-title" id="projectModalLabel">Start new test project</h4>
                   </div>
                   <div class="modal-body" id="s-p-body">
-                    {% include "maintest/include/s_p_template.html" %}
+                    <a data-toggle="modal" href="#calcapp-template-modal">Calculator test</a>
+                    <a id="typical-test" href="#">Typical test</a>
+                    <!--{% include "maintest/include/s_p_template.html" %}-->
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">close
                     </button>
-                    <button type="button" class="btn btn-primary pull-right">Submit</button>
+                    <button id="submit-t-p-path" type="button" class="btn btn-primary pull-right">Submit</button>
                   </div>
                 </div><!-- /.modal-content -->
               </div><!-- /.modal -->
@@ -158,6 +232,8 @@
                            inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
           <p>file tree</p>
           <div id="tree"></div>
+          <button id="refresh_tree" type="button">refresh <span class="glyphicon glyphicon-refresh"></span></button>
+          <br><br>
         </div>
       </div>
       <div class="row">
@@ -165,6 +241,7 @@
              style="background-color: #dedef8;box-shadow:
                            inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
           <p>stream</p>
+          {% include "maintest/include/stream_status.html" %}
         </div>
       </div>
     </div>
@@ -176,21 +253,22 @@
         <div class="col-md-12"
              style="background-color: #dedef8;box-shadow:
                            inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-          <form role="form">
-            <div class="form-group">
+          <!--<form role="form" action="{% url 'maintest:test' %}" method="post">-->
+          <!--<form role="form" method="post">-->
+            <!--{% csrf_token %}-->
+            <!--<div class="form-group">-->
               <label for="name">edit area</label>
               <!--<input type="text" class="form-control" id="name" placeholder="selected file">-->
-              <textarea class="form-control" rows="3" placeholder="Edit your file here">dddddd</textarea>
-            </div>
-            <button type="submit" class="btn btn-default">submit</button>
-          </form>
+              <textarea id="edit-text" class="form-control" rows="10">{{ file_content }}</textarea>
+            <!--</div>-->
+            <button id="submit-edit-text" type="submit" class="btn btn-default">submit</button>
+          <!--</form>-->
           <br>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12"
-             style="background-color: #ffffff;box-shadow:
-                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+             style="background-color: #ffffff;">
           <h4>control area 标签式的导航菜单</h4>
           <ul id="myTab" class="nav nav-tabs">
             <li class="active">
@@ -211,42 +289,14 @@
             </div>
           </div>
           <br>
-          <!--<div id="myModal">-->
-          <h4>Select a window to open</h4>
-          <!-- 按钮触发模态框 -->
-          <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">开始演示模态框
-          </button>
-          <br><br>
-          <!-- 模态框（Modal） -->
-          <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-               aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"
-                          aria-hidden="true">
-                    &times;
-                  </button>
-                  <h4 class="modal-title" id="myModalLabel">Search window</h4>
-                </div>
-                <div class="modal-body">Type the window to open.</div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">close
-                  </button>
-                  <button type="button" class="btn btn-primary">Submit</button>
-                </div>
-              </div><!-- /.modal-content -->
-            </div><!-- /.modal -->
-          </div>
-          <!--</div>-->
           <br>
-          <div class="progress progress-striped">
-            <div class="progress-bar progress-bar-success" role="progressbar"
-                 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                 style="width: 90%;">
-              <span class="sr-only">90% 完成（成功）</span>
-            </div>
-          </div>
+          <!--<div class="progress progress-striped">-->
+            <!--<div class="progress-bar progress-bar-success" role="progressbar"-->
+                 <!--aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"-->
+                 <!--style="width: 90%;">-->
+              <!--<span class="sr-only">90% 完成（成功）</span>-->
+            <!--</div>-->
+          <!--</div>-->
           <br>
 
         </div>
@@ -258,7 +308,7 @@
           <h4>Calculator Application Test</h4>
           <!--<img src={% static "filebrowser/111.png" %} class="img-rounded">-->
           <!--<img src="test_waveform.png" class="img-rounded img-responsive">-->
-          <button type="button" onclick="loadXMLDoc()">Calculate</button>
+          <button type="button" onclick="loadXMLDoc_calc()">Calculate</button>
           <div id="myAjax"></div>
           <!--<a href="{% url 'maintest:arith_result' %}">arith_result</a>-->
           <br>
@@ -268,8 +318,12 @@
   </div>
 </div>
 <script>
-   $('#tree').treeview({data: {{ obj|safe}}});
+   generateFileTree({{obj|safe}});
 </script>
-
+<script>
+$(function() {
+    $('#strat-project-modal').modal('hide')
+});
+</script>
 </body>
 </html>

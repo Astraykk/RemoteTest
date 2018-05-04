@@ -1,0 +1,11 @@
+<LBF name = "LB0101" comment = "1" author = "dh" date = "2018/04/08">
+	<DUT identifier = "1" type = "LX200">
+		<CONNECT pin = "AU2" channel = "12305"/>
+		<CONNECT pin = "AJ10" channel = "12306"/>
+		<CONNECT pin = "AU1" channel = "12307"/>
+		<CONNECT pin = "AJ9" channel = "12308"/>
+		<CONNECT pin = "AV5" channel = "12309"/>
+		<CONNECT pin = "AN5" channel = "12310"/>
+		<CONNECT pin = "AU5" channel = "12311"/>
+	</DUT>
+</LBF>

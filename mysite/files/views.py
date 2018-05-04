@@ -51,8 +51,6 @@ def get_Breadcrumbs(query):
 	return breadcrumbs
 
 
-
-
 class MyFileBrowser(object):
 	# filelisting_class = FileListing
 
@@ -127,16 +125,12 @@ class MyFileBrowser(object):
 
 	def delete(self, request):
 		"""Delete existing File/Directory."""
-		print(1)
 		query = request.GET
 		path = u'%s' % os.path.join(self.directory, query.get('dir', ''))
-		print(path)
 		fileobject = FileObject(os.path.join(path, query.get('filename', '')))
-		print(fileobject)
 		if request.GET:
 			try:
 				fileobject.delete()
-				print(1)
 			except OSError:
 				# TODO: define error-message
 				pass

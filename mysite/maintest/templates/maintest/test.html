@@ -36,30 +36,39 @@
       });
     });
 
-    function generateFileTree(data){
+    function generateFileTree(tv_data, tv_data_dir){
       $("#tree").treeview({
-        data: data,
+        data: tv_data,
         enableLinks: true
       });
       $('#tree').treeview('collapseAll', { silent: true });
+
+      $("#o-p-body").treeview({
+        data: tv_data_dir,
+        enableLinks: true
+      });
+      $('#o-p-body').treeview('collapseAll', { silent: true });
     }
 
 
-    function loadTreeview(path){
+    function loadTreeview(path, flag='C'){
         $.ajax({
         url: "{% url 'maintest:tv_ajax' %}",
         async: true,
-        data: {dir:path},
+        data: {
+          dir:path,
+          flag:flag
+        },
         success: function(data){
           generateFileTree(data);
         }
       });
-      console.log('refreshed');
+      //console.log('refreshed');
       //json = $.parseJSON(htmlobj.responseText);
       //$("#tree").treeview({data:json});
     }
   </script>
-  <script>
+  <script>  //unfinished
     $(document).ready(function(){
       $(".expand-icon").click(function(){
         console.log('hello2');
@@ -152,7 +161,7 @@
                   <a role="menuitem" tabindex="-1" data-toggle="modal" href="#strat-project-modal">New project</a>
                 </li>
                 <li role="presentation">
-                  <a role="menuitem" tabindex="-1" href="#">Open project</a>
+                  <a role="menuitem" tabindex="-1" data-toggle="modal" href="#open-project-modal">Open project</a>
                 </li>
                 <li role="presentation" class="disabled">
                   <a role="menuitem" tabindex="-1" href="#">Save</a>
@@ -180,31 +189,8 @@
               <span class="glyphicon glyphicon-user"></span> User
             </button>
 
-            <div class="modal fade" id="strat-project-modal" tabindex="-1" role="dialog"
-                 aria-labelledby="projectModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-hidden="true">
-                      &times;
-                    </button>
-                    <h4 class="modal-title" id="projectModalLabel">Start new test project</h4>
-                  </div>
-                  <div class="modal-body" id="s-p-body">
-                    <a data-toggle="modal" href="#calcapp-template-modal">Calculator test</a>
-                    <a id="typical-test" href="#">Typical test</a>
-                    <!--{% include "maintest/include/s_p_template.html" %}-->
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default"
-                            data-dismiss="modal">close
-                    </button>
-                    <button id="submit-t-p-path" type="button" class="btn btn-primary pull-right">Submit</button>
-                  </div>
-                </div><!-- /.modal-content -->
-              </div><!-- /.modal -->
-            </div>
+            {% include "maintest/include/project.html" %}
+
           </div>
         </div>
       </div>
@@ -318,7 +304,7 @@
   </div>
 </div>
 <script>
-   generateFileTree({{obj|safe}});
+   generateFileTree({{obj|safe}}, {{tv_dir|safe}});
 </script>
 <script>
 $(function() {

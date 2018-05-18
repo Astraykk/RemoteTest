@@ -8,6 +8,9 @@ from django.http import StreamingHttpResponse
 from filebrowser.sites import site
 from filebrowser.base import FileListing, FileObject
 import os, json, re
+# from .mytools import patternGen
+
+# patternGen.prepare()
 
 # define
 DONE = 2
@@ -17,26 +20,12 @@ UNDONE = 0
 
 # Create your views here.
 
-DIRECTORY = os.path.join(site.storage.location, "uploads")
-
-
-def index(request):
-	return HttpResponse("This is the file management page.")
-
-
-def dict2json(List):
-	"""
-	Change a dict to a json.
-	:param dict:
-	:return json:
-	"""
-	return render(request, 'maintest/test.html', {
-		'List': json.dumps(List),
-	})
+DIRECTORY = os.path.join(site.storage.location, "uploads")  # /path/to/mysite/uploads/
+SELFDIRECTORY = DIRECTORY
 
 
 """
-arithmetic app functions
+Arithmetic app functions
 """
 
 
@@ -77,14 +66,18 @@ def arithmetic_app(request):
 	return HttpResponse(result)
 
 
-"""Main test template"""
+"""
+Main test template
+"""
 
 
-def treeview_parser(root='', abspath=''):
+def treeview_parser(root='', abspath='', flag='C'):
 	"""
 	According to the given root, traverse its file tree and return a json object.
 	:param root:
-	:return dict:
+	:param abspath:
+	:param flag: 'C'-> Complete file tree, 'O'-> file tree used in open project
+	:return:
 	"""
 	dataList = []
 	path = os.path.join(DIRECTORY, root)
@@ -92,17 +85,17 @@ def treeview_parser(root='', abspath=''):
 	for item in filelisting.listing():
 		fileobject = FileObject(os.path.join(path, item))
 		newabspath = os.path.join(abspath, item)
-		if fileobject.is_folder and not fileobject.is_empty:
+		if fileobject.is_folder:  # and not fileobject.is_empty:
 			dataList.append({
 				"text": item,
 				"icon": "glyphicon glyphicon-folder-close",
-				"nodes": treeview_parser(fileobject.path_relative_directory, newabspath)
+				"nodes": treeview_parser(fileobject.path_relative_directory, newabspath, flag=flag)
 			})
-		else:
+		elif flag == 'C':
 			dataList.append({
+				"text": item,
 				"icon": "glyphicon glyphicon-file",
-				"href": reverse('maintest:test') + "?file=" + newabspath,
-				"text": item
+				"href": reverse('maintest:test') + "?file=" + newabspath
 			})
 	return dataList
 
@@ -115,8 +108,11 @@ def treeview_ajax(request):
 	"""
 	query = request.GET
 	query_dir = query.get('dir', '')
+	query_flag = query.get('flag', '')
 	path = os.path.join(DIRECTORY, query_dir)
-	result = treeview_parser(path)
+	global SELFDIRECTORY  # replaced by self.directory
+	SELFDIRECTORY = query_dir
+	result = treeview_parser(path, query_flag)
 	return HttpResponse(json.dumps(result), content_type='application/json')
 
 
@@ -124,13 +120,17 @@ def test(request):
 	query = request.GET
 	query_file = query.get('file', '')
 	file_path = os.path.join(DIRECTORY, query_file)
-	obj = treeview_parser()
+	query_path = query.get('path', '')
+	# print(SELFDIRECTORY)
+	obj = treeview_parser(SELFDIRECTORY)
+	tv_dir = treeview_parser(SELFDIRECTORY, flag='O')
 	stream_status = [["Check", DONE], ["Build", LOADING], ["Test", UNDONE]]
 
 	return render(request, 'maintest/test.html', {
 		'file_path': file_path,
 		'file_content': edit_file(file_path),
 		'obj': json.dumps(obj),
+		'tv_dir':json.dumps(tv_dir),
 		'stream_status': stream_status
 	})
 
@@ -171,7 +171,7 @@ class MainTest(object):
 	def __init__(self, storage=default_storage):
 		self.storage = storage
 		self.directory = DIRECTORY
-		self.stream_status = [["Check", UNDONE], ["Build", UNDONE], ["Test", UNDONE]]
+		self.stream_status = [["Check", UNDONE], ["Build", UNDONE], ["Test", UNDONE]]  # TODO: extend the item.
 
 	def file_check(self, request):
 		pass
@@ -190,8 +190,9 @@ class MainTest(object):
 
 	def treeview_ajax(self, request):
 		query = request.GET
-		query_dir = query.get('dir', self.directory)
-		path = os.path.join(self.directory, query_dir)
+		query_dir = query.get('dir', '')
+		path = os.path.join(DIRECTORY, query_dir)
+		self.directory = query_dir  # change root directory of the page
 		result = treeview_parser(path)
 		return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -204,11 +205,20 @@ class MainTest(object):
 		return HttpResponse(content)
 
 	def index(self, request):
-		obj = treeview_parser("myTest")
+		"""
+		:param request:
+		:return: file path,
+		"""
+		query = request.GET
+		query_file = query.get('file', '')
+		file_path = os.path.join(self.directory, query_file)
+		obj = treeview_parser()
 
-		return render(request, 'maintest/index.html', {
-			'obj': json.dumps(obj),
-			'stream_status': self.stream_status
+		return render(request, 'maintest/test.html', {
+			'file_content': edit_file(file_path),   # file to display in <textarea>
+			'file_path': file_path,                 # path of the above
+			'obj': json.dumps(obj),                 # default treeview object
+			'stream_status': self.stream_status     # stream status
 		})
 
 

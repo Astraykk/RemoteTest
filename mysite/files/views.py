@@ -19,8 +19,8 @@ def index(request):
 	return HttpResponse("This is the file management page.")
 
 
-def handle_uploaded_file(f):
-	with open('./uploads/'+f.name, 'wb+') as destination:
+def handle_uploaded_file(dir, f):
+	with open(os.path.join('./uploads/', dir, f.name), 'wb+') as destination:
 		for chunk in f.chunks():
 			destination.write(chunk)
 
@@ -85,7 +85,7 @@ class MyFileBrowser(object):
 		if request.method == 'POST':
 			form = UploadFileForm(request.POST, request.FILES)
 			if form.is_valid():
-				handle_uploaded_file(request.FILES['file'])
+				handle_uploaded_file(query_dir, request.FILES['file'])
 				redirect_url = reverse("files:browse") + '?dir=' + query.get('dir', '')
 				return HttpResponseRedirect(redirect_url)
 		else:

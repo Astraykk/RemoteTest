@@ -89,6 +89,7 @@ def treeview_parser(root='', abspath='', flag='C'):
 			dataList.append({
 				"text": item,
 				"icon": "glyphicon glyphicon-folder-close",
+				# "selectedIcon": "glyphicon glyphicon-folder-open",
 				"nodes": treeview_parser(fileobject.path_relative_directory, newabspath, flag=flag)
 			})
 		elif flag == 'C':
@@ -159,9 +160,10 @@ def edit_file(file_path):
 		# else:
 		# 	file_format = 'r+'
 		# with open(file_path, file_format) as f:
-		with open(file_path, 'r+') as f:
+		with open(file_path, 'rb+') as f:
 			content = f.read()
-		# content.encode('utf-8').strip()
+			if os.path.split(file_path)[1] == '.bin':
+				content = content.decode('unicode')
 		return content
 	else:
 		return "edit your file here."

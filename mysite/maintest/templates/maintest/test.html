@@ -102,6 +102,16 @@
       });
     });
   </script>
+  <script> //open project
+    $(document).ready(function(){
+      $("#submit-o-p-path").click(function(){
+        var path = $(".node-selected").text();
+        //var dir = $("[data-nodeid='0']").attr("class");
+        console.log("hello");
+        window.location.href="{% url 'maintest:test' %}?path="+path;
+      });
+    });
+  </script>
 </head>
 
 <body>

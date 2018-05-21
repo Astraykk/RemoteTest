@@ -30,15 +30,12 @@ xmlhttp.open("GET","{% url 'maintest:arith_result' %}",true);
 xmlhttp.send();
 }
 
-//function loadTreeview(path){
-//  var tv_ajaxURL = "{% url 'maintest:tv_ajax' %}";
-//  console.log(tv_ajaxURL)
-//  htmlobj = $.ajax({url:tv_ajaxURL,async:false, data:{dir:path}});
-//  console.log(typeof(htmlobj.responseText));
-//  //console.log(htmlobj.responseText);
-//  console.log("hello");
-//  json = $.parseJSON(htmlobj.responseText);
-//  console.log(typeof(json));
-//  $("#tree").treeview({data:json});
-//  $('#tree').treeview('collapseAll', { silent: true });
-//}
+//open project
+$(document).ready(function(){
+  $("#submit-o-p-path").click(function(){
+    var path = $(".node-selected").text();
+    //var dir = $("[data-nodeid='0']").attr("class");
+    console.log("hello");
+    window.location.href="{% url 'maintest:test' %}?path="+path;
+  });
+});

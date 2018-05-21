@@ -23,7 +23,7 @@
 	<!--{% block object-tools-items %}-->
 		<li><a href="{% url 'files:create_dir' %}{% query_string 'dir' %}">
 			New directory</a></li>
-		<li><a href="{% url 'files:upload' %}" class="grp-state-focus">
+		<li><a href="{% url 'files:upload' %}{% query_string 'dir' %}" class="grp-state-focus">
 			Upload
 		</a></li>
 	<!--{% endblock %}-->

@@ -25,7 +25,7 @@ SECRET_KEY = '&9x(ejpth!u+h=1cpzki(ii-5siwe!%awazi=a&arj^a#q@r4o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.187.138', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.187.138', '127.0.0.1', '192.168.67.3']
 
 
 # Application definition

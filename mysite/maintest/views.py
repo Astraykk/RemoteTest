@@ -4,6 +4,7 @@ from django.core.files.storage import DefaultStorage, default_storage, FileSyste
 from django.core.urlresolvers import reverse
 from django.core.files.storage import DefaultStorage, default_storage, FileSystemStorage
 from django.http import StreamingHttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from filebrowser.sites import site
 from filebrowser.base import FileListing, FileObject
@@ -124,19 +125,16 @@ def test(request):
 	query_path = query.get('path', '')
 	# print(SELFDIRECTORY)
 	obj = treeview_parser(SELFDIRECTORY)
-	tv_dir = treeview_parser(SELFDIRECTORY, flag='O')
+	tv_dir = treeview_parser(DIRECTORY, flag='O')
 	stream_status = [["Check", DONE], ["Build", LOADING], ["Test", UNDONE]]
 
 	return render(request, 'maintest/test.html', {
 		'file_path': file_path,
 		'file_content': edit_file(file_path),
 		'obj': json.dumps(obj),
-		'tv_dir':json.dumps(tv_dir),
+		'tv_dir': json.dumps(tv_dir),
 		'stream_status': stream_status
 	})
-
-
-from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt  # WTF
@@ -154,6 +152,7 @@ def save_file(request):
 
 
 def edit_file(file_path):
+	import binascii
 	if os.path.isfile(file_path):
 		# if os.path.splitext(file_path)[1] == '.bin':  # handle binary file
 		# 	file_format = 'rb+'
@@ -162,8 +161,10 @@ def edit_file(file_path):
 		# with open(file_path, file_format) as f:
 		with open(file_path, 'rb+') as f:
 			content = f.read()
-			if os.path.split(file_path)[1] == '.bin':
-				content = content.decode('unicode')
+			if os.path.splitext(file_path)[1] == '.bin':
+				# print('ok')
+				content = binascii.hexlify(content)
+				# print(type(content))
 		return content
 	else:
 		return "edit your file here."
@@ -193,18 +194,39 @@ class MainTest(object):
 	def treeview_ajax(self, request):
 		query = request.GET
 		query_dir = query.get('dir', '')
+		query_flag = query.get('flag', '')
 		path = os.path.join(DIRECTORY, query_dir)
+		# if os.path.exists(path):
+		# 	return HttpResponse('Project already exits!')
 		self.directory = query_dir  # change root directory of the page
-		result = treeview_parser(path)
+		result = treeview_parser(path, query_flag)
 		return HttpResponse(json.dumps(result), content_type='application/json')
 
-	def edit_file(self, request):
-		query = request.GET
-		query_file = query.get('file', '')
-		path = os.path.join(self.directory, query_file)
-		with open(path, 'r+') as f:
-			content = f.read()
-		return HttpResponse(content)
+	def edit_file(self, file_path):
+		import binascii
+		if os.path.isfile(file_path):
+			with open(file_path, 'rb+') as f:
+				content = f.read()
+				if os.path.splitext(file_path)[1] == '.bin':
+					# print('ok')
+					content = binascii.hexlify(content)
+			# print(type(content))
+			return content
+		else:
+			return "edit your file here."
+
+	@csrf_exempt  # WTF
+	def save_file(self, request):
+		if request.method == 'POST':
+			try:
+				# print(request.POST)
+				content = request.POST['text']
+				path = request.POST['path']
+				with open(path, 'w') as f:
+					f.write(content)
+				return HttpResponse("Success!")
+			except Exception as exc:
+				return HttpResponse(exc)
 
 	def index(self, request):
 		"""
@@ -214,12 +236,15 @@ class MainTest(object):
 		query = request.GET
 		query_file = query.get('file', '')
 		file_path = os.path.join(self.directory, query_file)
-		obj = treeview_parser()
-
+		query_path = query.get('path', '')
+		obj = treeview_parser(self.directory)
+		tv_dir = treeview_parser(DIRECTORY, flag='O')
 		return render(request, 'maintest/test.html', {
-			'file_content': edit_file(file_path),   # file to display in <textarea>
+			'current_path': self.directory,
+			'file_content': self.edit_file(file_path),   # file to display in <textarea>
 			'file_path': file_path,                 # path of the above
 			'obj': json.dumps(obj),                 # default treeview object
+			'tv_dir': json.dumps(tv_dir),
 			'stream_status': self.stream_status     # stream status
 		})
 

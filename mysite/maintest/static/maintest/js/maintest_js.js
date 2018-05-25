@@ -30,12 +30,29 @@ xmlhttp.open("GET","{% url 'maintest:arith_result' %}",true);
 xmlhttp.send();
 }
 
+function generateFileTree(tv_data){
+  $("#tree").treeview({
+    data: tv_data,
+    enableLinks: true
+  });
+  $('#tree').treeview('collapseAll', { silent: true });
+}
+
+function treeviewOpenProject(tv_data_dir){
+  $("#o-p-body").treeview({
+    data: tv_data_dir,
+    enableLinks: true
+  });
+  $('#o-p-body').treeview('collapseAll', { silent: true });
+}
+
 //open project
 $(document).ready(function(){
   $("#submit-o-p-path").click(function(){
-    var path = $(".node-selected").text();
+    currentTVPath = $(".node-selected").text();
     //var dir = $("[data-nodeid='0']").attr("class");
-    console.log("hello");
-    window.location.href="{% url 'maintest:test' %}?path="+path;
+    //console.log(currentTVPath);
+    loadTreeview(currentTVPath);
+    $('#open-project-modal').modal('hide')
   });
 });

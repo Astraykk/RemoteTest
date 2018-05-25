@@ -36,21 +36,6 @@
       });
     });
 
-    function generateFileTree(tv_data, tv_data_dir){
-      $("#tree").treeview({
-        data: tv_data,
-        enableLinks: true
-      });
-      $('#tree').treeview('collapseAll', { silent: true });
-
-      $("#o-p-body").treeview({
-        data: tv_data_dir,
-        enableLinks: true
-      });
-      $('#o-p-body').treeview('collapseAll', { silent: true });
-    }
-
-
     function loadTreeview(path, flag='C'){
         $.ajax({
         url: "{% url 'maintest:tv_ajax' %}",
@@ -101,16 +86,10 @@
         });
       });
     });
-  </script>
-  <script> //open project
-    $(document).ready(function(){
-      $("#submit-o-p-path").click(function(){
-        var path = $(".node-selected").text();
-        //var dir = $("[data-nodeid='0']").attr("class");
-        console.log("hello");
-        window.location.href="{% url 'maintest:test' %}?path="+path;
-      });
-    });
+
+    function uploadFile(path){
+      window.location.href = "{% url 'files:browse' %}?dir=" + path;
+    }
   </script>
 </head>
 
@@ -228,7 +207,12 @@
                            inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
           <p>file tree</p>
           <div id="tree"></div>
-          <button id="refresh_tree" type="button">refresh <span class="glyphicon glyphicon-refresh"></span></button>
+          <a onclick="uploadFile(currentTVPath)" class="btn btn-default">
+            upload <span class="glyphicon glyphicon-upload"></span>
+          </a>
+          <button id="refresh_tree" type="button" class="btn btn-default">
+            refresh <span class="glyphicon glyphicon-refresh"></span>
+          </button>
           <br><br>
         </div>
       </div>
@@ -292,8 +276,8 @@
                  <!--style="width: 90%;">-->
               <!--<span class="sr-only">90% 完成（成功）</span>-->
             <!--</div>-->
-          <!--</div>-->
           <br>
+          <!--</div>-->
 
         </div>
       </div>
@@ -314,7 +298,8 @@
   </div>
 </div>
 <script>
-   generateFileTree({{obj|safe}}, {{tv_dir|safe}});
+   generateFileTree({{obj|safe}});
+   treeviewOpenProject({{tv_dir|safe}});
 </script>
 <script>
 $(function() {

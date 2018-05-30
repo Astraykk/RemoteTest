@@ -1,7 +1,9 @@
-# django-tutorial
-A project baesd on the official django tutorial.
+# RemoteTest
 
---------------
-History
---------------
-20171012 20:58: A base project, at the end of "Writing your first Django app, part 6".
+Remote test system for BR0101. 
+
+Developed by Kang Chuanliang, 2017/07/21.
+
+------------------------------------------------------------------------------------------------------
+
+BR0101 is a chip test platform developed by State Key Laboratory of ASIC and System, Fudan University.

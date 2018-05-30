@@ -30,6 +30,21 @@ xmlhttp.open("GET","{% url 'maintest:arith_result' %}",true);
 xmlhttp.send();
 }
 
+// file tree function
+function loadTreeview(path, flag='C'){
+  $.ajax({
+    url: tv_ajax_url,
+    async: true,
+    data: {
+      dir:path,
+      flag:flag
+    },
+    success: function(data){
+      generateFileTree(data);
+    }
+  });
+}
+
 function generateFileTree(tv_data){
   $("#tree").treeview({
     data: tv_data,
@@ -46,6 +61,7 @@ function treeviewOpenProject(tv_data_dir){
   $('#o-p-body').treeview('collapseAll', { silent: true });
 }
 
+
 //open project
 $(document).ready(function(){
   $("#submit-o-p-path").click(function(){
@@ -56,3 +72,17 @@ $(document).ready(function(){
     $('#open-project-modal').modal('hide')
   });
 });
+
+
+// flow function
+function callFlowFunc(url){
+  console.log('func start')
+  $.ajax({
+    url: url,
+      async: true,
+      success: function(data){
+        alert(data);
+        location.reload();
+      }
+    });
+}

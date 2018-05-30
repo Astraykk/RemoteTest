@@ -1,0 +1,17 @@
+UCF
+# PlanAhead Generated physical constraints 
+
+NET "data_in" LOC = AU2;
+NET "data_out" LOC = AJ10;
+NET "en_output" LOC = AU1;
+NET "pin_in" LOC = AJ9;
+NET "pin_out" LOC = AV5;
+NET "tri_inout" LOC = AN5;
+
+# PlanAhead Generated IO constraints 
+
+NET "data_out" DRIVE = 2;
+NET "pin_out" DRIVE = 2;
+NET "tri_inout" DRIVE = 2;
+
+# default level = LVCMOS25

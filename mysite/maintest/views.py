@@ -182,11 +182,23 @@ class MainTest(object):
 	def syntax_check(self, request):
 		pass
 
+	def check(self, request):
+		self.stream_status[0][1] = DONE  # Check status
+		return HttpResponse('check success')
+
 	def build(self, request):
+		from .mytools.patternGen import PatternGen
 		query = request.GET
-		query_dir = query.get('path', '')
-		path = os.path.join(self.directory, query_dir)
-		os.popen("/path/to/patternGen.py")
+		path = query.get('path', '')
+		# tfo_file = query.get('tfo', '')
+		tfo_file = 'tfo_demo'
+		pattern = PatternGen(path, tfo_file)
+		try:
+			pattern.write()
+			self.stream_status[1][1] = DONE  # Build status
+			return HttpResponse("Build Success!")
+		except Exception as err:
+			return err
 
 	def test(self, request):
 		pass

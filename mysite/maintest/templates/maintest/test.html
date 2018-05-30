@@ -15,6 +15,13 @@
   <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
   <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
   <script>
+    // define django template tag variables
+    var build_url = "{% url 'maintest:build' %}";
+    var check_url = "{% url 'maintest:check' %}";
+    var tv_ajax_url = "{% url 'maintest:tv_ajax' %}";
+
+  </script>
+  <script>
     var currentTVPath = '';  //delete when class MainTest available.
 
     $(document).ready(function()
@@ -35,23 +42,6 @@
         loadTreeview(currentTVPath);
       });
     });
-
-    function loadTreeview(path, flag='C'){
-        $.ajax({
-        url: "{% url 'maintest:tv_ajax' %}",
-        async: true,
-        data: {
-          dir:path,
-          flag:flag
-        },
-        success: function(data){
-          generateFileTree(data);
-        }
-      });
-      //console.log('refreshed');
-      //json = $.parseJSON(htmlobj.responseText);
-      //$("#tree").treeview({data:json});
-    }
   </script>
   <script>  //unfinished
     $(document).ready(function(){
@@ -138,50 +128,7 @@
     <div class="col-md-9">
       <div class="col-md-8">
         <!--Toolbar-->
-        <div class="btn-toolbar" role="toolbar">
-          <div class="btn-group">
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1"
-                      data-toggle="dropdown">
-                project <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                <li role="presentation">
-                  <a role="menuitem" tabindex="-1" data-toggle="modal" href="#strat-project-modal">New project</a>
-                </li>
-                <li role="presentation">
-                  <a role="menuitem" tabindex="-1" data-toggle="modal" href="#open-project-modal">Open project</a>
-                </li>
-                <li role="presentation" class="disabled">
-                  <a role="menuitem" tabindex="-1" href="#">Save</a>
-                </li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation" class="dropdown-header">下拉菜单标题</li>
-                <li role="presentation">
-                  <a role="menuitem" tabindex="-1" href="#">分离的链接</a>
-                </li>
-              </ul>
-            </div>
-            <button type="button" class="btn btn-primary" href="/maintest/test/"><span
-                class="glyphicon glyphicon-file"></span> file
-            </button>
-            <button type="button" class="btn btn-success"><span
-                class="glyphicon glyphicon-pencil"></span> edit
-            </button>
-            <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-cog"></span>
-              tool
-            </button>
-            <button type="button" class="btn btn-warning"><span
-                class="glyphicon glyphicon-eye-open"></span> view
-            </button>
-            <button type="button" class="btn btn-default">
-              <span class="glyphicon glyphicon-user"></span> User
-            </button>
-
-            {% include "maintest/include/project.html" %}
-
-          </div>
-        </div>
+        {% include "maintest/include/toolbar.html" %}
       </div>
       <div class="col-md-4">
         <!--Search bar-->

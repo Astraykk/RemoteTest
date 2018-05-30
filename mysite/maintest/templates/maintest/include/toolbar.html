@@ -1,0 +1,61 @@
+{% load static%}
+<div class="btn-toolbar" role="toolbar">
+  <div class="btn-group">
+    <div class="btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1"
+              data-toggle="dropdown">
+        project <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" data-toggle="modal" href="#strat-project-modal">New project</a>
+        </li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" data-toggle="modal" href="#open-project-modal">Open project</a>
+        </li>
+        <li role="presentation" class="disabled">
+          <a role="menuitem" tabindex="-1" href="#">Save</a>
+        </li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation" class="dropdown-header">下拉菜单标题</li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" href="#">分离的链接</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu2"
+              data-toggle="dropdown">
+        flow <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" data-toggle="modal" onclick="callFlowFunc(check_url)">Check</a>
+        </li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" data-toggle="modal" onclick="callFlowFunc(build_url)">Build</a>
+        </li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" href="#">Test</a>
+        </li>
+      </ul>
+    </div>
+
+    <button type="button" class="btn btn-default">
+      <span class="glyphicon glyphicon-pencil"></span> edit
+    </button>
+    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span>
+      tool
+    </button>
+    <button type="button" class="btn btn-default"><span
+        class="glyphicon glyphicon-eye-open"></span> view
+    </button>
+    <button type="button" class="btn btn-default">
+      <span class="glyphicon glyphicon-user"></span> User
+    </button>
+
+    {% include "maintest/include/project.html" %}
+
+  </div>
+</div>

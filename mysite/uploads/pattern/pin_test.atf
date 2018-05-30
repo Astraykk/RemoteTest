@@ -1,0 +1,16 @@
+<ATF name = "pin_test" path = "" comment = "nothing" author = "dh" date = "2018/05/09">
+	<LBF type = "LB0101"/>
+	<LIST>
+		<DUT name = "1" type = "LX200">
+			<BSD name = "" path = ""/>
+			<PPF name = "" path = ""/>
+		</DUT>
+		
+		<DWM name = "SelectMAP32" path = ".">
+			<SBC name = "LX200"/>
+			<SPIO name = "LX200"/>
+			<SUCF name = "LX200"/>
+		</DWM>
+	</LIST>
+</ATF>
+			

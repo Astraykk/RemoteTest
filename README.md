@@ -2,7 +2,7 @@
 
 Remote test system for BR0101. 
 
-Developed by Kang Chuanliang, 2017/07/21.
+Created by Kang Chuanliang, 2017/07/21.
 
 ------------------------------------------------------------------------------------------------------
 

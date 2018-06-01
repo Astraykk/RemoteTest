@@ -191,7 +191,8 @@ class MainTest(object):
 		query = request.GET
 		path = query.get('path', '')
 		# tfo_file = query.get('tfo', '')
-		tfo_file = 'tfo_demo'
+		print('path= ', path)
+		tfo_file = 'tfo_demo.tfo'
 		pattern = PatternGen(path, tfo_file)
 		try:
 			pattern.write()

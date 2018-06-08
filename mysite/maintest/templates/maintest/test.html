@@ -5,15 +5,22 @@
   <meta charset="utf-8">
   <title>Test App in Bootstrap!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-  <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
+  <!--<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>-->
+  <!--<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 
+
+  <script type="text/javascript" src="{% static 'maintest/js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'maintest/bootstrap/js/bootstrap.min.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'maintest/bootstrap/css/bootstrap.min.css' %}">
+
+  <script type="text/javascript" src="{% static 'maintest/js/bootstrap-treeview.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/bootstrap-treeview.css' %}">
   <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>
   <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
 
-  <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
-  <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
+  <!--<script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>-->
+  <!--<link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">-->
   <script>
     // define django template tag variables
     var build_url = "{% url 'maintest:build' %}";

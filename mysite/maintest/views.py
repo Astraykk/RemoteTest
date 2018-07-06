@@ -5,11 +5,12 @@ from django.core.urlresolvers import reverse
 from django.core.files.storage import DefaultStorage, default_storage, FileSystemStorage
 from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 from filebrowser.sites import site
 from filebrowser.base import FileListing, FileObject
 import os, json, re
-# from .mytools import patternGen
+from .mytools.patternGen import PatternGen
 
 # patternGen.prepare()
 
@@ -171,6 +172,8 @@ def edit_file(file_path):
 
 
 class MainTest(object):
+	pattern = 0
+
 	def __init__(self, storage=default_storage):
 		self.storage = storage
 		self.directory = DIRECTORY
@@ -187,15 +190,14 @@ class MainTest(object):
 		return HttpResponse('check success')
 
 	def build(self, request):
-		from .mytools.patternGen import PatternGen
 		query = request.GET
 		path = query.get('path', '')
 		# tfo_file = query.get('tfo', '')
 		print('path= ', path)
 		tfo_file = 'tfo_demo.tfo'
-		pattern = PatternGen(path, tfo_file)
+		self.pattern = PatternGen(path, tfo_file)
 		try:
-			pattern.write()
+			self.pattern.write()
 			self.stream_status[1][1] = DONE  # Build status
 			return HttpResponse("Build Success!")
 		except Exception as err:
@@ -206,14 +208,18 @@ class MainTest(object):
 		path = os.path.join(self.directory, query.get('path', ''))
 		# path = query.get('path', '')
 		i_file = '/path/to/i_file'
-		o_file = os.path.join(path, 'test_result')
-		print('path= ', path)
+		o_file = os.path.join(path, 'test_result.rpt')
+		vcd_file = os.path.join(path, 'test_result.vcd')
+		# print('path= ', path)
 		try:
 			msg = os.popen('python3 mytools/runtest.py ' + i_file + ' ' + o_file)
 			self.stream_status[2][1] = DONE  # Build status
+			# TODO: self.pattern.rpt2vcd(o_file, vcd_file)
+			from .mytools.vcd2pic.vcd2pic import vcd2pic
+			vcd2pic(vcd_file, self.wave_path)
 			return HttpResponse(msg)
 		except Exception as err:
-			return err
+			return HttpResponse(err)
 
 	def treeview_ajax(self, request):
 		query = request.GET
@@ -223,6 +229,9 @@ class MainTest(object):
 		# if os.path.exists(path):
 		# 	return HttpResponse('Project already exits!')
 		self.directory = query_dir  # change root directory of the page
+		self.wave_path = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
+		if not os.path.exists(self.wave_path):
+			os.mkdir(self.wave_path)
 		result = treeview_parser(path, query_flag)
 		return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -263,10 +272,13 @@ class MainTest(object):
 		query_path = query.get('path', '')
 		obj = treeview_parser(self.directory)
 		tv_dir = treeview_parser(DIRECTORY, flag='O')
+		wave_path = os.path.join('maintest/img/', self.directory, '/wave.jpg')
 		return render(request, 'maintest/test.html', {
+			'DIRECTORY': DIRECTORY,
 			'current_path': self.directory,
 			'file_content': self.edit_file(file_path),   # file to display in <textarea>
 			'file_path': file_path,                 # path of the above
+			'wave_path': wave_path,
 			'obj': json.dumps(obj),                 # default treeview object
 			'tv_dir': json.dumps(tv_dir),
 			'stream_status': self.stream_status     # stream status

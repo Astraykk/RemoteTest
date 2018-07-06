@@ -131,3 +131,5 @@ FILEBROWSER_EXTENSIONS = {
     'Audio': ['.mp3','.mp4','.wav','.aiff','.midi','.m4p'],
     'Test': ['.vcd','.bit','wlf']
 }
+
+MEDIA_URL = '/media/'

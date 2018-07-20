@@ -5,19 +5,19 @@
   <meta charset="utf-8">
   <title>Test App in Bootstrap!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-  <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!--<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>-->
+  <script type="text/javascript" src="{% static 'maintest/js/jquery.js' %}"></script>
+  <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
+  <link rel="stylesheet" href="{% static 'maintest/bootstrap/css/bootstrap.css' %}">
+  <!--<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+  <script type="text/javascript" src="{% static 'maintest/bootstrap/js/bootstrap.min.js' %}"></script>
 
 
-  <!--<script type="text/javascript" src="{% static 'maintest/js/jquery.min.js' %}"></script>-->
-  <!--<script type="text/javascript" src="{% static 'maintest/bootstrap/js/bootstrap.min.js' %}"></script>-->
-  <!--<link rel="stylesheet" type="text/css" href="{% static 'maintest/bootstrap/css/bootstrap.min.css' %}">-->
 
-  <!--<script type="text/javascript" src="{% static 'maintest/js/bootstrap-treeview.js' %}"></script>-->
-  <!--<link rel="stylesheet" type="text/css" href="{% static 'maintest/css/bootstrap-treeview.css' %}">-->
-  <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>
-  <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+  <script type="text/javascript" src="{% static 'maintest/js/bootstrap-treeview.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/bootstrap-treeview.css' %}">
+  <!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>-->
+  <!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>-->
 
   <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
   <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
@@ -25,6 +25,7 @@
     // define django template tag variables
     var build_url = "{% url 'maintest:build' %}";
     var check_url = "{% url 'maintest:check' %}";
+    var test_url = "{% url 'maintest:test' %}";
     var tv_ajax_url = "{% url 'maintest:tv_ajax' %}";
   </script>
   <script>
@@ -199,48 +200,48 @@
           <br>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12"
-             style="background-color: #ffffff;">
-          <h4>control area 标签式的导航菜单</h4>
-          <ul id="myTab" class="nav nav-tabs">
-            <li class="active">
-              <a href="#console" data-toggle="tab">Console</a>
-            </li>
-            <li><a href="#results" data-toggle="tab">Results</a></li>
-            <li><a href="#">Terminal</a></li>
-            <li><a href="#">Info</a></li>
-            <li><a href="#">Error</a></li>
-            <li><a href="#">Warning</a></li>
-          </ul>
-          <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade in active" id="console">
-              <p>在这里嵌入控制台窗口。</p>
-            </div>
-            <div class="tab-pane fade" id="results">
-              <p>在这里嵌入测试结果窗口。</p>
-            </div>
-          </div>
-          <br>
-          <br>
-          <!--<div class="progress progress-striped">-->
-            <!--<div class="progress-bar progress-bar-success" role="progressbar"-->
-                 <!--aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"-->
-                 <!--style="width: 90%;">-->
-              <!--<span class="sr-only">90% 完成（成功）</span>-->
+      <!--<div class="row">-->
+        <!--<div class="col-md-12"-->
+             <!--style="background-color: #ffffff;">-->
+          <!--<h4>control area 标签式的导航菜单</h4>-->
+          <!--<ul id="myTab" class="nav nav-tabs">-->
+            <!--<li class="active">-->
+              <!--<a href="#console" data-toggle="tab">Console</a>-->
+            <!--</li>-->
+            <!--<li><a href="#results" data-toggle="tab">Results</a></li>-->
+            <!--<li><a href="#">Terminal</a></li>-->
+            <!--<li><a href="#">Info</a></li>-->
+            <!--<li><a href="#">Error</a></li>-->
+            <!--<li><a href="#">Warning</a></li>-->
+          <!--</ul>-->
+          <!--<div id="myTabContent" class="tab-content">-->
+            <!--<div class="tab-pane fade in active" id="console">-->
+              <!--<p>在这里嵌入控制台窗口。</p>-->
             <!--</div>-->
-          <br>
+            <!--<div class="tab-pane fade" id="results">-->
+              <!--<p>在这里嵌入测试结果窗口。</p>-->
+            <!--</div>-->
           <!--</div>-->
+          <!--<br>-->
+          <!--<br>-->
+          <!--&lt;!&ndash;<div class="progress progress-striped">&ndash;&gt;-->
+            <!--&lt;!&ndash;<div class="progress-bar progress-bar-success" role="progressbar"&ndash;&gt;-->
+                 <!--&lt;!&ndash;aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"&ndash;&gt;-->
+                 <!--&lt;!&ndash;style="width: 90%;">&ndash;&gt;-->
+              <!--&lt;!&ndash;<span class="sr-only">90% 完成（成功）</span>&ndash;&gt;-->
+            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+          <!--<br>-->
+          <!--&lt;!&ndash;</div>&ndash;&gt;-->
 
-        </div>
-      </div>
+        <!--</div>-->
+      <!--</div>-->
       <div class="row">
-        <div class="col-md-12"
+          <h4>Waveform</h4>
+        <div class="col-md-12 pre-scrollable"
              style="background-color: #dedef8;box-shadow:
                    inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
-          <h4>Waveform</h4>
           <!--<img src="{{ DIRECTORY }}/{{ current_path }}/wave.jpg" class="img-rounded img-responsive">-->
-          <img src="{% static 'maintest/img/' %}{{ current_path }}/wave.jpg" class="img-rounded img-responsive">
+          <img class="pre-scrollable" src="{% static 'maintest/img/' %}{{ current_path }}/wave_long.jpg" class="img-rounded img-responsive">
           <!--<button type="button" onclick="loadXMLDoc_calc()">Calculate</button>-->
           <br>
         </div>

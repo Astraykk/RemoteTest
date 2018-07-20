@@ -103,3 +103,20 @@ function buildPattern(path){
       }
     });
 }
+
+function runTest(path){
+  var url = test_url;
+  console.log("Running test");
+  console.log(url);
+  $.ajax({
+    url: url,
+      async: true,
+      data: {
+        path: path
+      },
+      success: function(data){
+        alert(data);
+        location.reload();
+      }
+    });
+}

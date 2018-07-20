@@ -7,7 +7,11 @@ def vcd2pic(vcd_location, pic_location):
         input = []
         output = []
         for each_line in vcd:
+
             word=each_line.strip().split()
+            if not word:
+                continue
+            print(word)
             if word[0]=='$date':
                 date=vcd.readline()
                 #print(date)
@@ -90,7 +94,7 @@ def vcd2pic(vcd_location, pic_location):
             draw.point((x, begin_height + unit_height-1), fill=green)
 
     def zero_one(begin_width, begin_height, unit_width, unit_height):
-        for x in pprange(begin_width, begin_width + unit_width):
+        for x in range(begin_width, begin_width + unit_width):
             if x == begin_width:
                 for y in range(begin_height + int(0.2 * unit_height), begin_height + unit_height):
                     draw.point((x, y), fill=green)
@@ -153,4 +157,4 @@ def vcd2pic(vcd_location, pic_location):
 
 
 if __name__ == '__main__':
-    vcd2pic('pin_test.vcd','wave.jpg')
+    vcd2pic('test_tri.vcd','wave.jpg')

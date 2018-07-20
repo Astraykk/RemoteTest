@@ -173,6 +173,7 @@ def edit_file(file_path):
 
 class MainTest(object):
 	pattern = 0
+	wave_path = ''
 
 	def __init__(self, storage=default_storage):
 		self.storage = storage
@@ -205,14 +206,16 @@ class MainTest(object):
 
 	def test(self, request):
 		query = request.GET
-		path = os.path.join(self.directory, query.get('path', ''))
+		print(self.directory)
+		path = os.path.join(self.directory)  #, query.get('path', ''))
 		# path = query.get('path', '')
-		i_file = '/path/to/i_file'
+		i_file = os.path.join(path, 'pin_test.ptn')
 		o_file = os.path.join(path, 'test_result.rpt')
-		vcd_file = os.path.join(path, 'test_result.vcd')
-		# print('path= ', path)
+		vcd_file = os.path.join(path, 'pin_test.vcd')
+		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
 		try:
-			msg = os.popen('python3 mytools/runtest.py ' + i_file + ' ' + o_file)
+			msg = os.popen('~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file))
+			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
 			# TODO: self.pattern.rpt2vcd(o_file, vcd_file)
 			from .mytools.vcd2pic.vcd2pic import vcd2pic
@@ -228,7 +231,8 @@ class MainTest(object):
 		path = os.path.join(DIRECTORY, query_dir)
 		# if os.path.exists(path):
 		# 	return HttpResponse('Project already exits!')
-		self.directory = query_dir  # change root directory of the page
+		# self.directory = query_dir  # change root directory of the page
+		self.directory = path  # change root directory of the page
 		self.wave_path = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
 		if not os.path.exists(self.wave_path):
 			os.mkdir(self.wave_path)

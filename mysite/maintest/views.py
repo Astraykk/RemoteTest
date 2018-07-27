@@ -231,8 +231,8 @@ class MainTest(object):
 		path = os.path.join(DIRECTORY, query_dir)
 		# if os.path.exists(path):
 		# 	return HttpResponse('Project already exits!')
-		# self.directory = query_dir  # change root directory of the page
-		self.directory = path  # change root directory of the page
+		self.directory = query_dir  # change root directory of the page
+		# self.directory = path  # change root directory of the page
 		self.wave_path = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
 		if not os.path.exists(self.wave_path):
 			os.mkdir(self.wave_path)

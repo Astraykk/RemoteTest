@@ -10,7 +10,7 @@ from django.conf import settings
 from filebrowser.sites import site
 from filebrowser.base import FileListing, FileObject
 import os, json, re
-from .mytools.patternGen import PatternGen
+# from .mytools.patternGen import PatternGen
 
 # patternGen.prepare()
 
@@ -196,9 +196,9 @@ class MainTest(object):
 		# tfo_file = query.get('tfo', '')
 		print('path= ', path)
 		tfo_file = 'tfo_demo.tfo'
-		self.pattern = PatternGen(path, tfo_file)
+		# self.pattern = PatternGen(path, tfo_file)
 		try:
-			self.pattern.write()
+			# self.pattern.write()
 			self.stream_status[1][1] = DONE  # Build status
 			return HttpResponse("Build Success!")
 		except Exception as err:
@@ -214,7 +214,7 @@ class MainTest(object):
 		vcd_file = os.path.join(path, 'pin_test.vcd')
 		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
 		try:
-			msg = os.popen('~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file))
+			msg = os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file))
 			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
 			# TODO: self.pattern.rpt2vcd(o_file, vcd_file)
@@ -231,7 +231,7 @@ class MainTest(object):
 		path = os.path.join(DIRECTORY, query_dir)
 		# if os.path.exists(path):
 		# 	return HttpResponse('Project already exits!')
-		self.directory = query_dir  # change root directory of the page
+		self.directory = os.path.join(self.directory, query_dir)  # change root directory of the page
 		# self.directory = path  # change root directory of the page
 		self.wave_path = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
 		if not os.path.exists(self.wave_path):

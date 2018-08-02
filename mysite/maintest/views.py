@@ -217,7 +217,7 @@ class MainTest(object):
 			msg = os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file))
 			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
-			# TODO: self.pattern.rpt2vcd(o_file, vcd_file)
+			# TODO: self.pattern.trf2vcd(o_file, vcd_file)
 			from .mytools.vcd2pic.vcd2pic import vcd2pic
 			vcd2pic(vcd_file, self.wave_path)
 			return HttpResponse(msg)

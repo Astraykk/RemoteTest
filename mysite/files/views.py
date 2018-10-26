@@ -142,7 +142,7 @@ class MyFileBrowser(object):
 		file_path = u'%s' % os.path.join(site.directory, query.get('dir', ''), query.get('filename', ''))
 
 		def file_iterator(file_name, chunk_size=512):
-			with open(file_name) as f:
+			with open(file_name, 'rb') as f:
 				while True:
 					c = f.read(chunk_size)
 					if c:

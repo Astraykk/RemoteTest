@@ -209,17 +209,18 @@ class MainTest(object):
 		print(self.directory)
 		path = os.path.join(self.directory)  #, query.get('path', ''))
 		# path = query.get('path', '')
-		i_file = os.path.join(path, 'pin_test.ptn')
-		o_file = os.path.join(path, 'test_result.rpt')
-		vcd_file = os.path.join(path, 'pin_test.vcd')
+		rpt_name = query.get('rpt_name', 'test_result')
+		i_file = os.path.join(DIRECTORY, path, 'pin_test.ptn')
+		o_file = os.path.join(DIRECTORY, path, rpt_name + '.trf')
+		vcd_file = os.path.join(path, rpt_name + '.vcd')
 		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
 		try:
 			msg = os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file))
 			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
 			# TODO: self.pattern.trf2vcd(o_file, vcd_file)
-			from .mytools.vcd2pic.vcd2pic import vcd2pic
-			vcd2pic(vcd_file, self.wave_path)
+			# from .mytools.vcd2pic.vcd2pic import vcd2pic
+			# vcd2pic(vcd_file, self.wave_path)
 			return HttpResponse(msg)
 		except Exception as err:
 			return HttpResponse(err)
@@ -231,8 +232,8 @@ class MainTest(object):
 		path = os.path.join(DIRECTORY, query_dir)
 		# if os.path.exists(path):
 		# 	return HttpResponse('Project already exits!')
-		self.directory = os.path.join(self.directory, query_dir)  # change root directory of the page
-		# self.directory = path  # change root directory of the page
+		# self.directory = os.path.join(self.directory, query_dir)  # change root directory of the page
+		self.directory = query_dir  # change root directory of the page
 		self.wave_path = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
 		if not os.path.exists(self.wave_path):
 			os.mkdir(self.wave_path)
@@ -276,6 +277,7 @@ class MainTest(object):
 		query_path = query.get('path', '')
 		obj = treeview_parser(self.directory)
 		tv_dir = treeview_parser(DIRECTORY, flag='O')
+		print(self.directory)
 		wave_path = os.path.join('maintest/img/', self.directory, '/wave.jpg')
 		return render(request, 'maintest/test.html', {
 			'DIRECTORY': DIRECTORY,

@@ -106,13 +106,15 @@ function buildPattern(path){
 
 function runTest(path){
   var url = test_url;
+  var rpt_name = $("#rptName").val();
   console.log("Running test");
   console.log(url);
   $.ajax({
     url: url,
       async: true,
       data: {
-        path: path
+        path: path,
+        rpt_name: rpt_name
       },
       success: function(data){
         alert(data);

@@ -10,7 +10,7 @@ from django.conf import settings
 from filebrowser.sites import site
 from filebrowser.base import FileListing, FileObject
 import os, json, re
-# from .mytools.patternGen import PatternGen
+from .mytools.patternGen import PatternGen
 
 # patternGen.prepare()
 
@@ -196,9 +196,11 @@ class MainTest(object):
 		# tfo_file = query.get('tfo', '')
 		print('path= ', path)
 		tfo_file = 'tfo_demo.tfo'
-		# self.pattern = PatternGen(path, tfo_file)
+		self.pattern = PatternGen(path, tfo_file)
+		print('initialization success!')
 		try:
-			# self.pattern.write()
+			self.pattern.write()
+			print('write success!')
 			self.stream_status[1][1] = DONE  # Build status
 			return HttpResponse("Build Success!")
 		except Exception as err:
@@ -207,7 +209,7 @@ class MainTest(object):
 	def test(self, request):
 		query = request.GET
 		print(self.directory)
-		path = os.path.join(self.directory)  #, query.get('path', ''))
+		path = os.path.join(self.directory)  # query.get('path', ''))
 		# path = query.get('path', '')
 		rpt_name = query.get('rpt_name', 'test_result')
 		i_file = os.path.join(DIRECTORY, path, 'pin_test.ptn')
@@ -215,10 +217,11 @@ class MainTest(object):
 		vcd_file = os.path.join(path, rpt_name + '.vcd')
 		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
 		try:
-			msg = os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file))
+			msg = os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file)).read()
 			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
 			# TODO: self.pattern.trf2vcd(o_file, vcd_file)
+			# self.pattern.trf2vcd(o_file, vcd_file)
 			# from .mytools.vcd2pic.vcd2pic import vcd2pic
 			# vcd2pic(vcd_file, self.wave_path)
 			return HttpResponse(msg)

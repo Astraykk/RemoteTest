@@ -7,6 +7,7 @@
 			<ITM name = "pin_test"/>
 			<PIO name = "pin_test"/>
 			<BIT name = "pin_test"/>
+			<PTN name = "pin_test"/>
 			<VCD name = "pin_test"/>
 			<UCF name = "pin_test"/>
 			<RPT name = "pin_test"/>

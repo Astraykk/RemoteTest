@@ -491,7 +491,7 @@ class PatternGen(object):
 						tb_counter = 0
 			write_length(fw, tb_counter)
 			self.trf_param['vcd_len'] = tick + 1 + 2 * len(self.trf_param['vcd_list'])
-pp
+
 	def sbc_parser(self, file):
 		soup = get_soup(self.include_path, file)
 		name_check(file, soup.SBC['name'])

@@ -87,7 +87,7 @@ def vcd2pic(vcd_location, pic_location):
 
     draw = ImageDraw.Draw(image)
 
-    font = ImageFont.truetype('arial.ttf', 12)
+    font = ImageFont.truetype('maintest/mytools/vcd2pic/arial.ttf', 12)
 
     def zero_zero(begin_width, begin_height, unit_width, unit_height):
         for x in range(begin_width, begin_width + unit_width):

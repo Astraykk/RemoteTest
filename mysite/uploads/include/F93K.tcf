@@ -1,13 +1,13 @@
 <TCF name = "F93K" comment = "1" author = "xy:wangjian" date = "2018/04/17">
 	<FRAME name = "EF0101">
-		<CONNECT assembly = "AS0101" pogo = "106" cage = "1" slot = "1" card = "BR0101" plug = "D01"/>
-		<CONNECT assembly = "AS0101" pogo = "109" cage = "1" slot = "1" card = "BR0101" plug = "D02"/>
-		<CONNECT assembly = "AS0101" pogo = "111" cage = "1" slot = "1" card = "BR0101" plug = "D03"/>
-		<CONNECT assembly = "AS0101" pogo = "112" cage = "1" slot = "1" card = "BR0101" plug = "D04"/>
-		<CONNECT assembly = "AS0101" pogo = "117" cage = "1" slot = "1" card = "BR0101" plug = "D05"/>
-		<CONNECT assembly = "AS0101" pogo = "120" cage = "1" slot = "1" card = "BR0101" plug = "D06"/>
-		<CONNECT assembly = "AS0101" pogo = "121" cage = "1" slot = "1" card = "BR0101" plug = "D07"/>
-		<CONNECT assembly = "AS0101" pogo = "123" cage = "1" slot = "1" card = "BR0101" plug = "D08"/>
+		<CONNECT assembly = "AS0101" pogo = "106" cage = "1" slot = "1" card = "BR0101" plug = "D05"/>
+		<CONNECT assembly = "AS0101" pogo = "109" cage = "1" slot = "1" card = "BR0101" plug = "D07"/>
+		<CONNECT assembly = "AS0101" pogo = "111" cage = "1" slot = "1" card = "BR0101" plug = "D08"/>
+		<CONNECT assembly = "AS0101" pogo = "112" cage = "1" slot = "1" card = "BR0101" plug = "D01"/>
+		<CONNECT assembly = "AS0101" pogo = "117" cage = "1" slot = "1" card = "BR0101" plug = "D03"/>
+		<CONNECT assembly = "AS0101" pogo = "120" cage = "1" slot = "1" card = "BR0101" plug = "D04"/>
+		<CONNECT assembly = "AS0101" pogo = "121" cage = "1" slot = "1" card = "BR0101" plug = "D06"/>
+		<CONNECT assembly = "AS0101" pogo = "123" cage = "1" slot = "1" card = "BR0101" plug = "D02"/>
 	</FRAME>
 	<ASSEMBLY code = "AS0101" capacity = "16">
 		<WIRE pogopin = "01" plugpin = "01"/>

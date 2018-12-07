@@ -107,6 +107,7 @@ function buildPattern(path){
 function runTest(path){
   var url = test_url;
   var rpt_name = $("#rptName").val();
+  // waveform_path = waveform_path + rpt_name + ".jpg"
   console.log("Running test");
   console.log(url);
   $.ajax({
@@ -118,6 +119,8 @@ function runTest(path){
       },
       success: function(data){
         alert(data);
+        // document.getElementById("waveform").src = waveform_path;
+        console.log("change img src")
         location.reload();
       }
     });

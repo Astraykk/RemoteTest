@@ -1,0 +1,19 @@
+
+# PlanAhead Generated physical constraints 
+
+NET "out[0]" LOC = AN7;
+NET "out[1]" LOC = AP7;
+NET "out[3]" LOC = AW5;
+NET "out[2]" LOC = AW4;
+
+# PlanAhead Generated IO constraints 
+
+NET "out[3]" DRIVE = 2;
+NET "out[2]" DRIVE = 2;
+NET "out[1]" DRIVE = 2;
+NET "out[0]" DRIVE = 2;
+
+# PlanAhead Generated physical constraints 
+
+NET "clk" LOC = AN5;
+NET "rst_n" LOC = AN4;

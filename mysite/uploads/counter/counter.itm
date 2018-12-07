@@ -1,0 +1,11 @@
+<ITEM name = "counter">
+	<POWER>
+	</POWER>
+	<DC>
+	</DC>
+	<DIGITAL>
+		<CYCLE period = "1"/>
+	<DIGITAL>
+	<ANALOG>
+	</ANALOG>
+</ITEM>

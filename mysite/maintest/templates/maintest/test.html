@@ -190,7 +190,7 @@
       <div class="row">
         <div class="col-md-12"
              style="background-color: #dedef8;box-shadow:
-                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+                           inset 1px -1px 1px #444, inset -1px 1px 1px #444;padding:10px;">
           <!--<form role="form" action="{% url 'maintest:test' %}" method="post">-->
           <!--<form role="form" method="post">-->
             <!--{% csrf_token %}-->
@@ -243,9 +243,11 @@
           <h4>Waveform</h4>
         <div class="col-md-12 pre-scrollable"
              style="background-color: #dedef8;box-shadow:
-                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;padding:10px;">
           <!--<img src="{{ DIRECTORY }}/{{ current_path }}/wave.jpg" class="img-rounded img-responsive">-->
-          <img class="pre-scrollable" src="{% static 'maintest/img/' %}{{ current_path }}/wave_long.jpg" class="img-rounded img-responsive">
+          <img id="waveform" class="pre-scrollable"
+               src="{% static 'maintest/img/' %}{{ current_path }}/{{ current_path }}.jpg"
+               class="img-rounded img-responsive">
           <!--<button type="button" onclick="loadXMLDoc_calc()">Calculate</button>-->
           <br>
         </div>
@@ -269,6 +271,7 @@
 <script>
    generateFileTree({{obj|safe}});
    treeviewOpenProject({{tv_dir|safe}});
+   // waveform_path = "{% static 'maintest/img/' %}{{ current_path }}/";
 </script>
 <script>
 $(function() {

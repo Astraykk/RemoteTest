@@ -174,6 +174,7 @@ def edit_file(file_path):
 class MainTest(object):
 	pattern = 0
 	wave_path = ''
+	project_name = ''
 
 	def __init__(self, storage=default_storage):
 		self.storage = storage
@@ -214,19 +215,23 @@ class MainTest(object):
 		rpt_name = query.get('rpt_name', 'test_result')
 		i_file = os.path.join(DIRECTORY, path, 'pin_test.ptn')
 		o_file = os.path.join(DIRECTORY, path, rpt_name + '.trf')
-		vcd_file = os.path.join(path, rpt_name + '.vcd')
+		vcd_file = os.path.join(DIRECTORY, path, rpt_name + '.vcd')
 		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
+		print('wave_path = ' + self.wave_path)
 		try:
-			msg = os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file)).read()
+			msg = "hello"  # os.popen('sudo ~/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file)).read()
 			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
 			# TODO: self.pattern.trf2vcd(o_file, vcd_file)
-			# self.pattern.trf2vcd(o_file, vcd_file)
-			# from .mytools.vcd2pic.vcd2pic import vcd2pic
-			# vcd2pic(vcd_file, self.wave_path)
+			self.pattern.trf2vcd(o_file, vcd_file)
+			from .mytools.vcd2pic.vcd2pic import vcd2pic
+			pic_path = os.path.join(self.wave_path, self.project_name) + '.jpg'
+			print(pic_path)
+			vcd2pic(vcd_file, pic_path)
 			return HttpResponse(msg)
 		except Exception as err:
 			return HttpResponse(err)
+			# return HttpResponse('error')
 
 	def treeview_ajax(self, request):
 		query = request.GET
@@ -237,6 +242,7 @@ class MainTest(object):
 		# 	return HttpResponse('Project already exits!')
 		# self.directory = os.path.join(self.directory, query_dir)  # change root directory of the page
 		self.directory = query_dir  # change root directory of the page
+		self.project_name = query_dir
 		self.wave_path = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
 		if not os.path.exists(self.wave_path):
 			os.mkdir(self.wave_path)

@@ -188,6 +188,11 @@ class MainTest(object):
 		pass
 
 	def check(self, request):
+		query = request.GET
+		path = query.get('path', '')
+		print('path=', path)
+		tfo_file = 'tfo_demo.tfo'
+		self.pattern = PatternGen(path, tfo_file)
 		self.stream_status[0][1] = DONE  # Check status
 		return HttpResponse('check success')
 

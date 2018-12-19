@@ -75,11 +75,27 @@ $(document).ready(function(){
 
 
 // flow function
-function callFlowFunc(url){
-  console.log('callFlow func start')
+//function callFlowFunc(url){
+//  console.log('callFlow func start')
+//  $.ajax({
+//    url: url,
+//      async: true,
+//      success: function(data){
+//        alert(data);
+//        location.reload();
+//      }
+//    });
+//}
+function callFlowFunc(path){
+  var url = check_url;
+  console.log("check func start");
+  console.log(url);
   $.ajax({
     url: url,
       async: true,
+      data: {
+        path: path
+      },
       success: function(data){
         alert(data);
         location.reload();

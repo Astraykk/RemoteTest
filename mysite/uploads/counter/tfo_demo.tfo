@@ -5,7 +5,7 @@
 		<TEST name = "counter" path = "."> 
 			<DWM name = "SelectMAP32"/>
 			<ITM name = "counter"/>
-			<ATF name = "pin_test"/>
+			<ATF name = "counter"/>
 			<PIO name = "counter"/>
 			<BIT name = "counter"/>
 			<VCD name = "counter"/>

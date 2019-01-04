@@ -1,0 +1,40 @@
+<TFO name = "tfo_demo" path = "." comment = "batch test" author = "xy" date = "2018/04/08">
+	<LBF type = "LB0101">
+	<LIST>
+		<DUT name = "1" type = "LX200">
+		<TEST name = "counter" path = "counter">
+			<DWM name = "SelectMAP32"/>
+			<ITM name = "counter"/>
+			<ATF name = "pin_test"/>
+			<PIO name = "counter"/>
+			<BIT name = "counter"/>
+			<VCD name = "counter"/>
+			<UCF name = "counter"/>
+			<RPT name = "counter"/>
+			<WAV name = "counter" type = "" compare = "yes"/>
+		</TEST>
+		<TEST name = "test_tri" path = "test_tri_pro">
+			<DWM name = "SelectMAP32"/>
+			<ITM name = "test_tri"/>
+			<PIO name = "test_tri"/>
+			<BIT name = "test_tri"/>
+			<ATF name = "test_tri"/>
+			<VCD name = "test_tri"/>
+			<UCF name = "test_tri"/>
+			<RPT name = "test_tri"/>
+			<WAV name = "test_tri" type = "" compare = "yes"/>
+		</TEST>
+		<TEST name = "pin_test" path = "pin_test">
+			<DWM name = "SelectMAP32"/>
+			<ITM name = "pin_test"/>
+			<PIO name = "pin_test"/>
+			<BIT name = "pin_test"/>
+			<VCD name = "pin_test"/>
+			<UCF name = "pin_test"/>
+			<RPT name = "pin_test"/>
+			<ATF name = "pin_test"/>
+			<WAV name = "pin_test" type = "" compare = "yes"/>
+		</TEST>
+	</LIST>
+</TFO>
+			

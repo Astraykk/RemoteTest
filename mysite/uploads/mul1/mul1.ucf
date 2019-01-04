@@ -1,0 +1,27 @@
+
+# PlanAhead Generated physical constraints 
+
+NET "clk"       LOC = D22;
+NET "ce"        LOC = A24;
+NET "sr"        LOC = C22;
+NET "rs"        LOC = A23;
+
+NET "ai[3]"     LOC = AK21;
+NET "ai[2]"     LOC = AL21;
+NET "ai[1]"     LOC = AF20;
+NET "ai[0]"     LOC = AG20;
+
+NET "bi[3]"     LOC = AU21;
+NET "bi[2]"     LOC = AU22;
+NET "bi[1]"     LOC = AT15;
+NET "bi[0]"     LOC = AT16;
+
+NET "ao[3]"     LOC = H22;
+NET "ao[2]"     LOC = J22;
+NET "ao[1]"     LOC = C18;
+NET "ao[0]"     LOC = C19;
+
+NET "bo[3]"     LOC = K23;
+NET "bo[2]"     LOC = L24;
+NET "bo[1]"     LOC = E22;
+NET "bo[0]"     LOC = F23;

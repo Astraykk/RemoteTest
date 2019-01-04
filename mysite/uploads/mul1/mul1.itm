@@ -1,0 +1,12 @@
+<ITEM name = "mul1">
+	<POWER>
+	</POWER>
+	<DC>
+	</DC>
+	<DIGITAL>
+		<CYCLE period = "1u"/>
+		<CYCLE multiple = "1">
+	<DIGITAL>
+	<ANALOG>
+	</ANALOG>
+</ITEM>

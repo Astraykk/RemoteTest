@@ -1,0 +1,25 @@
+//mul1
+NET "clk"   DIR  =  input;
+NET "ce"    DIR =   input;
+NET "sr"    DIR  =  input;
+NET "rs"    DIR =   input;  
+
+NET "ai[0]" DIR  =  input;
+NET "ai[1]" DIR  =  input;
+NET "ai[3]" DIR  =  input;
+NET "ai[2]" DIR  =  input;
+
+NET "bi[0]" DIR  =  input;
+NET "bi[1]" DIR  =  input;
+NET "bi[3]" DIR  =  input;
+NET "bi[2]" DIR  =  input;
+
+NET "ao[0]" DIR  =  output;
+NET "ao[1]" DIR  =  output;
+NET "ao[3]" DIR  =  output;
+NET "ao[2]" DIR  =  output;
+
+NET "bo[0]" DIR  =  output;
+NET "bo[1]" DIR  =  output;
+NET "bo[3]" DIR  =  output;
+NET "bo[2]" DIR  =  output;

@@ -1,0 +1,26 @@
+create dir 	 swq 	 Wed Jan 16 15:18:46 2019
+upload file 	 README.pdf 	 Wed Jan 16 15:18:56 2019
+create dir 	 www 	 Wed Jan 16 15:19:06 2019
+create dir 	 aaa 	 Wed Jan 16 15:19:09 2019
+testing 	 aaa 	 Thu Jan 17 09:53:46 2019
+finish testing 	 aaa 	 Thu Jan 17 09:54:02 2019
+testing 	 sssaa 	 Thu Jan 17 09:54:03 2019
+finish testing 	 sssaa 	 Thu Jan 17 09:54:19 2019
+testing 	 mmmm 	 Thu Jan 17 09:54:43 2019
+finish testing 	 mmmm 	 Thu Jan 17 09:54:59 2019
+add testing task 	 sss 	 Thu Jan 17 09:59:09 2019
+testing 	 sss 	 Thu Jan 17 09:59:10 2019
+finish testing 	 sss 	 Thu Jan 17 09:59:26 2019
+add testing task 	 aaa 	 Thu Jan 17 10:13:57 2019
+testing 	 aaa 	 Thu Jan 17 10:13:58 2019
+finish testing 	 aaa 	 Thu Jan 17 10:14:14 2019
+add testing task 	 sss 	 Thu Jan 17 10:44:21 2019
+testing 	 sss 	 Thu Jan 17 10:44:22 2019
+finish testing 	 sss 	 Thu Jan 17 10:44:22 2019
+add testing task 	 sssaa 	 Thu Jan 17 10:45:34 2019
+testing 	 sssaa 	 Thu Jan 17 10:45:35 2019
+finish testing 	 sssaa 	 Thu Jan 17 10:45:35 2019
+add testing task 	 aaa 	 Thu Jan 17 10:46:12 2019
+testing 	 aaa 	 Thu Jan 17 10:46:13 2019
+finish testing 	 aaa 	 Thu Jan 17 10:46:13 2019
+create dir 	 wwws 	 Thu Jan 17 11:04:28 2019

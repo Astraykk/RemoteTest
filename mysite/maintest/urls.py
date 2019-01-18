@@ -13,5 +13,6 @@ urlpatterns = [
 	url(r'^check/$', views.maintest.check, name='check'),
 	url(r'^build/$', views.maintest.build, name='build'),
 	url(r'^test/$', views.maintest.test, name='test'),
+	url(r'^edit_file/$', views.maintest.edit_file, name='edit_file'),
 
 ]

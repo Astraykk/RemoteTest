@@ -141,3 +141,7 @@ function runTest(path){
       }
     });
 }
+
+function editText(path){
+    console.log(' enter editText');
+}

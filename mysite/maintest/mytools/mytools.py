@@ -81,12 +81,12 @@ class VcdFile(object):
 	vcd_info = []
 	# vcd_info = [
 	# 	{
-	# 		'symbol': '!', 'sig': 'clk', 'type': 'wire', 'wave_info': [0, 1, 0, 1], 'width': 1,
+	# 		'symbol': '!', 'signal': 'clk', 'type': 'wire', 'wave_info': [0, 1, 0, 1], 'width': 1,
 	# 		'wave_state': [ZERO_ZERO, ZERO_ONE, ONE_ZERO, ZERO_ONE]
 	# 	},
 	# 	{
-	# 		'symbol': '"', 'sig': 'a', 'type': 'reg', width: 4,
-	#       'wave_info': ['0000', '0001', '0001', '0010', '0010', '0010', '0010'],
+	# 		'symbol': '"', 'signal': 'a', 'type': 'reg', 'width': 4,
+	# 		'wave_info': ['0000', '0001', '0001', '0010', '0010', '0010', '0010'],
 	# 		'wave_state': [BUS_SINGLE, BUS_START, BUS_END, BUS_START, BUS_BODY, BUS_BODY, BUS_END]
 	# 	}
 	# ]
@@ -236,12 +236,8 @@ def vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 	vcd_m = VcdFile(path, vcd_ref.period)
 	for sig_dict in vcd_ref.vcd_info[:]:
 		sig = sig_dict['signal'] + '_ref'
-		# print(sig)
 		new_dict = sig_dict.copy()
-		# print(new_dict)
 		new_dict['signal'] = sig
-		# print(new_dict)
-		# print(sig_dict)
 		vcd_m.vcd_info.append(new_dict)
 		vcd_m.sym2sig[sig_dict['symbol']] = sig
 	offset = len(vcd_ref.vcd_info)
@@ -251,7 +247,6 @@ def vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 		new_dict['symbol'] = sym
 		vcd_m.sym2sig[sym] = new_dict['signal']
 		vcd_m.vcd_info.append(new_dict)
-	# print(vcd_merge.vcd_info)
 	if compare:  # generate error signal
 		sym = chr(len(vcd_m.vcd_info) + 33)
 		sig = 'error'  # TODO: check signal name clash
@@ -272,7 +267,6 @@ def vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 				if x != 'x' and x != 'z' and x != y:
 					fr.write('Line {}: {}_ref = {}, {} = {}\n'.format(i, sig_ref, x, sig_act, y))  # report
 					wave_info[i] = '1'  # generate wave info for error_dict
-		# print(wave_info)
 		error_dict = {
 			'symbol': sym, 'signal': sig, 'type': 'wire', 'width': 1, 'wave_info': list(wave_info), 'wave_state': []
 		}

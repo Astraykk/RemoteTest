@@ -11,6 +11,7 @@ from filebrowser.sites import site
 from filebrowser.base import FileListing, FileObject
 import os, json, re
 from .mytools.patternGen import PatternGen
+from .mytools.mytools import VcdFile, vcd_merge
 
 # patternGen.prepare()
 
@@ -98,7 +99,8 @@ def treeview_parser(root='', abspath='', flag='C'):
 			dataList.append({
 				"text": item,
 				"icon": "glyphicon glyphicon-file",
-				"href": reverse('maintest:test') + "?file=" + newabspath
+				"href": reverse('maintest:index') + "?file=" + newabspath
+				# "href": "#edit-text"
 			})
 	return dataList
 
@@ -218,21 +220,36 @@ class MainTest(object):
 		path = os.path.join(self.directory)  # query.get('path', ''))
 		# path = query.get('path', '')
 		rpt_name = query.get('rpt_name', 'test_result')
-		i_file = os.path.join(DIRECTORY, path, self.project_name+'.ptn')
+		i_file = os.path.join(DIRECTORY, path, self.pattern.file_list['BIT']+'.ptn')
 		o_file = os.path.join(DIRECTORY, path, rpt_name + '.trf')
 		vcd_file = os.path.join(DIRECTORY, path, rpt_name + '.vcd')
+		ref_vcd_path = os.path.join(DIRECTORY, path, self.pattern.file_list['VCD'])
+		timescale = self.pattern.digital_param['period']
 		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
 		print('wave_path = ' + self.wave_path)
 		try:
-			# msg = os.popen('sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file)).read()
-			msg = 'test success'
+			msg = os.popen('sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file)).read()
+			# msg = 'test success'
 			print('msg = ', msg)
 			self.stream_status[2][1] = DONE  # Build status
-			self.pattern.trf2vcd(o_file, vcd_file, flag='bypass')
+			self.pattern.trf2vcd(rpt_name + '.trf', rpt_name + '.vcd', flag='bypass')
 			# from .mytools.vcd2pic.vcd2pic import vcd2pic
 			# pic_path = os.path.join(self.wave_path, self.project_name) + '.jpg'
 			# print(pic_path)
 			# vcd2pic(vcd_file, pic_path)
+
+			# vcd merge
+			vcd1 = VcdFile(ref_vcd_path, period=timescale)  # reference vcd
+			# print('vcd1 = ', vcd1.vcd_info)
+			vcd1.get_vcd_info()
+			vcd2 = VcdFile(vcd_file, period='1ps')
+			# print('vcd2 = ', vcd2.vcd_info)
+			vcd2.get_vcd_info()
+			vcdm = vcd_merge(vcd1, vcd2, os.path.join(DIRECTORY, path, rpt_name + '_merge.vcd'))
+			print(vcdm.sym2sig)
+			# vcd2.gen_vcd('pin_test/p1_merge.vcd')
+			vcdm.gen_vcd(vcdm.path)
+
 			return HttpResponse(msg)
 		except Exception as err:
 			return HttpResponse(err)
@@ -259,9 +276,11 @@ class MainTest(object):
 		if os.path.isfile(file_path):
 			with open(file_path, 'rb+') as f:
 				content = f.read()
-				if os.path.splitext(file_path)[1] == '.bin':
-					# print('ok')
-					content = binascii.hexlify(content)
+				if os.path.splitext(file_path)[1] == '.ptn':
+					pattern = re.compile('.{32}')
+					content = str(binascii.hexlify(content)).lstrip("b'").upper()
+					content = '\t'.join(re.findall(r'.{4}', content))
+					content = '\n'.join(re.findall(r'.{40}', content))
 			# print(type(content))
 			return content
 		else:
@@ -286,18 +305,20 @@ class MainTest(object):
 		:return: file path,
 		"""
 		query = request.GET
-		query_file = query.get('file', '')
+		query_file = query.get('file', 'open file')
 		file_path = os.path.join(self.directory, query_file)
+		# print(query_file, file_path)
 		query_path = query.get('path', '')
 		obj = treeview_parser(self.directory)
 		tv_dir = treeview_parser(DIRECTORY, flag='O')
-		print(self.directory)
+		# print(self.directory)
 		wave_path = os.path.join('maintest/img/', self.directory, '/wave.jpg')
 		return render(request, 'maintest/test.html', {
 			'DIRECTORY': DIRECTORY,
 			'current_path': self.directory,
 			'file_content': self.edit_file(file_path),   # file to display in <textarea>
 			'file_path': file_path,                 # path of the above
+			'file_name': query_file,
 			'wave_path': wave_path,
 			'obj': json.dumps(obj),                 # default treeview object
 			'tv_dir': json.dumps(tv_dir),

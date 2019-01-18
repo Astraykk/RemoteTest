@@ -1,0 +1,42 @@
+
+
+body{
+	background-image: url('images/background.jpg');
+	background-size:cover;
+}
+td.f1{
+	font-family:New Times Roman;
+	font-size:24px
+	
+}
+input.tran{
+	background:transparent;
+	border:1;
+	height:24px;
+	font-size:18px	
+}
+table.pos{
+    margin-left:8em;
+    margin-top:8em;
+    background-color:rgba(255,255,255,0.8)
+}
+
+label.bkg{
+	background-color:rgba(255,255,255,0.8)
+}
+
+input.button{
+	height:30px;
+	width:120px;
+	font-family:Times New Roman;
+	font-size:20px;
+}
+
+a.doc{
+	text-decoration:none;
+	color: #0000ff;
+}
+
+a:hover{
+	color: #00afff;
+}

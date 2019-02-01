@@ -74,7 +74,7 @@ Main test template
 """
 
 
-def treeview_parser(root='', abspath='', flag='C'):
+def treeview_parser(root='', abspath='', relpath='', flag='C'):
 	"""
 	According to the given root, traverse its file tree and return a json object.
 	:param root:
@@ -88,7 +88,15 @@ def treeview_parser(root='', abspath='', flag='C'):
 	for item in filelisting.listing():
 		fileobject = FileObject(os.path.join(path, item))
 		newabspath = os.path.join(abspath, item)
-		if fileobject.is_folder:  # and not fileobject.is_empty:
+		if flag == 'O':
+			dataList.append({
+				"text": item,
+				"icon": "glyphicon glyphicon-folder-close",
+				# "selectedIcon": "glyphicon glyphicon-folder-open",
+				"nodes": treeview_parser(fileobject.path_relative_directory, newabspath, flag=flag),
+				"href": reverse('maintest:index') + "?path=" + newabspath
+			})
+		elif fileobject.is_folder:  # and not fileobject.is_empty:
 			dataList.append({
 				"text": item,
 				"icon": "glyphicon glyphicon-folder-close",
@@ -99,7 +107,7 @@ def treeview_parser(root='', abspath='', flag='C'):
 			dataList.append({
 				"text": item,
 				"icon": "glyphicon glyphicon-file",
-				"href": reverse('maintest:index') + "?file=" + newabspath
+				"href": reverse('maintest:index') + "?file=" + newabspath + "&path=" + relpath
 				# "href": "#edit-text"
 			})
 	return dataList
@@ -309,7 +317,9 @@ class MainTest(object):
 		file_path = os.path.join(self.directory, query_file)
 		# print(query_file, file_path)
 		query_path = query.get('path', '')
-		obj = treeview_parser(self.directory)
+		self.directory = os.path.join(DIRECTORY, query_path)
+		obj = treeview_parser(self.directory, relpath=query_path)
+		print(obj)
 		tv_dir = treeview_parser(DIRECTORY, flag='O')
 		# print(self.directory)
 		wave_path = os.path.join('maintest/img/', self.directory, '/wave.jpg')

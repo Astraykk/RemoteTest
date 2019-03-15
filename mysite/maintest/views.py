@@ -13,6 +13,8 @@ import os, json, re
 from .mytools.patternGen import PatternGen
 from .mytools.mytools import VcdFile, vcd_merge
 
+import time
+
 # patternGen.prepare()
 
 # define
@@ -236,9 +238,13 @@ class MainTest(object):
 		print('i_file = {}\no_file = {}\nvcd_file = {}\n'.format(i_file, o_file, vcd_file))
 		print('wave_path = ' + self.wave_path)
 		try:
+			start_time = time.time()
+			print('Start batch build')
 			msg = os.popen('sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app {} {} 1 1 1'.format(i_file, o_file)).read()
 			# msg = 'test success'
 			print('msg = ', msg)
+			end_time = time.time()
+			print("\nTest time: " + str(end_time - start_time))
 			self.stream_status[2][1] = DONE  # Build status
 			self.pattern.trf2vcd(rpt_name + '.trf', rpt_name + '.vcd', flag='bypass')
 			# from .mytools.vcd2pic.vcd2pic import vcd2pic

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <script src="./script/jquery-3.3.1.js"></script>
+    
+    <title>Wave</title></head>
+  
+  <body>
+  <p id='#wavedrawing'>
+    <div style='outline: 1px solid gray;'>
+        <button id="load">Compile and Draw</button>
+        <button id="draw" disabled='disabled'>Reload Image</button>
+    </div>
+    <div style='outline: 1px solid gray;'>
+        <ul id="namel"style='outline: 1px solid green; width:20%;margin:0;display: inline-block;vertical-align:top;list-style-type: square;'></ul>
+		<ul id='sep' style='background:url(img/sep.png) repeat-y;display: inline-block;width:1%;height:0;margin: 0; padding: 0;list-style-type: none'> </ul>
+    <!-- canvas容器 -->
+        <ul id="canvasl"style='outline: 2px solid white;display: inline-block;width:70%;margin: 0; padding: 0;list-style-type: none;font-size:0'></ul>
+    </div>
+    <p>propotion<input id="propotion" type="range" min="0" max="1000" value="1000"></p>
+    <p>width<input id="width" type="range" min="0" max="1000" value="1000"></p>
+    <p>scale<input id="scale" type="range" min="0" max="1000" value="1000"></p>
+    <script src="./script/utils.js"></script>
+    <script src="./script/draw.js"></script>
+    <script src="./script/controller.js"></script>
+	</p>
+  </body>
+
+</html>

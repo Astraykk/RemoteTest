@@ -15,6 +15,27 @@ import os
 # Create your views here.
 
 
+from django.views.generic.edit import FormView
+from .forms import UploadFileForm
+
+
+class FileFieldView(FormView):
+	form_class = UploadFileForm
+	template_name = 'files/upload.html'  # Replace with your template.
+	success_url = '...'  # Replace with your URL or reverse().
+
+	def post(self, request, *args, **kwargs):
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		files = request.FILES.getlist('file_field')
+		if form.is_valid():
+			for f in files:
+				...  # Do something with each file.
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+
+
 def index(request):
 	return HttpResponse("This is the file management page.")
 
@@ -84,6 +105,7 @@ class MyFileBrowser(object):
 		query_dir = query.get('dir', '')
 		if request.method == 'POST':
 			form = UploadFileForm(request.POST, request.FILES)
+			print(request.FILES.getlist('file'))
 			if form.is_valid():
 				handle_uploaded_file(query_dir, request.FILES['file'])
 				redirect_url = reverse("files:browse") + '?dir=' + query.get('dir', '')

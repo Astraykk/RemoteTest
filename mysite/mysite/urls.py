@@ -19,7 +19,7 @@ import admin
 from filebrowser.sites import site
 
 urlpatterns = [
-	url(r'^Users/', include('Users.urls', namespace="Users")),
+	# url(r'^Users/', include('Users.urls', namespace="Users")),
 	url(r'^admin/filebrowser/', include(site.urls)),
 	url(r'^grappelli/', include('grappelli.urls')),
 	url(r'^polls/', include('polls.urls')),

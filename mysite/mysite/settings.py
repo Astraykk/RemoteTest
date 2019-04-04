@@ -34,11 +34,9 @@ INSTALLED_APPS = [
     'grappelli',
     'filebrowser',
     'polls.apps.PollsConfig',
-    'Users.apps.UsersConfig',
-    'admin.apps.AdminConfig',
     'files.apps.FilesConfig',
     'maintest.apps.MaintestConfig',
-    #'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -125,21 +123,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-
-    os.path.join(BASE_DIR, 'Users/static'),
-
-    os.path.join(BASE_DIR, 'Users/static/css'),
-
-    os.path.join(BASE_DIR, 'Users/static/js'),
-
-    os.path.join(BASE_DIR, 'Users/static/images')
-
-]
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-
-SESSION_CACHE_ALIAS = 'default'
 
 FILEBROWSER_EXTENSIONS = {
     'Image': ['.jpg','.jpeg','.gif','.png','.tif','.tiff'],

@@ -214,37 +214,37 @@
       </div>
       <div class="row">
         <h4>Waveform</h4>
-        <!--<div class="col-md-12 pre-scrollable"-->
-             <!--style="background-color: #dedef8;box-shadow:-->
-                   <!--inset 1px -1px 1px #444, inset -1px 1px 1px #444;padding:10px;">-->
-          <!--&lt;!&ndash;<img src="{{ DIRECTORY }}/{{ current_path }}/wave.jpg" class="img-rounded img-responsive">&ndash;&gt;-->
-          <!--<img id="waveform" class="pre-scrollable"-->
-               <!--src="{% static 'maintest/img/' %}{{ current_path }}/{{ current_path }}.jpg"-->
-               <!--class="img-rounded img-responsive">-->
-          <!--&lt;!&ndash;<button type="button" onclick="loadXMLDoc_calc()">Calculate</button>&ndash;&gt;-->
-          <!--<br>-->
+        <div class="col-md-12 pre-scrollable"
+             style="background-color: #dedef8;box-shadow:
+                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;padding:10px;">
+          <!--<img src="{{ DIRECTORY }}/{{ current_path }}/wave.jpg" class="img-rounded img-responsive">-->
+          <img id="waveform" class="pre-scrollable"
+               src="{% static 'maintest/img/' %}{{ current_path }}/{{ current_path }}.jpg"
+               class="img-rounded img-responsive">
+          <!--<button type="button" onclick="loadXMLDoc_calc()">Calculate</button>-->
+          <br>
+        </div>
+        <!--<p id='#wavedrawing'>-->
+        <!--<div style='outline: 1px solid gray;'>-->
+          <!--<button id="load">Compile and Draw</button>-->
+          <!--<button id="draw" disabled='disabled'>Reload Image</button>-->
         <!--</div>-->
-        <p id='#wavedrawing'>
-        <div style='outline: 1px solid gray;'>
-          <button id="load">Compile and Draw</button>
-          <button id="draw" disabled='disabled'>Reload Image</button>
-        </div>
-        <div style='outline: 1px solid gray;'>
-          <ul id="namel"
-              style='outline: 1px solid green; width:20%;margin:0;display: inline-block;vertical-align:top;list-style-type: square;'></ul>
-          <ul id='sep'
-              style='background:url(../../static/maintest/WaveDrawJS/img/sep.png) repeat-y;display: inline-block;width:1%;height:0;margin: 0; padding: 0;list-style-type: none'></ul>
-          <!-- canvas容器 -->
-          <ul id="canvasl"
-              style='outline: 2px solid white;display: inline-block;width:70%;margin: 0; padding: 0;list-style-type: none;font-size:0'></ul>
-        </div>
-        <p>propotion<input id="propotion" type="range" min="0" max="1000" value="1000"></p>
-        <p>width<input id="width" type="range" min="0" max="1000" value="1000"></p>
-        <p>scale<input id="scale" type="range" min="0" max="1000" value="1000"></p>
-        <script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>
-        <script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>
-        <script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>
-        </p>
+        <!--<div style='outline: 1px solid gray;'>-->
+          <!--<ul id="namel"-->
+              <!--style='outline: 1px solid green; width:20%;margin:0;display: inline-block;vertical-align:top;list-style-type: square;'></ul>-->
+          <!--<ul id='sep'-->
+              <!--style='background:url(../../static/maintest/WaveDrawJS/img/sep.png) repeat-y;display: inline-block;width:1%;height:0;margin: 0; padding: 0;list-style-type: none'></ul>-->
+          <!--&lt;!&ndash; canvas容器 &ndash;&gt;-->
+          <!--<ul id="canvasl"-->
+              <!--style='outline: 2px solid white;display: inline-block;width:70%;margin: 0; padding: 0;list-style-type: none;font-size:0'></ul>-->
+        <!--</div>-->
+        <!--<p>propotion<input id="propotion" type="range" min="0" max="1000" value="1000"></p>-->
+        <!--<p>width<input id="width" type="range" min="0" max="1000" value="1000"></p>-->
+        <!--<p>scale<input id="scale" type="range" min="0" max="1000" value="1000"></p>-->
+        <!--<script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>-->
+        <!--<script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>-->
+        <!--<script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>-->
+        <!--</p>-->
       </div>
     </div>
   </div>

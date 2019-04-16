@@ -25,6 +25,7 @@
     var build_url = "{% url 'maintest:build' %}";
     var check_url = "{% url 'maintest:check' %}";
     var test_url = "{% url 'maintest:test' %}";
+    var report_url = "{% url 'maintest:report' %}";
     var tv_ajax_url = "{% url 'maintest:tv_ajax' %}";
 
 
@@ -124,8 +125,6 @@
       {% include "maintest/include/toolbar.html" %}
     </div>
     <div class="col-md-3">
-      <a href="{% url 'Users:login' %}">Log in</a>
-      <a href="{% url 'Users:sign_up' %}">Sign up</a>
       <!--Search bar-->
       <!--<div class="input-group">-->
         <!--<input type="text" class="form-control">-->

@@ -93,6 +93,8 @@ class VcdFile(object):
 
 	def __init__(self, path, period='1ps'):
 		self.vcd_info = []
+		# self.parameter = []
+		self.sym2ord = {}
 		self.path = path
 		self.period = period
 		self.get_header()
@@ -107,19 +109,29 @@ class VcdFile(object):
 		regex1 = re.compile(r'\$var\s+(\w+)\s+(\d+)\s+(.)\s+(\w+)\s*(\[(\d+)(:?)(\d*)\])?\s+\$end', re.I)
 		# $var 'type' 'width' 'symbol' 'signal' $end
 		regex2 = re.compile(r'#(\d+)')                # match period
-		regex3 = re.compile(r'(b?)([0|1|x|z]+)\s*(.)')  # match testbench
+		regex3 = re.compile(r'(b?)([0|1|x|z]+)\s*([^\r\n])')  # match testbench
 		with open(self.path, "r") as f:
+			# header
 			content = f.read()  # TODO: match signal definitions here.
 			self.module_name = re.findall(r'\$scope module (\w+) \$end', content)[0]
+			self.header['timescale'] = re.findall(r'\$timescale\s+(\w+)\s+\$end', content)[0]
+			print(self.header['timescale'])
+			self.timescale = int(timescale_op(self.period) / timescale_op(self.header['timescale']))
 			f.seek(0)
+
+			# main
 			for line in f.readlines():
+				# print(line)
 				# print(self.vcd_info)
 				m3 = regex3.match(line)
 				if m3:
 					base, value, key = m3.groups()
+					# print(m3.groups())
 					# print(key, value)
-					i = ord(key) - 33  # ASCII value, start from '!'(33)
+					# i = ord(key) - 33  # ASCII value, start from '!'(33)
+					i = self.sym2ord[key]
 					if key not in self.sym2sig:
+						# print(key + ' key not exist')
 						continue
 					if isinstance(self.sym2sig[key], tuple):
 						bus_ele = self.sym2sig[key]
@@ -140,6 +152,8 @@ class VcdFile(object):
 					# 	if value == 'z':
 					# 		value = z_val
 					# 	pos2val[self.sig2pos.setdefault(self.sym2sig[key], None)] = value
+					# print(i)
+					# print(i, len(self.vcd_info))
 					if vcd_tick + 1 == len(self.vcd_info[i]['wave_info']):
 						self.vcd_info[i]['wave_info'][-1] = value
 					else:
@@ -150,13 +164,14 @@ class VcdFile(object):
 				m2 = regex2.match(line)
 				if m2:
 					vcd_tick_raw = int(m2.group(1))
+					# print(vcd_tick_raw)
 					if vcd_tick_raw == 0 or vcd_tick_raw % self.timescale:  # small delay, skip the write operation
 						continue
 					else:
 						vcd_tick = int(vcd_tick_raw / self.timescale)
 					# if tick < vcd_tick:
 					for sig_dict in self.vcd_info:
-						# print(sig_dict)
+						# print(self.vcd_info)
 						last_val = sig_dict['wave_info'][-1]
 						sig_dict['wave_info'] += [last_val] * (vcd_tick-len(sig_dict['wave_info']))
 					continue
@@ -169,7 +184,7 @@ class VcdFile(object):
 					if m.group(7):  # Combined bus
 						msb = int(m.group(6))
 						lsb = int(m.group(8))
-						sig = m.group(4)
+						sig = m.group(4) + m.group(5)
 						self.sym2sig[sym] = (sig, msb, lsb)  # symbol => (bus, MSB, LSB)
 					elif m.group(5):
 						sig = m.group(4) + m.group(5)
@@ -178,8 +193,12 @@ class VcdFile(object):
 						sig = m.group(4)
 						self.sym2sig[sym] = sig
 					sig_dict = {'symbol': sym, 'signal': sig, 'type': type, 'width': width, 'wave_info': [], 'wave_state': []}
+					self.sym2ord[sym] = len(self.vcd_info)
+					# print(self.sym2ord)
 					self.vcd_info.append(sig_dict)
+					# print(self.vcd_info)
 					# print(self.vcd_info, len(self.vcd_info))
+
 					continue
 				if re.search(r'\$dumpoff', line):
 					break
@@ -205,12 +224,14 @@ class VcdFile(object):
 				f.write('${}\n\t{}\n$end\n'.format(header, self.header[header]))
 			f.write('$scope module {}_tb $end\n'.format(self.module_name))
 			for sig_dict in self.vcd_info:
-				f.write('$var {} {} {} {} $end\n'.format(sig_dict['type'], sig_dict['width'], sig_dict['symbol'], sig_dict['signal']))
+				f.write('$var {} {} {} {} $end\n'.format('wire', sig_dict['width'], sig_dict['symbol'], sig_dict['signal']))
+				# f.write('$var {} {} {} {} $end\n'.format(sig_dict['type'], sig_dict['width'], sig_dict['symbol'], sig_dict['signal']))
 			f.write('$upscope $end\n$enddefinitions $end\n')
 			f.write('#0\n$dumpvars\n')
 			content = ''
 			for sig_dict in self.vcd_info:
-				content += '{}{}\n'.format(sig_dict['wave_info'][0], sig_dict['symbol'])
+				string = (sig_dict['width'] == 1) and '{}{}\n' or '{} {}\n'
+				content += string.format(sig_dict['wave_info'][0], sig_dict['symbol'])
 			f.write(content + '$end\n')
 			for i in range(1, len(self.vcd_info[0]['wave_info'])):
 				content = '#{}\n'.format(i)
@@ -223,24 +244,27 @@ class VcdFile(object):
 			f.write('$dumpoff\n')
 
 
-def vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
+def _vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 	"""
 	Merge vcd files.
 	"""
-	def compare_value(x, y):
-		return (x == y or x == 'x' or x == 'z') and '0' or '1'
-
-	def and_value(x, y):
-		return (x == '0' and y == '0') and '0' or '1'
+	time_cycle = vcd_ref.timescale
 	fr = open(os.path.splitext(path)[0] + '.rpt', 'w')
 	vcd_m = VcdFile(path, vcd_ref.period)
+	vcd_m.header['timescale'] = vcd_ref.header['timescale']
+	print(vcd_m.header['timescale'])
 	for sig_dict in vcd_ref.vcd_info[:]:
-		sig = sig_dict['signal'] + '_ref'
+		if '[' in sig_dict['signal']:
+			sig = '_ref['.join(sig_dict['signal'].split('['))
+		else:
+			sig = sig_dict['signal'] + '_ref'
+		sym = chr(ord(sig_dict['symbol']) + 1)
 		new_dict = sig_dict.copy()
 		new_dict['signal'] = sig
+		new_dict['symbol'] = sym
 		vcd_m.vcd_info.append(new_dict)
 		vcd_m.sym2sig[sig_dict['symbol']] = sig
-	offset = len(vcd_ref.vcd_info)
+	offset = len(vcd_ref.vcd_info) + 1
 	for sig_dict in vcd_file.vcd_info[:]:
 		sym = chr(ord(sig_dict['symbol']) + offset)
 		new_dict = sig_dict.copy()
@@ -248,7 +272,7 @@ def vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 		vcd_m.sym2sig[sym] = new_dict['signal']
 		vcd_m.vcd_info.append(new_dict)
 	if compare:  # generate error signal
-		sym = chr(len(vcd_m.vcd_info) + 33)
+		sym = '!'  # chr(len(vcd_m.vcd_info) + 33)
 		sig = 'error'  # TODO: check signal name clash
 		wave_info = ['0'] * len(vcd_ref.vcd_info[0]['wave_info'])
 		# for i in range(len(vcd_ref.vcd_info)):  # directly compare 2 lists
@@ -257,43 +281,42 @@ def vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 		# 	compare_result = list(map(compare_value, ref_dict, act_dict))
 		# 	wave_info = list(map(and_value, wave_info, compare_result))
 		# print(len(vcd_ref.vcd_info))
-		for i in range(len(vcd_ref.vcd_info[0]['wave_info'])):  # tick
-			for j in range(len(vcd_ref.vcd_info)):  # signal
-				# print(i, j)
-				x = vcd_ref.vcd_info[j]['wave_info'][i]
+		for i in range(len(vcd_file.vcd_info[0]['wave_info'])):  # tick
+			for j in range(len(vcd_file.vcd_info)):  # signal
+				ref_ord = vcd_ref.sym2ord[vcd_file.vcd_info[j]['symbol']]
+				x = vcd_ref.vcd_info[ref_ord]['wave_info'][i]
 				y = vcd_file.vcd_info[j]['wave_info'][i]
 				sig_ref = vcd_ref.vcd_info[j]['signal']
 				sig_act = vcd_file.vcd_info[j]['signal']
 				if x != 'x' and x != 'z' and x != y:
-					fr.write('Line {}: {}_ref = {}, {} = {}\n'.format(i, sig_ref, x, sig_act, y))  # report
+					fr.write('Time #{}: {}_ref = {}, {} = {}\n'.format(i*time_cycle, sig_ref, x, sig_act, y))  # report
 					wave_info[i] = '1'  # generate wave info for error_dict
 		error_dict = {
 			'symbol': sym, 'signal': sig, 'type': 'wire', 'width': 1, 'wave_info': list(wave_info), 'wave_state': []
 		}
+		if '1' not in wave_info:
+			fr.write("Test pass!")
 		vcd_m.sym2sig[sym] = sig
-		vcd_m.vcd_info.append(error_dict)
+		vcd_m.vcd_info.insert(0, error_dict)
 	fr.close()
 	return vcd_m
 
 
+def vcd_merge(vcd1, vcd2='', period='1us', path='.', compare=True):
+	vcd_ref = VcdFile(vcd1, period=period)
+	vcd_ref.get_vcd_info()
+	vcd_file = VcdFile(vcd2, period=period)
+	vcd_file.get_vcd_info()
+	vcd_merge = _vcd_merge(vcd_ref, vcd_file, path, compare)
+	vcd_merge.gen_vcd(path)
+
+
 if __name__ == "__main__":
 	'''vcd test'''
-	# # compare_ptn('counter/counter.ptn', 'counter/counter.ptn.bak1207')
-	# vcd = VcdFile('pin_test/pin_test.vcd', period='1ps')
-	# # vcd = VcdFile('counter/counter.vcd', period='1ps')
-	# # vcd = VcdFile('mul5/mul5.vcd', period='1us')
-	# vcd.get_vcd_info()
-	# # vcd.gen_vcd('pin_test/p3.vcd')
-	# # vcd.gen_vcd('mul5/m9.vcd')
-	#
-	# # test vcd_merge
-	# vcd1 = VcdFile('pin_test/p2.vcd', period='1ps')
-	# print('vcd1 = ', vcd1.vcd_info)
-	# vcd1.get_vcd_info()
-	# vcd2 = vcd_merge(vcd, vcd1, 'pin_test/p2_merge.vcd')
-	# print(vcd2.sym2sig)
-	# # vcd2.gen_vcd('pin_test/p1_merge.vcd')
-	# vcd2.gen_vcd(vcd2.path)
-
-	'''json test'''
-	test_json('temp.json')
+	vcd1 = 'vcd/stage1_2x_h_000.vcd'
+	# vcd1 = 'Bugs/MULreg/MULreg.vcd'
+	vcd2 = 'vcd/stage1_2x_h_000_trf.vcd'
+	# vcd2 = 'Bugs/MULreg/MULreg_trf.vcd'
+	period = '1us'
+	path = 'test1.vcd'
+	vcd_merge(vcd1, vcd2, period, path)

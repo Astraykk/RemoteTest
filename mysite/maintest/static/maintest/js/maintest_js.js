@@ -66,6 +66,7 @@ function treeviewOpenProject(tv_data_dir){
 $(document).ready(function(){
   $("#submit-o-p-path").click(function(){
     currentTVPath = $(".node-selected").text();
+    $(".node-selected").removeClass("node-selected");
     //var dir = $("[data-nodeid='0']").attr("class");
     //console.log(currentTVPath);
     loadTreeview(currentTVPath);
@@ -90,14 +91,20 @@ function callFlowFunc(path){
   var url = check_url;
   console.log("check func start");
   console.log(url);
+  var selected_tfo = $(".node-selected").text();
+//  alert('current path = ' + currentTVPath);
+//  var selected_tfo = $(".list-group").text();
+//  alert(selected_tfo);
   $.ajax({
     url: url,
       async: true,
       data: {
-        path: path
+        path: path,
+        tfo: selected_tfo
       },
       success: function(data){
         alert(data);
+//        alert('hello')
         location.reload();
       }
     });
@@ -137,6 +144,28 @@ function runTest(path){
         alert(data);
         // document.getElementById("waveform").src = waveform_path;
         console.log("change img src")
+        location.reload();
+      }
+    });
+}
+
+function genTestReport(path){
+  var url = report_url;
+//  var rpt_name = $("#rptName").val();
+  // waveform_path = waveform_path + rpt_name + ".jpg"
+  console.log("Test report");
+  console.log(url);
+  $.ajax({
+    url: url,
+      async: true,
+      data: {
+        path: path,
+//        rpt_name: rpt_name
+      },
+      success: function(data){
+        alert(data);
+        // document.getElementById("waveform").src = waveform_path;
+//        console.log("change img src")
         location.reload();
       }
     });

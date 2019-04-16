@@ -12,8 +12,12 @@ import bs4
 import time
 from importlib import util
 if util.find_spec("filebrowser"):
-	from filebrowser.sites import site
-	DIRECTORY = os.path.join(site.storage.location, "uploads")  # /path/to/mysite/uploads/
+	try:
+		from filebrowser.sites import site
+		DIRECTORY = os.path.join(site.storage.location, "uploads")  # /path/to/mysite/uploads/
+	except Exception as exc:
+		print('site not found')
+		DIRECTORY = sys.path[0]
 else:
 	print("filebrowser not find!")
 	DIRECTORY = sys.path[0]  # os.path.join(sys.path[0], 'uploads')
@@ -24,10 +28,14 @@ PROJECT_PATH = ''  # /mysite/uploads/project/
 INCLUDE_PATH = 'include'  # /mysite/tools/include/
 
 # define operation code here
-MASK_OP = 0x1
-BITSTREAM_OP = 0x2
-TESTBENCH_OP = 0x4
-END_OP = 0x80
+# MASK_OP = 0x1
+# BITSTREAM_OP = 0x2
+# TESTBENCH_OP = 0x4
+# END_OP = 0x80
+MASK_OP = b'\x01'
+BITSTREAM_OP = b'\x02'
+TESTBENCH_OP = b'\x04'
+END_OP = b'\x80'
 # enddefine
 
 # define other global constants
@@ -47,7 +55,6 @@ def timer(func):
 		func(self)
 		end_time = time.time()
 		print("\nTotal time: " + str(end_time - start_time))
-
 	return _timer
 
 
@@ -92,15 +99,21 @@ def write_content(fw, pos_dict, base=[0]*16):
 			numbers[key[0] - 1] += 2 ** key[1] * int(value)
 		# numbers[key[0]-1] += int(value) << key[1]  # shift operation is faster?
 	for num in numbers:
-		# print(num)
-		fw.write(struct.pack('B', num))
+		# fw.write(struct.pack('B', num))
+		if num:
+			content = struct.pack('B', num)
+		else:
+			content = b'\x00'
+		fw.write(content)
 
 
 def write_operator(fw, operator, length):
-	fw.write(struct.pack('B', operator))  # 1 byte
-	for i in range(11):  # length takes 4 bytes
-		fw.write(struct.pack('B', 0xff))
-	fw.write(struct.pack('>I', length))  # 4 bytes, big-endian
+	fw.write(operator + b'\xff' * 11 + struct.pack('>I', length))
+	# fw.write(operator)  # 1 byte
+	# # for i in range(11):  # length takes 4 bytes
+	# # 	fw.write(struct.pack('B', 0xff))
+	# fw.write(b'\xff' * 11)
+	# fw.write(struct.pack('>I', length))  # 4 bytes, big-endian
 
 
 def write_tb_op(fw, tb_counter):
@@ -271,6 +284,7 @@ class PatternGen(object):
 
 	def __init__(self, path='.', tfo_file='tfo_demo', command='-normal', file_list=()):
 		self.project_name = path
+		print('Creating instance for project {}\n'.format(path))
 		self.path = os.path.join(DIRECTORY, path)
 		# self.command = command.split('-')          # Get command: -normal, -legacy, ...
 		self.config['command'] = command.split('-')  # Get command: -normal, -legacy, ...
@@ -281,14 +295,15 @@ class PatternGen(object):
 		self.atf_parser(self.file_list['ATF'])  # Get position of include files.
 		self.itm_parser(self.file_list['ITM'])
 		# print(self.file_list)
+		self.last_pos2val = {}
 
-		# initialize bitstream infolf.cmd2spio, whatever = self.pio_parser(self.include_path, self.file_list['SPIO'])
+		# initialize bitstream info
 		self.cmd2spio, whatever = self.pio_parser(self.include_path, self.file_list['SPIO'])
 		cmd2pin = self.ucf_parser(self.include_path, self.file_list['SUCF'])
 		cmd2channel = self.lbf_parser(self.file_list['LBF'], cmd2pin)
 		self.cmd2pos = self.tcf_parser(self.file_list['TCF'], cmd2channel)
 		self.sbc_parser(self.file_list['SBC'])
-		self.cclk_pos = self.cmd2pos['CCLK']
+		self.cclk_pos = self.cmd2pos.setdefault('CCLK', 0)
 
 		# initialize testbench info
 		self.sig2pio, self.entri_dict = self.pio_parser(self.path, self.file_list['PIO'])
@@ -356,7 +371,7 @@ class PatternGen(object):
 	def ucf_parser(path, file):
 		sig2pin = {}
 		path = os.path.join(path, file)
-		regex = re.compile(r'NET\s+"(.+)"\s+LOC =(.+);', re.I)
+		regex = re.compile(r'NET\s+"(.+)"\s+LOC\s*=\s*(.+)\s*;\s*', re.I)
 		with open(path, "r") as f:
 			for line in f.readlines():
 				m = regex.match(line)
@@ -602,17 +617,26 @@ class PatternGen(object):
 			default = int(element['default'])
 			self.cmd2flag[element['name']] = {'value': value, 'flag': flag, 'default': default}
 
-		# Handle BTC tag
-		btc_tag = soup.find('BTC')
-		self.bs_start = int(btc_tag['start'][:-1])
-		for child in btc_tag.find_all('DATA'):
-			num = (int(child['byte']) - 1) * 8 + 7 - int(child['bit'])
-			self.pos2data[num] = child['name']
-
 		# Handle NOP tag
 		nop_tag = soup.find('NOP')
-		self.nop['start'] = nop_tag['start']
-		self.nop['cycle'] = int(nop_tag['cycle'][:-1])
+		if nop_tag:
+			self.nop['start'] = nop_tag['start'].strip('T')
+			self.nop['cycle'] = int(nop_tag['cycle'][:-1])
+		else:
+			print('Warning: No NOP tag found.')
+			self.nop['start'] = 0
+			self.nop['cycle'] = 0
+
+		# Handle BTC tag
+		btc_tag = soup.find('BTC')
+		if btc_tag:
+			self.bs_start = int(btc_tag['start'][:-1])
+			for child in btc_tag.find_all('DATA'):
+				num = (int(child['byte']) - 1) * 8 + 7 - int(child['bit'])
+				self.pos2data[num] = child['name']
+		else:
+			print('Warning: No BTC tag found.')
+			self.bs_start = int(self.nop['start'])
 
 	def rbt_generator(self, file):
 		"""
@@ -667,6 +691,8 @@ class PatternGen(object):
 		return sym2sig
 
 	def edge_check(self, fw):
+		if not self.last_pos2val:
+			return
 		if self.last_pos2val[self.cclk_pos] == 0:
 			self.last_pos2val[self.cclk_pos] = 1
 			write_content(fw, self.last_pos2val)
@@ -677,6 +703,7 @@ class PatternGen(object):
 		bus_width = bus[1] - bus[2]
 		bus_signal = bus_width > 0 and 1 or -1
 		val = 'b'
+		# print(self.sig2pos)
 		for i in range(0, bus_width + bus_signal, bus_signal):
 			bus_sig = '{}[{}]'.format(bus[0], str(bus[1] - i))
 			bus_pos = self.sig2pos[bus_sig]
@@ -702,6 +729,7 @@ class PatternGen(object):
 		}
 		# Prepare param for trf abandon
 		if flag == 'bypass':   # load length of vcd and bs from json file
+			print('Load temp file')
 			self.load_temp()
 		vcd_len = self.trf_param['vcd_len']
 		bs_len = self.trf_param['bs_len']
@@ -711,7 +739,7 @@ class PatternGen(object):
 		else:
 			end_tick = 2049 + vcd_len - x1
 
-		with open(path_trf, 'rb') as ft, open(path_vcd, 'w') as fv, open(path_pruned_trf, 'wb') as fp:
+		with open(path_trf, 'rb') as ft, open(path_vcd, 'w') as fv:  # , open(path_pruned_trf, 'wb') as fp:
 			for item in title:
 				fv.write('${}\n\t{}\n$end\n'.format(item, title[item]))
 			fv.write('$scope module {}_tb $end\n'.format(self.project_name))
@@ -719,13 +747,15 @@ class PatternGen(object):
 			# for symbol, signal in self.sym2sig.items():
 			# print(sorted_sym2sig)
 			for symbol, signal in sorted_sym2sig:
-				print(symbol, signal)
+				# print(symbol, signal)
 				if isinstance(signal, tuple):
-					io = self.sig2pio['{}[{}]'.format(signal[0], signal[1])] == 'input' and 'reg' or 'wire'
+					# io = self.sig2pio['{}[{}]'.format(signal[0], signal[1])] == 'input' and 'reg' or 'wire'
+					io = 'wire'
 					signal, width = '{}[{}:{}]'.format(signal[0], signal[1], signal[2]), abs(signal[1] - signal[2] + 1)
 				else:
 					width = 1
-					io = self.sig2pio[signal] == 'input' and 'reg' or 'wire'
+					# io = self.sig2pio[signal] == 'input' and 'reg' or 'wire'
+					io = 'wire'
 				fv.write('$var {} {} {} {} $end\n'.format(io, width, symbol, signal))
 			fv.write('$upscope $end\n$enddefinitions $end\n')
 			line = ft.read(BIN_BYTE_WIDTH)  # Bytes type
@@ -737,7 +767,7 @@ class PatternGen(object):
 				elif 1 < tick < x1 or tick >= 2048:
 					sym2val = {}
 					line_tuple = struct.unpack('>' + 'B' * 16, line)
-					fp.write(line)  # generate pruned TRF file
+					# fp.write(line)  # generate pruned TRF file
 					if not last_line:  # first line
 						fv.write('#{}\n$dumpvars\n'.format(order))
 						for sym, sig in self.sym2sig.items():
@@ -773,6 +803,7 @@ class PatternGen(object):
 					order += 1
 				line = ft.read(BIN_BYTE_WIDTH)
 				tick += 1
+		# print(sorted_sym2sig)
 
 	def compare_trf(self, ptn, trf):
 		# compare trf and ptn file, generate report.
@@ -834,6 +865,12 @@ class PatternGen(object):
 
 	def write_bitstream(self, fw):
 		pos2val = {}
+		if 'BIT' not in self.file_list: # project without BIT tag
+			return
+		rbt_path = os.path.join(self.path, self.file_list['BIT'] + '.rbt')
+		if not os.path.isfile(rbt_path):
+			print('Warning: No BIT file found.')
+			return
 		gen = self.rbt_generator(self.file_list['BIT'] + '.rbt')
 		# zero_line_1 = b'\x00' * 16
 		# byte, bit = self.cclk_pos
@@ -877,8 +914,7 @@ class PatternGen(object):
 			value = get_sig_value(flag, self.tick)
 			self.last_pos2val[self.cmd2pos[key]] = value
 		self.last_pos2val[self.cmd2pos['CCLK']] = 1
-
-	# print(self.last_bs)
+		print('Bitstream complete')
 
 	def write_nop(self, fw):
 		start = self.nop['start']
@@ -900,11 +936,14 @@ class PatternGen(object):
 		else:
 			start = int(start)
 			while self.tick <= start:
+				if not start:
+					break
 				fw.write(line)
 				self.tick += 1
 				self.total_length += 1
 		write_length(fw, self.tick)
 		self.trf_param['bs_len'] = self.tick
+		print('Nop complete')
 
 	def write_testbench(self, fw):
 		self.total_length -= 1  # the first line will add an extra 1
@@ -915,6 +954,8 @@ class PatternGen(object):
 
 	@timer
 	def write(self):
+		# s_time = time.time()
+		print('\nWriting PTN file ...')
 		path = os.path.join(self.path, self.file_list['PTN'])
 		with open(path, 'wb+') as fw:
 			write_mask(fw, self.cmd2pos, self.cmd2spio)
@@ -929,9 +970,7 @@ class PatternGen(object):
 			self.edge_check(fw)  # Check clock edge.
 			print('Edge check complete')
 			self.write_bitstream(fw)
-			print('Bitstream complete')
 			self.write_nop(fw)
-			print('Nop complete')
 			self.write_testbench(fw)
 			print('Testbench complete')
 			write_operator(fw, END_OP, 0)
@@ -939,9 +978,13 @@ class PatternGen(object):
 			self.completion(fw)
 			print('2048-completion complete')
 			self.save_temp()
-			print('Temp file saved')
+			print('Save Temp.json file')
 			print("Finished!")
 		del fw
+		# e_time = time.time()
+		# time_record(s_time, e_time, self.report_path)
+
+	# def time_record(self, s_time):
 
 	def save_temp(self):
 		path = os.path.join(self.path, "temp.json")
@@ -967,10 +1010,12 @@ class PatternGen(object):
 
 
 def batch_build(path, tfo):
+	print('Start batch build')
 	file_list_list = tfo_parser(path, tfo)
 	for project_path, file_list in file_list_list.items():
 		pattern = PatternGen(os.path.join(path, project_path), file_list=file_list)
 		pattern.write()
+	print('Batch build finished')
 
 
 # @timer
@@ -982,8 +1027,12 @@ def test():
 	# pattern = PatternGen('test_tri', 'tfo_demo.tfo')  # Test trigate bus.
 	# pattern = PatternGen('counter', 'tfo_demo.tfo')  # type: PatternGen
 	# pattern = PatternGen('test_tri_pro', 'tfo_demo.tfo')  # Test trigate bus.
-	pattern = PatternGen('mul5', 'tfo_demo.tfo')
+	# pattern = PatternGen('mul5', 'tfo_demo.tfo')
 	# pattern = PatternGen('mul1', 'tfo_demo.tfo')
+	# pattern = PatternGen('and_xor_1', 'tfo_demo.tfo')
+	# pattern = PatternGen('f8_mux', 'tfo_demo.tfo')
+	# pattern = PatternGen('eras', 'FLASH.tfo')
+	pattern = PatternGen('Bugs/MULreg', 'bugs2.tfo')
 
 	# pattern.write()
 	# print(pattern.sym2sig)
@@ -993,8 +1042,10 @@ def test():
 	# print(pattern.sym2sig)
 	# pattern.trf2vcd('pin_test.trf', 'p4.vcd', flag='bypass')
 	# pattern.trf2vcd('counter.trf', 'c3.vcd', flag='bypass')
-	pattern.trf2vcd('m8.trf', 'm11.vcd', flag='bypass')
+	pattern.trf2vcd('MULreg.trf', 'A1.vcd', flag='bypass')
+	# pattern.trf2vcd('m8.trf', 'm11.vcd', flag='bypass')
 	# pattern.trf2vcd('mul1_r.trf', 'mul1_r.vcd', flag='bypass')
+	# pattern.trf2vcd('and_xor_0_noddr3.trf', 'and_xor_0_noddr3.vcd', flag='bypass')
 	# pattern.compare_trf('counter.ptn', 'pruned_counter.trf')
 	# pattern.compare_trf('mul5.ptn', 'm8.trf')
 

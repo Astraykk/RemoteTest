@@ -1,0 +1,154 @@
+<TCF name = "F93K" comment = "1" author = "xy" date = "2018/04/08">
+	<FRAME name = "EF0101">
+		<CONNECT pogo = "106" cage = "1" slot = "1" card = "BR0101" plug = "D01"/>
+		<CONNECT pogo = "109" cage = "1" slot = "1" card = "BR0101" plug = "D02"/>
+		<CONNECT pogo = "111" cage = "1" slot = "1" card = "BR0101" plug = "D03"/>
+		<CONNECT pogo = "112" cage = "1" slot = "1" card = "BR0101" plug = "D04"/>
+		<CONNECT pogo = "117" cage = "1" slot = "1" card = "BR0101" plug = "D05"/>
+		<CONNECT pogo = "120" cage = "1" slot = "1" card = "BR0101" plug = "D06"/>
+		<CONNECT pogo = "121" cage = "1" slot = "1" card = "BR0101" plug = "D07"/>
+		<CONNECT pogo = "123" cage = "1" slot = "1" card = "BR0101" plug = "D08"/>
+	</FRAME>
+	<CARD name = "BR0101" width = "128">
+		<SIGMAP>
+			<MAPPING channel = "D0101" byte = "1" bit = "7"/>
+			<MAPPING channel = "D0102" byte = "1" bit = "6"/>
+			<MAPPING channel = "D0103" byte = "1" bit = "5"/>
+			<MAPPING channel = "D0104" byte = "1" bit = "4"/>
+			<MAPPING channel = "D0105" byte = "1" bit = "3"/>
+			<MAPPING channel = "D0106" byte = "1" bit = "2"/>
+			<MAPPING channel = "D0107" byte = "1" bit = "1"/>
+			<MAPPING channel = "D0108" byte = "1" bit = "0"/>
+			<MAPPING channel = "D0109" byte = "2" bit = "7"/>
+			<MAPPING channel = "D0110" byte = "2" bit = "6"/>
+			<MAPPING channel = "D0111" byte = "2" bit = "5"/>
+			<MAPPING channel = "D0112" byte = "2" bit = "4"/>
+			<MAPPING channel = "D0113" byte = "2" bit = "3"/>
+			<MAPPING channel = "D0114" byte = "2" bit = "2"/>
+			<MAPPING channel = "D0115" byte = "2" bit = "1"/>
+			<MAPPING channel = "D0116" byte = "2" bit = "0"/>
+			
+			<MAPPING channel = "D0201" byte = "3" bit = "7"/>
+			<MAPPING channel = "D0202" byte = "3" bit = "6"/>
+			<MAPPING channel = "D0203" byte = "3" bit = "5"/>
+			<MAPPING channel = "D0204" byte = "3" bit = "4"/>
+			<MAPPING channel = "D0205" byte = "3" bit = "3"/>
+			<MAPPING channel = "D0206" byte = "3" bit = "2"/>
+			<MAPPING channel = "D0207" byte = "3" bit = "1"/>
+			<MAPPING channel = "D0208" byte = "3" bit = "0"/>
+			<MAPPING channel = "D0209" byte = "4" bit = "7"/>
+			<MAPPING channel = "D0210" byte = "4" bit = "6"/>
+			<MAPPING channel = "D0211" byte = "4" bit = "5"/>
+			<MAPPING channel = "D0212" byte = "4" bit = "4"/>
+			<MAPPING channel = "D0213" byte = "4" bit = "3"/>
+			<MAPPING channel = "D0214" byte = "4" bit = "2"/>
+			<MAPPING channel = "D0215" byte = "4" bit = "1"/>
+			<MAPPING channel = "D0216" byte = "4" bit = "0"/>
+			
+			<MAPPING channel = "D0301" byte = "5" bit = "7"/>
+			<MAPPING channel = "D0302" byte = "5" bit = "6"/>
+			<MAPPING channel = "D0303" byte = "5" bit = "5"/>
+			<MAPPING channel = "D0304" byte = "5" bit = "4"/>
+			<MAPPING channel = "D0305" byte = "5" bit = "3"/>
+			<MAPPING channel = "D0306" byte = "5" bit = "2"/>
+			<MAPPING channel = "D0307" byte = "5" bit = "1"/>
+			<MAPPING channel = "D0308" byte = "5" bit = "0"/>
+			<MAPPING channel = "D0309" byte = "6" bit = "7"/>
+			<MAPPING channel = "D0310" byte = "6" bit = "6"/>
+			<MAPPING channel = "D0311" byte = "6" bit = "5"/>
+			<MAPPING channel = "D0312" byte = "6" bit = "4"/>
+			<MAPPING channel = "D0313" byte = "6" bit = "3"/>
+			<MAPPING channel = "D0314" byte = "6" bit = "2"/>
+			<MAPPING channel = "D0315" byte = "6" bit = "1"/>
+			<MAPPING channel = "D0316" byte = "6" bit = "0"/>
+			
+			<MAPPING channel = "D0401" byte = "7" bit = "7"/>
+			<MAPPING channel = "D0402" byte = "7" bit = "6"/>
+			<MAPPING channel = "D0403" byte = "7" bit = "5"/>
+			<MAPPING channel = "D0404" byte = "7" bit = "4"/>
+			<MAPPING channel = "D0405" byte = "7" bit = "3"/>
+			<MAPPING channel = "D0406" byte = "7" bit = "2"/>
+			<MAPPING channel = "D0407" byte = "7" bit = "1"/>
+			<MAPPING channel = "D0408" byte = "7" bit = "0"/>
+			<MAPPING channel = "D0409" byte = "8" bit = "7"/>
+			<MAPPING channel = "D0410" byte = "8" bit = "6"/>
+			<MAPPING channel = "D0411" byte = "8" bit = "5"/>
+			<MAPPING channel = "D0412" byte = "8" bit = "4"/>
+			<MAPPING channel = "D0413" byte = "8" bit = "3"/>
+			<MAPPING channel = "D0414" byte = "8" bit = "2"/>
+			<MAPPING channel = "D0415" byte = "8" bit = "1"/>
+			<MAPPING channel = "D0416" byte = "8" bit = "0"/>
+			
+			<MAPPING channel = "D0501" byte = "9" bit = "7"/>
+			<MAPPING channel = "D0502" byte = "9" bit = "6"/>
+			<MAPPING channel = "D0503" byte = "9" bit = "5"/>
+			<MAPPING channel = "D0504" byte = "9" bit = "4"/>
+			<MAPPING channel = "D0505" byte = "9" bit = "3"/>
+			<MAPPING channel = "D0506" byte = "9" bit = "2"/>
+			<MAPPING channel = "D0507" byte = "9" bit = "1"/>
+			<MAPPING channel = "D0508" byte = "9" bit = "0"/>
+			<MAPPING channel = "D0509" byte = "10" bit = "7"/>
+			<MAPPING channel = "D0510" byte = "10" bit = "6"/>
+			<MAPPING channel = "D0511" byte = "10" bit = "5"/>
+			<MAPPING channel = "D0512" byte = "10" bit = "4"/>
+			<MAPPING channel = "D0513" byte = "10" bit = "3"/>
+			<MAPPING channel = "D0514" byte = "10" bit = "2"/>
+			<MAPPING channel = "D0515" byte = "10" bit = "1"/>
+			<MAPPING channel = "D0516" byte = "10" bit = "0"/>
+			
+			<MAPPING channel = "D0601" byte = "11" bit = "7"/>
+			<MAPPING channel = "D0602" byte = "11" bit = "6"/>
+			<MAPPING channel = "D0603" byte = "11" bit = "5"/>
+			<MAPPING channel = "D0604" byte = "11" bit = "4"/>
+			<MAPPING channel = "D0605" byte = "11" bit = "3"/>
+			<MAPPING channel = "D0606" byte = "11" bit = "2"/>
+			<MAPPING channel = "D0607" byte = "11" bit = "1"/>
+			<MAPPING channel = "D0608" byte = "11" bit = "0"/>
+			<MAPPING channel = "D0609" byte = "12" bit = "7"/>
+			<MAPPING channel = "D0610" byte = "12" bit = "6"/>
+			<MAPPING channel = "D0611" byte = "12" bit = "5"/>
+			<MAPPING channel = "D0612" byte = "12" bit = "4"/>
+			<MAPPING channel = "D0613" byte = "12" bit = "3"/>
+			<MAPPING channel = "D0614" byte = "12" bit = "2"/>
+			<MAPPING channel = "D0615" byte = "12" bit = "1"/>
+			<MAPPING channel = "D0616" byte = "12" bit = "0"/>
+			
+			<MAPPING channel = "D0701" byte = "13" bit = "7"/>
+			<MAPPING channel = "D0702" byte = "13" bit = "6"/>
+			<MAPPING channel = "D0703" byte = "13" bit = "5"/>
+			<MAPPING channel = "D0704" byte = "13" bit = "4"/>
+			<MAPPING channel = "D0705" byte = "13" bit = "3"/>
+			<MAPPING channel = "D0706" byte = "13" bit = "2"/>
+			<MAPPING channel = "D0707" byte = "13" bit = "1"/>
+			<MAPPING channel = "D0708" byte = "13" bit = "0"/>
+			<MAPPING channel = "D0709" byte = "14" bit = "7"/>
+			<MAPPING channel = "D0710" byte = "14" bit = "6"/>
+			<MAPPING channel = "D0711" byte = "14" bit = "5"/>
+			<MAPPING channel = "D0712" byte = "14" bit = "4"/>
+			<MAPPING channel = "D0713" byte = "14" bit = "3"/>
+			<MAPPING channel = "D0714" byte = "14" bit = "2"/>
+			<MAPPING channel = "D0715" byte = "14" bit = "1"/>
+			<MAPPING channel = "D0716" byte = "14" bit = "0"/>
+			
+			<MAPPING channel = "D0801" byte = "15" bit = "7"/>
+			<MAPPING channel = "D0802" byte = "15" bit = "6"/>
+			<MAPPING channel = "D0803" byte = "15" bit = "5"/>
+			<MAPPING channel = "D0804" byte = "15" bit = "4"/>
+			<MAPPING channel = "D0805" byte = "15" bit = "3"/>
+			<MAPPING channel = "D0806" byte = "15" bit = "2"/>
+			<MAPPING channel = "D0807" byte = "15" bit = "1"/>
+			<MAPPING channel = "D0808" byte = "15" bit = "0"/>
+			<MAPPING channel = "D0809" byte = "16" bit = "7"/>
+			<MAPPING channel = "D0810" byte = "16" bit = "6"/>
+			<MAPPING channel = "D0811" byte = "16" bit = "5"/>
+			<MAPPING channel = "D0812" byte = "16" bit = "4"/>
+			<MAPPING channel = "D0813" byte = "16" bit = "3"/>
+			<MAPPING channel = "D0814" byte = "16" bit = "2"/>
+			<MAPPING channel = "D0815" byte = "16" bit = "1"/>
+			<MAPPING channel = "D0816" byte = "16" bit = "0"/>
+			
+		</SIGMAP>
+	</CARD>
+</TCF>
+			
+		

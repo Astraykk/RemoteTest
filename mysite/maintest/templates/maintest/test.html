@@ -24,7 +24,7 @@
     // define django template tag variables
     var build_url = "{% url 'maintest:build' %}";
     var check_url = "{% url 'maintest:check' %}";
-    var test_url = "{% url 'maintest:test' %}";
+    var test_url = "{% url 'Users:test_request' %}";
     var report_url = "{% url 'maintest:report' %}";
     var tv_ajax_url = "{% url 'maintest:tv_ajax' %}";
 
@@ -114,6 +114,10 @@
 <!--</h1>-->
 <!--</div>-->
 <div class="container">
+	<div>
+		{% include "maintest/include/account.html" %}
+	</div>
+	
   <div class="row">
     <div class="col-md-3" style="vertical-align:middle;font-size:20px">
       <p>&nbsp;Chip-Test App
@@ -121,9 +125,7 @@
       </p>
     </div>
 	
-	<div>
-		{% include "maintest/include/account.html" %}
-	</div>
+	
 	
     <div class="col-md-6">
       <!--Toolbar-->

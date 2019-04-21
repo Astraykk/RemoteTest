@@ -1,13 +1,13 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse,JsonResponse
-from Users.models import Users
+from django.http import HttpResponse,JsonResponse,FileResponse
+from Users.models import Users,Invitation,Group
 
 import django.db 
 import time
 import os
-
-# def index(request):
-#     return HttpResponse("Hello, world. You're at the polls index.")
+import shutil
+#def index(request):
+    #return HttpResponse("Hello, world. You're at the polls index.")
 # Create your views here.
 
 
@@ -18,8 +18,8 @@ def sign_up(request):
 def login(request):
 	return render(request,"Users/login.html")
 
-
 def identify(request):
+
 	if request.method == 'POST':
 		username = request.POST.get('username',None)
 		password = request.POST.get('password',None)
@@ -77,41 +77,23 @@ def add_user(request):
 
 
 def upload(request):
-	if request.method == 'POST':
-		username = request.session.get('username',None)
-		if username:
-			dirname = request.POST.get('dir',None)
-			path = username + "/" + dirname;
-			# files = request.FILES.get("myfile", None)
-			# if files:
-			# 	for file in files:
-			# 		with open("./all_users/%s/%s" % (path,file.name)) as fp:    #<<<<<<<-------------------------
-			# 			for chunk in file.chunks():
-			# 				fp.write(chunk)
-			# 			fp.close()
 
-			file = request.FILES.get("myfile", None)
-			if file:
-				with open("Users/all_users/%s/%s" % (path,file.name),'wb') as fp:
-					for chunk in file.chunks():
-						fp.write(chunk)
-					fp.close()
-					create_history(username,"upload file",file.name)
-				# dirs = show_file(username)
-				# context = {'username': username,'dirs':dirs}
-				# return render(request, 'mysite/homepage.html', context)
-
-				return redirect("/")
-				# return redirect("/index")
-							
-			else:
-				return HttpResponse("<script>alert(\"please select files to upload!\");window.location.href=\"/\";</script>")
-		
-		else:
-			return HttpResponse("<script>alert(\"Login first!\");window.location.href=\"/Users/login/\";</script>")
-	else:	
-		return redirect("/")
-		# return redirect("/index")
+	username = request.session.get('username',None)
+	if username:
+		file_loc = request.POST.get('file_loc',None)
+		path = username + file_loc;
+		files = request.FILES.getlist("myfile")
+		for file in files:
+			with open("Users/all_users/%s%s" % (path,file.name),'wb') as fp:
+				for chunk in file.chunks():
+					fp.write(chunk)
+				fp.close()
+				#create_history(username,"upload file",file.name)
+		if len(files):
+			return JsonResponse({"msg":"Upload successfully! If file is too big, please wait some time and then refresh the page!","type":"s"})
+		return JsonResponse({"msg":"Please select files to upload!","type":"w"})
+	else:
+		return JsonResponse({"msg":"Your session has expired, please relogin first!","type":"w"})
 
 
 # def show_file(username):
@@ -135,30 +117,19 @@ def upload(request):
 # 	return dirs
 
 def mkdir(request):
-	if request.method == 'POST':
-		username = request.session.get('username',None)
-
-		if username:
-			dirname = request.POST.get("dir4mk", None)
-			#print(dirname+"--------------------------------")
-			path = "Users/all_users/" + username + "/"+ dirname
-			try:
-				os.mkdir(path)				
-			except OSError:
-				#context = {'username': username,'msg':"already have this direction"}
-				return HttpResponse("<script>alert(\"already have this direction!\");window.location.href=\"/\";</script>")
-			else:
-				# dirs = show_file(username)
-				# context = {'username': username,'dirs':dirs}
-				create_history(username,"create dir",dirname)
-				return redirect("/")
-				# return redirect("/index")
-			
-	# context = {'username': username,'msg':"make dir failed!"}
-	# return render(request, 'mysite/homepage.html', context)
-	# return redirect("/")
-	# return redirect("/index")
-	return HttpResponse("<script>alert(\"Login first!\");window.location.href=\"/Users/login/\";</script>")
+	username = request.session.get('username',None)
+	if username:
+		dir_loc = request.POST.get("dir_loc", None)
+		dir_name = request.POST.get("dir_name", None)
+		path = "Users/all_users/" + username + dir_loc + dir_name
+		try:
+			os.mkdir(path)				
+		except OSError:
+			return JsonResponse({"msg":"Failed in create!","type":"d"})
+		else:
+			return JsonResponse({"msg":"Create successfully!","type":"s"})
+	else:
+		return JsonResponse({"msg":"Your session has expired, please relogin first!","type":"w"})
 
 
 
@@ -172,20 +143,38 @@ def logout(request):
 
 
 
-def del_file(path):
-    ls = os.listdir(path)
-    for i in ls:
-        c_path = os.path.join(path, i)
-        if os.path.isdir(c_path):
-            del_file(c_path)
-        else:
-            os.remove(c_path)
+def del_file(request):
+	username = request.session.get("username",None)
+	if username:
+			
+		loc4del = request.POST.get("loc4del")
+		path = "Users/all_users/" + username + loc4del
+		if os.path.isdir(path):
+			ls = os.listdir(path)
+			for i in ls:
+				c_path = os.path.join(path, i)
+				if os.path.isdir(c_path):
+					shutil.rmtree(c_path,True)
+				else:
+					os.remove(c_path)
+			shutil.rmtree(path,True)
+			return JsonResponse({"msg":"delete the dir successfully!","type":"s"})
+		else:
+			os.remove(path)
+			return JsonResponse({"msg":"delete the file successfully!","type":"s"})
+	else:
+		return JsonResponse({"msg":"Your session has expired, please relogin first!","type":"d"})
 
 
-def create_history(username,behavior,filename):
-	with open("Users/all_users/%s/%s" % (username,"log.txt"),'a') as fp:
-		fp.write(behavior+" \t "+filename+" \t "+time.asctime(time.localtime(time.time()))+"\n")
-	fp.close()
+def create_history(username,behavior,filename,tag="0"):
+	if tag == "0":
+		with open("Users/all_users/%s/%s" % (username,".log.txt"),'a') as fp:
+			fp.write(behavior+" | "+filename+" | "+time.asctime(time.localtime(time.time()))+"\n")
+		fp.close()
+	else:
+		with open("Users/all_groups/%s/%s" % (username,".log.txt"),'a') as fp:
+			fp.write(behavior+" | "+filename+" | "+time.asctime(time.localtime(time.time()))+"\n")
+		fp.close()
 	# print "time.time(): %f " %  time.time()
 	# print time.localtime( time.time() )
 	# print time.asctime( time.localtime(time.time()) )
@@ -195,7 +184,7 @@ def log(request):
 	if username:
 		log=[]
 		try:
-			fp = open("Users/all_users/"+username+"/log.txt","r")
+			fp = open("Users/all_users/"+username+"/.log.txt","r")
 		except FileNotFoundError:
 			log.append("no log information")
 		else:
@@ -205,6 +194,30 @@ def log(request):
 	#else:
 		#return HttpResponse("<script>alert(\"Login first!\");window.location.href=\"/Users/login/\";</script>")
 		
-		
+def invitations(request):
+	username = request.session.get("username")
+	context = {}
+	if username:
+		user = Users.objects.get(username = username)
+		invitations = user.invitation_set.all().values("inviter_name","group_id","invitee_au","notes")
+		context["invitations"] = invitations
+		for inv in invitations:
+			group = Group.objects.get(group_id=inv["group_id"])
+			inv["group_name"] = group.group_name
+		return render(request,"Users/invitations.html",context)
+	else:
+		return redirect('/Users/login/')
 
+def download(request):
+	username = request.session.get('username',None)
+	if username:
+		loc4down = request.POST.get('loc4down',None)
+		filename = request.POST.get('file_name4down',None)
+		path = "Users/all_users/"+ username + loc4down + filename;
+		file = open(path,'rb')
+		response = FileResponse(file)	
+		response['Content-Disposition']='attachment;filename='+'"'+filename+'"'
+		return response
+	else:
+		return redirect('/Users/login/')
 	

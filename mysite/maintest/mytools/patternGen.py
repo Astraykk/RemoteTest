@@ -14,7 +14,8 @@ from importlib import util
 if util.find_spec("filebrowser"):
 	try:
 		from filebrowser.sites import site
-		DIRECTORY = os.path.join(site.storage.location, "uploads")  # /path/to/mysite/uploads/
+		#DIRECTORY = os.path.join(site.storage.location, "uploads")  # /path/to/mysite/uploads/
+		DIRECTORY = os.path.join(site.storage.location, "Users","all_users")
 	except Exception as exc:
 		print('site not found')
 		DIRECTORY = sys.path[0]
@@ -285,7 +286,8 @@ class PatternGen(object):
 	def __init__(self, path='.', tfo_file='tfo_demo', command='-normal', file_list=()):
 		self.project_name = path
 		print('Creating instance for project {}\n'.format(path))
-		self.path = os.path.join(DIRECTORY, path)
+		#self.path = os.path.join(DIRECTORY, path)
+		self.path = path
 		# self.command = command.split('-')          # Get command: -normal, -legacy, ...
 		self.config['command'] = command.split('-')  # Get command: -normal, -legacy, ...
 		if file_list:

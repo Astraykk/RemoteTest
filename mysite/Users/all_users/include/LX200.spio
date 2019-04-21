@@ -1,0 +1,56 @@
+#16 configuration control pins
+NET "CCLK" DIR = input;
+NET "D_IN" DIR = input;
+NET "INIT_B" DIR = OUTPUT;
+NET "M0" DIR = input;
+NET "M1" DIR = input;
+NET "M2" DIR = input;
+NET "PROG_B" dir    =   input;
+NET "RDWR_B" DIR = input;
+NET "DONE" DIR = OUTput;
+NET "PWRDWN_B" DIR = input;
+NET "CS_B" DIR = input;
+NET "DOUT_BUSY" DIR = output;
+
+NET "TDI" DIR = input;
+NET "TCK" DIR = input;
+NET "TDO" DIR = OUTput;
+NET "TMS" DIR = input;
+
+
+#32 configuration data pins
+NET "D0" DIR = input;
+NET "D1" DIR = input;
+NET "D2" DIR = input;
+NET "D3" DIR = input;
+NET "D4" DIR = input;
+NET "D5" DIR = input;
+NET "D6" DIR = input;
+NET "D7" DIR = input;
+
+NET "D8" DIR = input;
+NET "D9" DIR = input;
+NET "D10" DIR = input;
+NET "D11" DIR = input;
+NET "D12" DIR = input;
+NET "D13" DIR = input;
+NET "D14" DIR = input;
+NET "D15" DIR = input;
+
+NET "D16" DIR = input;
+NET "D17" DIR = input;
+NET "D18" DIR = input;
+NET "D19" DIR = input;
+NET "D20" DIR = input;
+NET "D21" DIR = input;
+NET "D22" DIR = input;
+NET "D23" DIR = input;
+
+NET "D24" DIR = input;
+NET "D25" DIR = input;
+NET "D26" DIR = input;
+NET "D27" DIR = input;
+NET "D28" DIR = input;
+NET "D29" DIR = input;
+NET "D30" DIR = input;
+NET "D31" DIR = input;

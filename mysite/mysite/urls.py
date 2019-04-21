@@ -19,13 +19,17 @@ import admin
 from filebrowser.sites import site
 
 urlpatterns = [
-	# url(r'^Users/', include('Users.urls', namespace="Users")),
+	url(r'^Users/', include('Users.urls', namespace="Users")),
 	url(r'^admin/filebrowser/', include(site.urls)),
+	url(r'^admin/', admin.site.urls),
 	url(r'^grappelli/', include('grappelli.urls')),
 	url(r'^polls/', include('polls.urls')),
 	url(r'^files/', include('files.urls')),
-	url(r'^maintest/', include('maintest.urls')),
-	url(r'^admin/', admin.site.urls),
+	url(r'^maintest/', include('maintest.urls',namespace="maintest")),
+	url(r'^',include('maintest.urls')),
+	url(r'^Nav/',include('Nav.urls')),
+	
+	#url(r'^admin/', admin.site.urls),
 	# url(r'^Users/', include('Users.urls', namespace="Users")),
 
 ]

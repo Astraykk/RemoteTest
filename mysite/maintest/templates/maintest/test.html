@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <title>Test App in Bootstrap!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <!--<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>-->
 <script type="text/javascript" src="{% static 'maintest/js/jquery.js' %}"></script>
 <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
@@ -19,6 +20,8 @@
 <!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>-->
 
 <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
+<script type="text/javascript" src="{% static 'maintest/js/add4cre_up.js' %}"></script>
+<script src="{% static 'js/jquery.form.js' %}" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
 <script>
     // define django template tag variables
@@ -35,6 +38,9 @@
 
     $(document).ready(function()
     {
+		$('#file_input_pack').click(function(){
+			$('#file').click();
+		});
       $("#typical-test").click(function()  //to delete
       {
         html = '<form>Location:<input type="text" id="t-p-path"></form>';
@@ -51,7 +57,7 @@
         loadTreeview(currentTVPath);
       });
     });
-
+	
 
 </script>
 <script>  //unfinished
@@ -113,7 +119,9 @@
 <!--<small>testing</small>-->
 <!--</h1>-->
 <!--</div>-->
+<div id="message"></div>
 <div class="container">
+	
 	<div>
 		{% include "maintest/include/account.html" %}
 	</div>
@@ -154,12 +162,14 @@
                            inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
           <p>file tree</p>
           <div id="tree"></div>
-          <a onclick="uploadFile(currentTVPath)" class="btn btn-default">
-            upload <span class="glyphicon glyphicon-upload"></span>
-          </a>
-          <button id="refresh_tree" type="button" class="btn btn-default">
-            refresh <span class="glyphicon glyphicon-refresh"></span>
-          </button>
+          <div class="btn-group">
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal_1">create dir</button>
+			<button type="button" class="btn btn-default" onclick="clear_files()" data-toggle="modal" data-target="#myModal_2">upload</button>
+			<button id="refresh_tree" type="button" class="btn btn-default">
+            refresh </span>
+			</button>
+		  </div>
+          
           <br><br>
         </div>
       </div>
@@ -255,6 +265,66 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel_1">project information</h4>
+			</div>
+			<form id="form4create" action="/Users/mkdir/" method="post" onsubmit="return user_submit_pack(this);">
+			{% csrf_token %}
+				<div class="modal-body">
+					dir location: <input type="text" id="dir_loc" name="dir_loc" value="/" />
+					dir name: <input type="text" id="dir_name" name="dir_name" maxlength="30" required oninvalid="setCustomValidity('group name can\'t be empty')" oninput="setCustomValidity('')"/>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+					<button type="submit" class="btn btn-primary" >create</button>
+				</div>
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="myModal_2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_2" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel_2">project information</h4>
+			</div>
+			<form id="form4upload"  action="/Users/upload/" method="post" enctype="multipart/form-data" onsubmit="return user_submit_pack4up(this);">
+			{% csrf_token %}
+				<div class="modal-body">
+					<div class="input-group">
+						<label class="input-group-addon">to location:</label>
+						<input type="file" name="myfile" multiple="multiple" id="file" onchange="getFilename()" multiple="multiple" style="display:none"/>
+						<input class="form-control col-md-4" type="text" id="file_loc" name="file_loc" value="/"/>
+						
+						<span class="input-group-btn"><button class="btn btn-default" type="button" id="file_input_pack" onclick="clear_files()">choose file</button></span>
+						
+					</div>
+					<br><br>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">Selected files:</h3>
+						</div>
+						<div class="panel-body" id="filename">
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+					<button type="submit" class="btn btn-primary" >upload</button>
+				</div>
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
 <script>
    generateFileTree({{obj|safe}});
    treeviewOpenProject({{tv_dir|safe}});

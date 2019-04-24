@@ -69,6 +69,7 @@ def test_request(request):
 			project_loc = "/"+request.session.get("tfo_path",None).split(os.path.join("Users","all_users",username,""))[1]+"/"
 			tfo_name = request.session.get("tfo_name",None)
 		tag = request.POST.get('user_or_group',None)
+		msg = check4waitingInfo()
 		if tag != 'group':
 			user_or_group = '0'
 			u_or_g = username
@@ -122,8 +123,8 @@ def test_request(request):
 			addIndb(request,u_or_g,project_loc,user_or_group,ptn_name)
 			#msg = {"msg":"add test task successfully!","type":"s"}
 		
-		msg = "add test task successfully!"
-		#return JsonResponse(msg)
+
+
 		if request.POST.get('tfo_loc',None):
 			return JsonResponse({"msg":msg,"type":"s"})
 		else:
@@ -209,11 +210,11 @@ def minute_process():
 			
 def queue2serving():
 	serving_num = user4serving.objects.count()
-	if  serving_num < 50 and user_in_queue.objects.count() > 0:
-		for i in range(serving_num,51):
+	if  serving_num < 5 and user_in_queue.objects.count() > 0:
+		for i in range(serving_num,6):
 			if user_in_queue.objects.count() > 0:
 				queue_first = user_in_queue.objects.order_by('serial')[0]   #repeat
-				w = 0.71 ** (queue_first.x - 10)
+				w = 0.7 ** queue_first.x
 				user4serving_item = user4serving(user=queue_first.user,group=queue_first.group,x=queue_first.x,x_current=queue_first.x,w=w)
 				user4serving_item.save()
 				queue_first.delete()
@@ -275,7 +276,7 @@ def choose_task():
 	
 	
 def weight_update():
-	k = 1.1
+	k = 3.3
 	serving_set = user4serving.objects.all()
 	for iter in serving_set:
 		iter.w = iter.w * k
@@ -391,3 +392,28 @@ def task_list4group(request):
 	else:
 		return redirect("/Users/login/")
 	
+def check4waitingInfo():
+	serving_num = user4serving.objects.count()
+	user_in_queue_num = user_in_queue.objects.count()
+	task_num_list = []
+	task_in_queue_list = []
+	A_task_time = 4
+	if serving_num + user_in_queue_num < 5:
+		return "Your tasks are running"
+	else:
+		task_num_dict = user4serving.objects.all().values("x_current")
+		task_in_queue_dict = user_in_queue.objects.all().order_by("serial").values("x")
+		
+		for iter in task_num_dict:
+			task_num_list.append(iter["x_current"])
+			
+		for iter in task_in_queue_dict:
+			task_in_queue_list.append(iter["x"])
+		
+		merge = task_num_list + task_in_queue_list
+		for i in range(1,5):
+			merge[merge.index(max(merge))] = 0
+		wait_sec = sum(merge) * A_task_time
+		return "There are %d users in serving list, and %d users in queue.\n your tasks will get to platform in about %d seconds." % (serving_num,user_in_queue_num,wait_sec)
+		
+		

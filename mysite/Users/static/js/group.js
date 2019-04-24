@@ -188,7 +188,7 @@ function form_submit4reply(obj) {
 		document.getElementById("message").innerHTML = inner + c_button + message.msg + "</div>";
 		window.setTimeout(function(){
 			$('[data-dismiss="alert"]').alert('close');
-		},3000);
+		},10000);
 		
 	}); 
 	
@@ -231,6 +231,7 @@ function au4pj_change_pack(obj){
 function test4m_pack(obj){
 	form_submit4reply(obj);
 	$("#myModal_test").modal('hide');
+	$("html,body").animate({"scrollTop":top});
 	return false;	
 }
 

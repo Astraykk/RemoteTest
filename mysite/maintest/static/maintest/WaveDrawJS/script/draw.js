@@ -1,5 +1,6 @@
-var flag_canvas_OK = false;
-function draw_hline(ctx, x_st, y_st, x_off, color) {
+function draw_hline(canvas, x_st, y_st, x_off, color) {
+  var ctx = canvas.getContext("2d");
+  //开始一个新的绘制路径
   ctx.lineWidth = 1;
   ctx.strokeStyle = color;
   ctx.beginPath();
@@ -8,7 +9,9 @@ function draw_hline(ctx, x_st, y_st, x_off, color) {
   ctx.stroke();
   ctx.closePath();
 }
-function draw_vline(ctx, x_st, y_st, y_off, color) {
+function draw_vline(canvas, x_st, y_st, y_off, color) {
+  var ctx = canvas.getContext("2d");
+  //开始一个新的绘制路径
   ctx.lineWidth = 1;
   ctx.strokeStyle = color;
   ctx.beginPath();
@@ -17,108 +20,87 @@ function draw_vline(ctx, x_st, y_st, y_off, color) {
   ctx.stroke();
   ctx.closePath();
 }
-function write_text(ctx, x_st, y_st, textc) {
-  ctx.font = "12px Arial";
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(textc, x_st, y_st);
-}
 function check_canvas_availablity() {
   //简单地检测当前浏览器是否支持Canvas对象，以免在一些不支持html5的浏览器中提示语法错误
   var canvas = document.createElement('canvas');
   if (canvas.getContext) return true;
   else return false;
 }
-function query_canvas(canvasname, height, width) {
-  /*for bus signal serach
-var x1=canvasname.replace('[','\\[');
-x1=x1.replace(']','\\]');
-  var ret = $('canvas.'+x1);
-console.log(ret)
-  if (ret.length) {
-    ret[0].height = height;
-    ret[0].width = width;
-  return ret[0];
-  } else {
-console.log(x1)
-    var ret = document.createElement('canvas');
-    ret.setAttribute('class', canvasname);
-    parentnode.appendChild(ret);
-    ret.height = height;
-    ret.width = width;
-  return ret;
-  }*/
-  var canvasl = document.getElementsByClassName(canvasname);
+function r_or_c_canvas(parentnode, canvasid, height, width) {
+  var canvasl = document.getElementsByClassName(canvasid);
   var ret;
   if (!canvasl.length) {
     var ret = document.createElement('canvas');
-    ret.setAttribute('class', canvasname);
+    ret.setAttribute('style', 'background-color: black;');
+    ret.setAttribute('class', canvasid);
+    parentnode.appendChild(ret);
     ret.height = height;
     ret.width = width;
-    return [false, ret];
   } else {
     for (var i = 0; i < canvasl.length; i++) {
       if (canvasl[i].nodeName == 'CANVAS') {
         ret = canvasl[i];
         ret.height = height;
         ret.width = width;
-        return [true, ret];
+        break;
       }
     }
   }
+  return ret;
 }
 function draw_grid(x_st, y_st, x_range, time) {
-  var gridcanvas = $('#wavedraw-gridc')[0];
-  gridcanvas.width = x_range;
-  gridcanvas.height = 1 + 0 | y_st;
-  var ctx = gridcanvas.getContext("2d");
-  draw_hline(ctx, x_st, y_st, x_range, '#ffffff');
+  var cl = document.getElementById("canvasl");
+  var canvas = r_or_c_canvas(cl, 'wavedraw-gridc', 1 + 0 | y_st, x_range);
+  draw_hline(canvas, x_st, y_st, x_range, '#ffffff');
   var timediff = (time[1][1] - time[1][0]).toFixed(0);
-  //determine the size of a grid
   var gridsize = round_scale(timediff);
-  var gridscale = reduce_timescale(gridsize, time[0][1]);
+  var gridscale = convert_timescale(gridsize, time[0][1]);
   gridsize = 0 | gridsize;
-  //get the first gridline to draw
-  //e.g. if starttime=1051ns and grid=10ns
-  //then the first gridline is at 1050ns
-  var first_visible_pos = (time[1][0] / gridsize);
-  var fv_time = (0 | first_visible_pos) * gridsize;
-  var fv_scale = reduce_timescale(round_scale(fv_time), time[0][1]);
-  var scale_text = 0;
+  var first_visible = (time[1][0] / gridsize);
+  var fv_disp = 0 | first_visible;
+  var fv_scale = fv_disp * gridsize;
   for (var i = 0,
-  val = fv_time; val < time[1][1]; i++) {
+  val = fv_scale,
+  scale = convert_timescale(val + '', time[0][1]); val < time[1][1]; i++) {
     var x_off = 0 | ((x_range - 0) * (val - time[1][0]) / timediff);
-    draw_vline(ctx, x_st + x_off, y_st, -(y_st / 2), '#ffffff');
-    write_text(ctx, x_st + x_off, y_st / 2, (i * gridsize + fv_time) + '' + time[0][1]);
+    draw_vline(canvas, x_st + x_off, y_st, -(y_st / 2), '#ffffff');
+    write_text(canvas, x_st + x_off, y_st / 2, (i * gridscale[0] + scale[0]) + '' + gridscale[1] + 's');
     val += gridsize;
   }
 }
+function write_text(canvas, x_st, y_st, textc) {
+  var ctx = canvas.getContext("2d");
+  ctx.font = "12px Arial";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(textc, x_st, y_st);
+}
 function get_bus_color(wave) {
-  // return 0 for x, 1 for z, 2 for others
   var hasx = false,
   hasz = false;
   for (var i = 0; i < wave.length; i++) {
     if ('x' == wave[i]) hasx = true;
     else if ('z' == wave[i]) hasz = true;
   }
-  if (hasx) return 0;
-  else if (hasz) return 1;
-  return 2;
+  if (hasx) return '#ff0000';
+  else if (hasz) return '#0000ff';
+  return '#00ff00';
 }
-function draw(cwidth, time_begin, time_end, flag_reset) {
-  var canvasfragment = document.createDocumentFragment();
-  var namefragment = document.createDocumentFragment();
-  var timerange = [time_begin, time_end];
-  if (flag_canvas_OK) {
+function draw(cwidth, scale, propotion) {
+  //获取Canvas对象(画布)
+  var canvasl = document.getElementById("canvasl");
+  var namel = document.getElementById("namel");
+  //removs all old canvases(if any) before starting drawing
+  clearallchildren(namel);
+  if (check_canvas_availablity()) {
     var jsdata = get_json_data();
-    var timerange = [time_begin, time_end];
-    var $timebar = $(".\\.timebar");
-    //$timebar.show();
-    var timebarspan = $timebar.children('span').toArray();
-    addInputandJump(timebarspan[0]);
-    addInputandJump(timebarspan[1]);
-    timebarspan[0].childNodes[0].innerHTML = time_begin + jsdata.time[1];
-    timebarspan[1].childNodes[0].innerHTML = time_end + jsdata.time[1];
+    var timemax = jsdata['time'][0]
+    var timerange = [propotion * jsdata.time[0] * (1 - scale)];
+    timerange.push(timerange[0] + jsdata.time[0] * scale);
     draw_grid(0.5, 22.5, cwidth, [jsdata['time'], timerange]);
+    createinvisiablebr(canvasl);
+    var nametag = document.createElement('li');
+    nametag.innerHTML = 'Signals';
+    namel.appendChild(nametag);
     for (var i = 0; i < jsdata.dat.length; i++) {
       //check if any new signals are added to json
       var wave = jsdata.dat[i];
@@ -129,132 +111,136 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
     }
     for (var ca = 0,
     sig = fun().getAllSignals(); ca < sig.length; ca++) {
-      var wave = jsdata.dat[sig[ca].jsonindex];
+      var jsonindex = sig[ca].jsonindex;
+      var wave = jsdata.dat[jsonindex];
       if (!sig[ca].visibility) {
         continue;
       }
-      var qcanvas = query_canvas(wave['name'], 35, cwidth);
-      var canvas = qcanvas[1];
-      if (flag_reset) {
-        nametag = document.createElement('li');
-        nametag.innerHTML = '<span>' + wave['name'] + '</span>';
-        if (wave['width'] > 1) {
-          nametag.setAttribute('class', wave['name'] + ' w-bus');
-        } else {
-          nametag.setAttribute('class', wave['name']);
-        }
-        addDrag(nametag);
-        namefragment.appendChild(nametag);
-      }
+      var canvas = r_or_c_canvas(canvasl, wave['name'], 35, cwidth);
+      addDrag(canvas);
+      nametag = document.createElement('li');
+      nametag.innerHTML = '<div style=\'color:blue\'>' + wave['name'] + '</div>';
+      nametag.setAttribute('class', wave['name']);
+      nametag.setAttribute('style', 'outline: 1px solid red;margin:5px;font-size:1.4em;');
+      namel.appendChild(nametag);
+      if (wave['width'] > 1) nametag.onclick = bus_toggle;
       var xmargin = 0.5;
       var xpos;
       var ypos;
-      var xend;
+      var xoff;
+      var yoff;
       if (wave['time'].indexOf(jsdata['time'][0]) == -1) {
         wave['time'].push(jsdata['time'][0]);
       }
-      var timediffval = time_end - time_begin;
-      var cwidth = canvas.width - 0;
-      var wavecache = [];
-      var ctx = canvas.getContext("2d");
-      for (var i = findlastless(wave['time'],  time_begin), endindex= findlastless(wave['time'],  time_end)+1; i < endindex; i++) {
-          xpos = (0 | (canvas.width - 0) * (wave['time'][i] - timerange[0]) / timediffval) + xmargin;
-          xend = (0 | (canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
+      for (var i = 0; i < wave.state.length; i++) {
+        xpos = 0 | (canvas.width - 0) * (wave['time'][i] - timerange[0]) / (timerange[1] - timerange[0]);
+        xoff = 0 | ((canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / (timerange[1] - timerange[0]) - xpos);
+        if ((xpos <= cwidth) && (xpos + xoff >= 0)) {
           switch (wave['state'][i]) {
           case 0:
           case 1:
+            ypos = 20.5;
+            yoff = 0;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#ff0000');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#ff0000');
+            break;
           case 2:
+            ypos = 20.5;
+            yoff = 10;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#ff0000');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#ff0000');
+            break;
           case 3:
             ypos = 20.5;
-            wavecache.push([xpos, ypos, 0]);
-            wavecache.push([xend, ypos, 0]);
+            yoff = -10;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#ff0000');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#ff0000');
             break;
           case 4:
           case 5:
+            ypos = 20.5;
+            yoff = 0;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#0000ff');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#0000ff');
+            break;
           case 6:
+            ypos = 20.5;
+            yoff = 10;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#0000ff');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#0000ff');
+            break;
           case 7:
             ypos = 20.5;
-            wavecache.push([xpos, ypos, 1]);
-            wavecache.push([xend, ypos, 1]);
+            yoff = -10;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#0000ff');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#0000ff');
             break;
           case 8:
           case 9:
+            ypos = 30.5;
+            yoff = -10;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#00ff00');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#00ff00');
+            break;
           case 10:
+            ypos = 30.5;
+            yoff = 0;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#00ff00');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#00ff00');
+            break;
           case 11:
             ypos = 30.5;
-            wavecache.push([xpos, ypos, 2]);
-            wavecache.push([xend, ypos, 2]);
+            yoff = -20;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#00ff00');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#00ff00');
             break;
           case 12:
           case 13:
+            ypos = 10.5;
+            yoff = 10;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#00ff00');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#00ff00');
+            break;
           case 14:
+            ypos = 10.5;
+            yoff = 20;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#00ff00');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#00ff00');
+            break;
           case 15:
             ypos = 10.5;
-            wavecache.push([xpos, ypos, 2]);
-            wavecache.push([xend, ypos, 2]);
+            yoff = 0;
+            draw_vline(canvas, xpos + xmargin, ypos, yoff, '#00ff00');
+            draw_hline(canvas, xpos + xmargin, ypos, xoff, '#00ff00');
             break;
           case 16:
-            /*case 16:
+            draw_vline(canvas, xpos + xmargin, 15.5, 10, '#00ff00');
+            draw_vline(canvas, xpos + xmargin + 1, 10.5, 5, '#00ff00');
+            draw_vline(canvas, xpos + xmargin + 1, 30.5, -5, '#00ff00');
+            draw_hline(canvas, xpos + xmargin + 1, 10.5, xoff - 2, '#00ff00');
+            draw_hline(canvas, xpos + xmargin + 1, 30.5, xoff - 2, '#00ff00');
+            write_text(canvas, xpos + xmargin + 2, 24.5, wave['wave'][i]);
+            break;
+          case 17:
             cl = get_bus_color(wave['wave'][i - 1]);
             draw_vline(canvas, xpos + xmargin - 1, 10.5, 5, cl);
             draw_vline(canvas, xpos + xmargin - 1, 30.5, -5, cl);
-          case 17:
+          case 18:
             cl = get_bus_color(wave['wave'][i]);
             draw_vline(canvas, xpos + xmargin, 15.5, 10, cl);
             draw_vline(canvas, xpos + xmargin + 1, 10.5, 5, cl);
             draw_vline(canvas, xpos + xmargin + 1, 30.5, -5, cl);
-            draw_hline(canvas, xpos + xmargin + 1, 10.5, xend - xpos - 2, cl);
-            draw_hline(canvas, xpos + xmargin + 1, 30.5, xend - xpos - 2, cl);*/
-            cl = get_bus_color(wave['wave'][i - 1]);
-            draw_vline(ctx, xpos - 1, 10.5, 5, cl);
-            draw_vline(ctx, xpos - 1, 30.5, -5, cl);
-          case 17:
-            cl = get_bus_color(wave['wave'][i]);
-            wavecache.push([xend, 30.5, 3]);
-            wavecache.push([xpos, 30.5, cl]);
-            //wavecache.push([xpos, 24.5, cl]);
-            //wavecache.push([xpos-1, 24.5, cl]);
-            wavecache.push([xpos - 1, 20.5, cl]);
-            //wavecache.push([xpos-1, 16.5, cl]);
-            //wavecache.push([xpos, 16.5, cl]);
-            wavecache.push([xpos, 10.5, cl]);
-            wavecache.push([xend, 10.5, cl]);
+            draw_hline(canvas, xpos + xmargin + 1, 10.5, xoff - 2, cl);
+            draw_hline(canvas, xpos + xmargin + 1, 30.5, xoff - 2, cl);
             if (xpos < 0) xpos = 0;
-            write_text(ctx, xpos + 2, 24.5, wave['wave'][i]);
+            write_text(canvas, xpos + xmargin + 2, 24.5, wave['wave'][i]);
             break;
+          }
         }
       }
-      var colourused = sig[ca].wavecolour;
-      ctx.beginPath();
-      ctx.strokeStyle = colourused[wavecache[0][2]];
-      ctx.moveTo(wavecache[0][0], wavecache[0][1]);
-      for (var i = 1; i < wavecache.length; i++) {
-        if (wavecache[i][2] != ctx.strokeStyle) {
-          ctx.stroke();
-          ctx.closePath();
-          ctx.beginPath();
-          ctx.strokeStyle = colourused[wavecache[i][2]];
-          ctx.moveTo(wavecache[i - 1][0], wavecache[i - 1][1]);
-        }
-        ctx.lineTo(wavecache[i][0], wavecache[i][1]);
-      }
-      ctx.stroke();
-      ctx.closePath();
-      if (!qcanvas[0]) {
-        canvasfragment.appendChild(canvas);
-      }
+      createinvisiablebr(canvasl);
     }
+    var sep = document.getElementById('sep');
+    sep.style.height = canvasl.clientHeight + 'px';
   }
-  var canvasl = $("#canvasl- ul")[0];
-  var namel = $("#namel-")[0];
-  //all elements are ready, add them to page
-  if (flag_reset) {
-  var newnamel = document.createElement('ul');
-    newnamel.appendChild(namefragment);
-    newnamel.setAttribute('class', "inner-list");
-    namel.replaceChild(newnamel,namel.childNodes[1]);
-  }
-  canvasl.appendChild(canvasfragment);
-  var sep = document.getElementById('column-sep');
-  sep.style.height = canvasl.parentNode.offsetHeight + 'px';
 }

@@ -12,8 +12,7 @@ from filebrowser.base import FileListing, FileObject
 import os, json, re
 from .mytools.patternGen import PatternGen
 from .mytools.mytools import VcdFile, vcd_merge
-
-import time
+from .vcd2pic_views import vcd2picjson
 
 # patternGen.prepare()
 
@@ -88,7 +87,6 @@ def treeview_parser(root='', abspath='', relpath='', flag='C'):
 	for item in filelisting.listing():
 		fileobject = FileObject(os.path.join(path, item))
 		newabspath = os.path.join(abspath, item)
-		# print(newabspath)
 		if flag == 'O':
 			dataList.append({
 				"text": item,

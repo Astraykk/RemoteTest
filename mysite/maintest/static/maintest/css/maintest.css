@@ -26,3 +26,73 @@ ul {
     line-height: 80%;
 }
 
+
+div.wavedrawing- ul {
+	display:inline-block;
+	margin:0;
+	padding:0;
+	list-style:none;
+	font-size:1em;
+}
+
+div.wavedrawing-container div{
+	display:inline-block;
+	margin:0;
+	list-style:none;
+	font-size:1em;
+}
+div#namel-{
+	font-size:1em;
+	outline:1px solid green;
+	width:20%;
+	vertical-align:top;
+	padding-left:3%;
+	max-height:300px;
+	overflow-y:auto;
+	overflow-x:auto;
+}
+
+ul.inner-list li.w-bus{
+list-style: circle;
+}
+
+
+ul.inner-list li.w-bus-close{
+list-style: disc;
+}
+
+
+li#wavedrawing-heading{
+padding:0;
+height: 23px;
+}
+div#column-sep{
+	background:url(../WaveDrawJS/img/sep.png) repeat-y;
+	width:1%;
+	height:0;
+	padding:0;
+	vertical-align:top;
+}
+div#canvasl- {
+	vertical-align:top;
+	outline:1px solid aqua;
+	width:75%;
+	font-size:0;
+	padding:0;
+	max-height:300px;
+	overflow-y:auto;
+}
+div#namel- li[class] > span {
+	color:#000;
+}
+div#namel- li[class] {
+	outline:1px solid red;
+	margin:0% 0% 0% 4%;
+	padding:10px 0px 0px 0px;
+	font-size:1.8em;
+	height:35px;
+}
+div#canvasl- canvas{
+    background-color: black;
+	display:block;
+}

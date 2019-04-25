@@ -61,47 +61,51 @@ function treeviewOpenProject(tv_data_dir){
   $('#o-p-body').treeview('collapseAll', { silent: true });
 }
 
-function changeWorkDir(alertmsg){
-    var x1=location.toString();
-if(x1.match(/path=(.*)/)){
-        console.log('alter'+currentTVPath)
-var n=x1.split('?');//n[0]: main url, n[1]: paras
-var paras=n[1].split('&');//get paras
-for (var i=0;i<paras.length;i++){
-if(paras[i].substr(0,4)=='path'){
-        console.log(i);paras[i]="path="+currentTVPath;break;}
-}
-x1=n[0]+"?path="+currentTVPath;
-}
-else{
-x1+="?path="+currentTVPath;}
-alert(alertmsg);
-        location.assign(x1);
-  }
+
 //open project
 $(document).ready(function(){
   $("#submit-o-p-path").click(function(){
     currentTVPath = $(".node-selected").text();
-    changeWorkDir('successfully open project. moving to new page.');
+    $(".node-selected").removeClass("node-selected");
+    //var dir = $("[data-nodeid='0']").attr("class");
+    //console.log(currentTVPath);
+    loadTreeview(currentTVPath);
+    $('#open-project-modal').modal('hide')
   });
 });
 
 
 // flow function
+//function callFlowFunc(url){
+//  console.log('callFlow func start')
+//  $.ajax({
+//    url: url,
+//      async: true,
+//      success: function(data){
+//        alert(data);
+//        location.reload();
+//      }
+//    });
+//}
 function callFlowFunc(path){
   var url = check_url;
   console.log("check func start");
-  console.log('url=',url);
-  console.log('path=',path);
+  console.log(url);
+  var selected_tfo = $(".node-selected").text();
+//  alert('current path = ' + currentTVPath);
+//  var selected_tfo = $(".list-group").text();
+//  alert(selected_tfo);
   $.ajax({
     url: url,
       async: true,
       data: {
-        path: path
+        path: path,
+        tfo: selected_tfo
       },
       success: function(data){
         alert(data);
-        console.log(location)//.reload();
+//        alert('hello')
+        location.reload();
       }
     });
 }
@@ -118,7 +122,7 @@ function buildPattern(path){
       },
       success: function(data){
         alert(data);
-        //location.reload();
+        location.reload();
       }
     });
 }
@@ -140,7 +144,33 @@ function runTest(path){
         alert(data);
         // document.getElementById("waveform").src = waveform_path;
         console.log("change img src")
-        //location.reload();
+        location.reload();
       }
     });
+}
+
+function genTestReport(path){
+  var url = report_url;
+//  var rpt_name = $("#rptName").val();
+  // waveform_path = waveform_path + rpt_name + ".jpg"
+  console.log("Test report");
+  console.log(url);
+  $.ajax({
+    url: url,
+      async: true,
+      data: {
+        path: path,
+//        rpt_name: rpt_name
+      },
+      success: function(data){
+        alert(data);
+        // document.getElementById("waveform").src = waveform_path;
+//        console.log("change img src")
+        location.reload();
+      }
+    });
+}
+
+function editText(path){
+    console.log(' enter editText');
 }

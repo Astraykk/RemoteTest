@@ -7,6 +7,7 @@ from .mytools.vcd2pic.vcd2pic import vcd2pic
 @csrf_exempt  # WTF
 #@profile(filename="./v2p.stats", immediate=True, stdout=False)
 def vcd2picjson(request):
+	##return HttpResponse(1)
 	if request.method == 'POST':
 		try:
 			vcd_file = request.POST['vcd_file']

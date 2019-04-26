@@ -5,21 +5,19 @@
 <meta charset="utf-8">
 <title>Test App in Bootstrap!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!--<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>-->
 <script type="text/javascript" src="{% static 'maintest/js/jquery.js' %}"></script>
-<!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
 <link rel="stylesheet" href="{% static 'maintest/bootstrap/css/bootstrap.css' %}">
-<!--<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 <script type="text/javascript" src="{% static 'maintest/bootstrap/js/bootstrap.min.js' %}"></script>
 
 
 <script type="text/javascript" src="{% static 'maintest/js/bootstrap-treeview.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/bootstrap-treeview.css' %}">
-<!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>-->
-<!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>-->
 
 <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'maintest/WaveDrawJS/css/WaveDrawJS.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
+<script src="{% static 'maintest/WaveDrawJS/script/loadjson.js' %}"></script>
+<script src="{% static 'maintest/WaveDrawJS/script/miscscript.js' %}"></script>
 <script>
     // define django template tag variables
     var build_url = "{% url 'maintest:build' %}";
@@ -27,6 +25,8 @@
     var test_url = "{% url 'maintest:test' %}";
     var report_url = "{% url 'maintest:report' %}";
     var tv_ajax_url = "{% url 'maintest:tv_ajax' %}";
+    var vcd2pic_url = "{% url 'maintest:vcd2picjson' %}";
+    var uservcdfile = "{{ file_path }}";
 
 
 </script>
@@ -213,37 +213,26 @@
       </div>
       <div class="row">
         <h4>Waveform</h4>
-        <div class="col-md-12 pre-scrollable"
-             style="background-color: #dedef8;box-shadow:
-                   inset 1px -1px 1px #444, inset -1px 1px 1px #444;padding:10px;">
-          <!--<img src="{{ DIRECTORY }}/{{ current_path }}/wave.jpg" class="img-rounded img-responsive">-->
-          <img id="waveform" class="pre-scrollable"
-               src="{% static 'maintest/img/' %}{{ current_path }}/{{ current_path }}.jpg"
-               class="img-rounded img-responsive">
-          <!--<button type="button" onclick="loadXMLDoc_calc()">Calculate</button>-->
-          <br>
+        <div class='wavedrawing-'>
+          <div>
+            <button id="wave-draw" class="btn btn-default">Reload Image</button>
+          </div>
+          <div class="wavedrawing-container">
+            <div id="namel-"><li id="wavedrawing-heading">Signals</li><ul class="inner-list"></ul></div><!--用注释去除空白
+         --><div id='column-sep'> </div><!--用注释去除空白
+         --><div id="canvasl-"><canvas id="wavedraw-gridc"></canvas><ul class="inner-list"></ul></div>
+          </div>
+          <p class='.timebar'>Now showing <span></span> to <span></span>.</p>
+          <p>propotion<input id="propotion-" type="range" min="0" max="1000" value="1000"></p>
+          <p>width<input id="width-" type="range" min="0" max="1000" value="1000"></p>
+          <input type="radio" name="mode" value="0">observe
+          <input type="radio" name="mode" value="1">control
+        <script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>
+        <script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>
+        <script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>
         </div>
-        <!--<p id='#wavedrawing'>-->
-        <!--<div style='outline: 1px solid gray;'>-->
-          <!--<button id="load">Compile and Draw</button>-->
-          <!--<button id="draw" disabled='disabled'>Reload Image</button>-->
-        <!--</div>-->
-        <!--<div style='outline: 1px solid gray;'>-->
-          <!--<ul id="namel"-->
-              <!--style='outline: 1px solid green; width:20%;margin:0;display: inline-block;vertical-align:top;list-style-type: square;'></ul>-->
-          <!--<ul id='sep'-->
-              <!--style='background:url(../../static/maintest/WaveDrawJS/img/sep.png) repeat-y;display: inline-block;width:1%;height:0;margin: 0; padding: 0;list-style-type: none'></ul>-->
-          <!--&lt;!&ndash; canvas容器 &ndash;&gt;-->
-          <!--<ul id="canvasl"-->
-              <!--style='outline: 2px solid white;display: inline-block;width:70%;margin: 0; padding: 0;list-style-type: none;font-size:0'></ul>-->
-        <!--</div>-->
-        <!--<p>propotion<input id="propotion" type="range" min="0" max="1000" value="1000"></p>-->
-        <!--<p>width<input id="width" type="range" min="0" max="1000" value="1000"></p>-->
-        <!--<p>scale<input id="scale" type="range" min="0" max="1000" value="1000"></p>-->
-        <!--<script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>-->
-        <!--<script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>-->
-        <!--<script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>-->
-        <!--</p>-->
+      </div>
+        
       </div>
     </div>
   </div>

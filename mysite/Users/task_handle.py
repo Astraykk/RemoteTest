@@ -199,22 +199,25 @@ def addIndb(request,username,project_loc,user_or_group,ptn_name):
 
 def minute_process():
 	times = 0
+	bata = 4
 	while(task_db.objects.count()>0):
 		queue2serving()		
 		task_db2task()
-		time.sleep(4)             #
+		time.sleep(1)             #
 		times = times + 1
-		if times % 15 == 0:
+		if times % beta*4 == 0:
 			times = 0
 			weight_update()
 			
 def queue2serving():
+	alpha = 0.75
+	N = 5
 	serving_num = user4serving.objects.count()
-	if  serving_num < 5 and user_in_queue.objects.count() > 0:
-		for i in range(serving_num,6):
+	if  serving_num < N and user_in_queue.objects.count() > 0:
+		for i in range(serving_num,N+1):
 			if user_in_queue.objects.count() > 0:
 				queue_first = user_in_queue.objects.order_by('serial')[0]   #repeat
-				w = 0.7 ** queue_first.x
+				w = alpha ** queue_first.x
 				user4serving_item = user4serving(user=queue_first.user,group=queue_first.group,x=queue_first.x,x_current=queue_first.x,w=w)
 				user4serving_item.save()
 				queue_first.delete()
@@ -276,7 +279,7 @@ def choose_task():
 	
 	
 def weight_update():
-	k = 3.3
+	k = 1.3
 	serving_set = user4serving.objects.all()
 	for iter in serving_set:
 		iter.w = iter.w * k

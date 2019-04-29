@@ -48,26 +48,44 @@ var scrollbarmove = (function() {
 } ());
 function addDrag(el) {
   el.onmouseup = function(event) {
-    console.log(this.offsetLeft);
-    DragHelperClosure().setstop(el.getAttribute('class').replace(' w-bus', ''));
+    DragHelperClosure().setstop(el.getAttribute('class').split(' ')[0]);
   }
   el.onmousedown = function(event) {
-    DragHelperClosure().setstart(el.getAttribute('class').replace(' w-bus', ''));
+    DragHelperClosure().setstart(el.getAttribute('class').split(' ')[0]);
   }
 }
 function addZoom() {
   this.onmouseup = function(event) {
     var left = 0 | $(this).offset().left;
-    //console.log(event.clientX,left);
     WaveZoomHelperClosure().setstop(event.clientX - left);
   };
-
   this.onmousedown = function(event) {
     var left = 0 | $(this).offset().left;
-    //console.log(event.clientX,left);
     WaveZoomHelperClosure().setstart(event.clientX - left);
   };
 }
+function CursorMove() {
+  this.$cursor = $("#cursor-");
+  this.$info = $("#wavedraw-cursor-info");
+  this.cursoroffset = $("#wavedrawing-gridc").offset().left - $("#wavedrawing-heading-text").offset().left;
+  this.nowpos = 0;
+  this.movetoX = function(pos) {
+    this.nowpos = pos;
+    var scrbar = scrollbarmove();
+    var width = scrbar.width;
+    var timerange = scrbar.t_end - scrbar.t_begin;
+    var newbeginoffset = 0 | (timerange / width * pos);
+    //console.log(timerange,newbeginoffset);
+    this.$info.html(scrbar.t_begin + newbeginoffset + get_json_data()['time'][1]);
+    this.$cursor.css({
+      'left': this.cursoroffset + pos + 8
+    });
+    this.$info.css({
+      'left': this.cursoroffset + pos + 8
+    });
+  };
+}
+var CursorMover = new CursorMove();
 function addInputandJump(obj) {
   var $children = $(obj).children();
   if ($children.length) {

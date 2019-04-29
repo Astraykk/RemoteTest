@@ -54,13 +54,12 @@
 
 
 </script>
-<script>  //unfinished
+<script>
     $(document).ready(function(){
       $(".expand-icon").click(function(){
         console.log('hello2');
         console.log($(this).attr("data-nodeid"));
         console.log('hello3');
-        //$(this).nextElementSibling.attr("class", "glyphicon-folder-open");
       });
     });
 
@@ -99,20 +98,9 @@
 
 
 </script>
-<script>
-    // FOR STUDY
-
-
-
-</script>
 </head>
 
 <body>
-<!--<div class="page-header">-->
-<!--<h1>&nbsp;Chip-Test App-->
-<!--<small>testing</small>-->
-<!--</h1>-->
-<!--</div>-->
 <div class="container">
   <div class="row">
     <div class="col-md-3" style="vertical-align:middle;font-size:20px">
@@ -125,13 +113,6 @@
       {% include "maintest/include/toolbar.html" %}
     </div>
     <div class="col-md-3">
-      <!--Search bar-->
-      <!--<div class="input-group">-->
-        <!--<input type="text" class="form-control">-->
-        <!--<span class="input-group-btn">-->
-                        <!--<button class="btn btn-default" type="button">Search!</button>-->
-                    <!--</span>-->
-      <!--</div>&lt;!&ndash; /input-group &ndash;&gt;-->
     </div><!-- /.col-lg-6 -->
   </div>
   <br>
@@ -182,17 +163,6 @@
             <li class="pull-right">
               <button id="submit-edit-text" type="submit" class="btn btn-default">submit</button>
             </li>
-            <!--<li><a href="#ios" data-toggle="tab">iOS</a></li>-->
-            <!--<li class="dropdown">-->
-            <!--<a href="#" id="myTabDrop1" class="dropdown-toggle"-->
-            <!--data-toggle="dropdown">Java-->
-            <!--<b class="caret"></b>-->
-            <!--</a>-->
-            <!--<ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">-->
-            <!--<li><a href="#jmeter" tabindex="-1" data-toggle="tab">jmeter</a></li>-->
-            <!--<li><a href="#ejb" tabindex="-1" data-toggle="tab">ejb</a></li>-->
-            <!--</ul>-->
-            <!--</li>-->
           </ul>
           <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade in active" id="home">
@@ -202,31 +172,34 @@
               <p>some comtent</p>
             </div>
           </div>
-          <!--<label for="name">edit area</label>-->
-          <!--&lt;!&ndash;<input type="text" class="form-control" id="name" placeholder="selected file">&ndash;&gt;-->
-          <!--<textarea id="edit-text" class="form-control" rows="10">{{ file_content }}</textarea>-->
-          <!--</div>-->
-          <!--<button id="submit-edit-text" type="submit" class="btn btn-default">submit</button>-->
-          <!--</form>-->
           <br>
         </div>
       </div>
       <div class="row">
         <h4>Waveform</h4>
         <div class='wavedrawing-'>
+          <div class='wavedraw-menu'>
+            <button id="wavedraw-reset" class="btn btn-default">Reload Image</button>
+            <button id="wavedraw-cursor" class="btn btn-default">Cursor Mode</button>
+            <button id="wavedraw-zoom" class="btn btn-default">Zoom Mode</button>
+          </div>
           <div>
-            <button id="wave-draw" class="btn btn-default">Reload Image</button>
+            <li id="wavedrawing-heading-text">Signals</li><!--用注释去除空白
+         --><div class="column-sep"></div><!--用注释去除空白
+         --><canvas id="wavedrawing-gridc">
           </div>
           <div class="wavedrawing-container">
-            <div id="namel-"><li id="wavedrawing-heading">Signals</li><ul class="inner-list"></ul></div><!--用注释去除空白
-         --><div id='column-sep'> </div><!--用注释去除空白
-         --><div id="canvasl-"><canvas id="wavedraw-gridc"></canvas><ul class="inner-list"></ul></div>
+            <div id="namel-"><ul class="inner-list"></ul></div><!--用注释去除空白
+         --><div class='column-sep'></div><!--用注释去除空白
+         --><div id="canvasl-"><ul class="inner-list"></ul></div>
+            <div id="cursor-"></div>
           </div>
+          <div id="wavedraw-cursor-info"></div>
+          <br>
           <p class='.timebar'>Now showing <span></span> to <span></span>.</p>
+          <!--p class='.timebar'>Now showing <span><input type="text"><span> to </span><input type="text"></span>.</p-->
           <p>propotion<input id="propotion-" type="range" min="0" max="1000" value="1000"></p>
           <p>width<input id="width-" type="range" min="0" max="1000" value="1000"></p>
-          <input type="radio" name="mode" value="0">observe
-          <input type="radio" name="mode" value="1">control
         <script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>
         <script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>
         <script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>
@@ -240,9 +213,6 @@
 <script>
    generateFileTree({{obj|safe}});
    treeviewOpenProject({{tv_dir|safe}});
-   // waveform_path = "{% static 'maintest/img/' %}{{ current_path }}/";
-
-
 </script>
 <script>
 $(function() {

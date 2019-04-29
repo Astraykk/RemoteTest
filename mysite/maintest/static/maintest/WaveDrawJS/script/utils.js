@@ -134,11 +134,10 @@ function _DragImpl(start, stop) {
     startgroup.unshift(stoppos, stoplen);
     Array.prototype.splice.apply(s, startgroup);
     var canvasNodes = $("#canvasl- canvas");
-    for (var i = 1; i < s.length + 1; i++) {
-      console.log(canvasNodes[i]);
-      var newclass = s[i - 1].name;
+    for (var i = 0; i < s.length; i++) {
+      var newclass = s[i].name;
       canvasNodes.eq(i).attr('class', newclass);
-      if (s[i - 1].visibility) {
+      if (s[i].visibility) {
         canvasNodes.eq(i).show();
       } else {
         canvasNodes.eq(i).hide();
@@ -176,18 +175,31 @@ var DragHelperClosure = (function() {
   }
 } ());
 function _WaveZoomImpl(start, stop) {
-  //convert px to actual time values
   var scrbar = scrollbarmove();
   var timebegin = scrbar.t_begin;
   var timerange = scrbar.t_end - scrbar.t_begin;
-  //now calculate new begin and end
   var width = scrbar.width;
-  var newbeginoffset = 0 | (timerange / width * start);
-  scrbar.t_begin += newbeginoffset;
-  var newendoffset = 0 | (timerange / width * stop);
-  scrbar.t_end = timebegin + newendoffset;
-  scrbar.changecanvas(false);
   var jstime = get_json_data().time[0] - 0;
+  //convert px to actual time values
+  if (start > stop) {
+    //right to left, zoom out
+    var scalefactor = width / (start - stop);
+    timerange = 0 | (timerange * scalefactor);
+    //now calculate new begin and end
+    var newbeginoffset = 0 | (timerange / width * start);
+    scrbar.t_begin -= newbeginoffset;
+    if (scrbar.t_begin < 0) scrbar.t_begin = 0;
+    scrbar.t_end = scrbar.t_begin + timerange;
+    if (scrbar.t_end > jstime) scrbar.t_end = jstime;
+  }
+  //now calculate new begin and end
+  else {
+    var newbeginoffset = 0 | (timerange / width * start);
+    scrbar.t_begin += newbeginoffset;
+    var newendoffset = 0 | (timerange / width * stop);
+    scrbar.t_end = timebegin + newendoffset;
+  }
+  scrbar.changecanvas(false);
   var propbar = $("#propotion-");
   var propv = propbar.attr('max') * scrbar.t_begin / jstime;
   propbar.attr('value', propv)
@@ -202,15 +214,59 @@ function WaveZoomHelper() {
   };
   this.setstop = function(pos) {
     this.stop = pos;
-    if (1
-    /*a delay is needed to enable zooming
-   */
-    ) {}
-    _WaveZoomImpl(this.start, this.stop);
+    if (global_states().mode == 1) {
+      //mode is cursor, move cursor to stop position
+      CursorMover.movetoX(pos);
+    } else {
+      //mode is zoom, do zoom in/out
+      if (this.start == this.stop) {
+        //no dragging detected
+        return;
+      }
+      _WaveZoomImpl(this.start, this.stop);
+    }
   };
 }
 var WaveZoomHelperClosure = (function() {
   var i = new WaveZoomHelper();
+  return function() {
+    return i;
+  }
+} ());
+function ScorllSyncHelper() {
+  //Implements sync of scorllbars
+  var currentTab = 0;
+  this.scale = 1;
+  this.setup = () => {
+    var $l = $('#namel-');
+    var $r = $('#canvasl-');
+    $l.scroll(() =>{
+      if (this.currentTab !== 1) return;
+      $r[0].scrollTop = $l[0].scrollTop * this.scale;
+    });
+    $r.scroll(() =>{
+      if (this.currentTab !== 2) return;
+      $l[0].scrollTop = $r[0].scrollTop / this.scale;
+    });
+    $l.mouseover(() =>{
+      this.currentTab = 1;
+    });
+    $r.mouseover(() =>{
+      this.currentTab = 2;
+    });
+    this.$l = $l;
+    this.$r = $r;
+  };
+  this.calibrateTracking = () =>{
+    var $lc = this.$l.children();
+    var $rc = this.$r.children();
+    this.scale = ($rc[0].offsetHeight - this.$r[0].offsetHeight) / ($lc[0].offsetHeight - this.$l[0].offsetHeight);
+  };
+}
+var ScorllSyncHelperClosure = (function() {
+  var i = new ScorllSyncHelper();
+  i.setup();
+  i.calibrateTracking();
   return function() {
     return i;
   }
@@ -268,17 +324,16 @@ function convert_timescale(time, dst_scale, src_scale) {
   var grade_diff = dst_index - src_index;
   return [time * Math.pow(0.001, grade_diff), dst_scale];
 }
-/*function createinvisiablebr(parentel) {
-  //seperate canvases using a 0px newline
-  var br = document.createElement('br');
-  br.setAttribute('style', 'font-size:0');
-  parentel.appendChild(br);
-}*/
-function findlastless(arr,el){
-	var lo=0,hi=arr.length;
-	while(lo < hi-1){
-        var mid = Math.floor((lo + hi)/2)
-        if(el >= arr[mid])lo = mid;
-        else hi = mid;}
-	return lo;
+function findlastless(arr, el) {
+  var lo = 0,
+  hi = arr.length;
+  while (lo < hi - 1) {
+    var mid = Math.floor((lo + hi) / 2);
+    if (el >= arr[mid]) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
 }

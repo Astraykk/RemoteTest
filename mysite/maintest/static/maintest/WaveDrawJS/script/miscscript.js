@@ -12,25 +12,29 @@ $(document).ready(function() {
         get_json_data(ret);
         scrollbarmove().reset_to_default();
         $("canvas").each(addZoom);
+        ScorllSyncHelperClosure().calibrateTracking();
+        global_states().mode = 0;
       }
     });
   } else {
     $(".wavedrawing-").hide();
   }
-  $("#wave-draw")[0].onclick = function() {
+  $("#wavedraw-reset")[0].onclick = function() {
     fun().clearAllSignals();
     clearallchildren($("#canvasl- ul")[0]);
     clearallchildren($("#namel- ul")[0]);
     scrollbarmove().reset_to_default();
     $("canvas").each(addZoom);
-  }
-  $("#column-sep")[0].onclick = function(event) {}
+    ScorllSyncHelperClosure().calibrateTracking();
+    $("#wavedraw-zoom")[0].onclick();
+    CursorMover.movetoX(0);
+  };
   $("#width-")[0].onchange = function() {
     var p = this.value / this.max;
     var bar = scrollbarmove();
     bar.width = 0 | p * $('#canvasl-').width();
     if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
-  }
+  };
   $("#propotion-")[0].oninput = function() {
     var propotion = this.value / this.max;
     var totaltime = get_json_data().time[0] - 0;
@@ -40,16 +44,26 @@ $(document).ready(function() {
     bar.t_begin = newleft;
     bar.t_end = bar.t_begin + diff;
     if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
-  }
-  $(":radio").click(function() {
-    var $this = $(this);
-    global_states().mode = $this.val();
-    if ($this.val() == 0) {
-      $('[type=range]').attr("disabled", 'disabled');
-    } else if ($this.val() == 1) {
-      $('[type=range]').attr("disabled", false);
-    }
-  });
+  };
+  $("#wavedraw-cursor")[0].onclick = function() {
+    global_states().mode = 1;
+    CursorMover.movetoX(CursorMover.nowpos);
+    CursorMover.$cursor.css({
+      'visibility': 'visible'
+    });
+    CursorMover.$info.css({
+      'visibility': 'visible'
+    });
+  };
+  $("#wavedraw-zoom")[0].onclick = function() {
+    global_states().mode = 0;
+    CursorMover.$cursor.css({
+      'visibility': 'hidden'
+    });
+    CursorMover.$info.css({
+      'visibility': 'hidden'
+    });
+  };
   $(window).resize(function() {
     $("#width-")[0].onchange();
   });

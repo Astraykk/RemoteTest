@@ -184,9 +184,9 @@ function _WaveZoomImpl(start, stop) {
   if (start > stop) {
     //right to left, zoom out
     var scalefactor = width / (start - stop);
-    timerange = 0 | (timerange * scalefactor);
+    timerange = Math.floor(timerange * scalefactor);
     //now calculate new begin and end
-    var newbeginoffset = 0 | (timerange / width * start);
+    var newbeginoffset = Math.floor(timerange / width * start);
     scrbar.t_begin -= newbeginoffset;
     if (scrbar.t_begin < 0) scrbar.t_begin = 0;
     scrbar.t_end = scrbar.t_begin + timerange;
@@ -194,9 +194,9 @@ function _WaveZoomImpl(start, stop) {
   }
   //now calculate new begin and end
   else {
-    var newbeginoffset = 0 | (timerange / width * start);
+    var newbeginoffset = Math.floor(timerange / width * start);
     scrbar.t_begin += newbeginoffset;
-    var newendoffset = 0 | (timerange / width * stop);
+    var newendoffset = Math.floor(timerange / width * stop);
     scrbar.t_end = timebegin + newendoffset;
   }
   scrbar.changecanvas(false);
@@ -297,7 +297,7 @@ function round_scale(timev) {
   var res;
   var judge = [Math.sqrt(50), Math.sqrt(10), Math.sqrt(2)];
   for (var i = 1; i <= 10; i++) {
-    var gridtime = 0 | (timev / i);
+    var gridtime = Math.floor(timev / i);
     var zeroes = '0'.repeat(('' + gridtime).length - 1);
     var gridtimelt10 = gridtime / ('1' + zeroes);
     if (gridtimelt10 >= judge[0]) res = 10;

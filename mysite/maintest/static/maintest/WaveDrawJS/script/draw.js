@@ -69,24 +69,24 @@ console.log(x1)
 function draw_grid(x_st, y_st, x_range, time) {
   var gridcanvas = $('#wavedrawing-gridc')[0];
   gridcanvas.width = x_range;
-  gridcanvas.height = 1 + 0 | y_st;
+  gridcanvas.height = Math.ceil(y_st);
   var ctx = gridcanvas.getContext("2d");
   draw_hline(ctx, x_st, y_st, x_range, '#ffffff');
   var timediff = (time[1][1] - time[1][0]).toFixed(0);
   //determine the size of a grid
   var gridsize = round_scale(timediff);
   var gridscale = reduce_timescale(gridsize, time[0][1]);
-  gridsize = 0 | gridsize;
+  gridsize = Math.floor(gridsize);
   //get the first gridline to draw
   //e.g. if starttime=1051ns and grid=10ns
   //then the first gridline is at 1050ns
   var first_visible_pos = (time[1][0] / gridsize);
-  var fv_time = (0 | first_visible_pos) * gridsize;
+  var fv_time = Math.floor(first_visible_pos) * gridsize;
   var fv_scale = reduce_timescale(round_scale(fv_time), time[0][1]);
   var scale_text = 0;
   for (var i = 0,
   val = fv_time; val < time[1][1]; i++) {
-    var x_off = 0 | ((x_range - 0) * (val - time[1][0]) / timediff);
+    var x_off = Math.floor((x_range - 0) * (val - time[1][0]) / timediff);
     draw_vline(ctx, x_st + x_off, y_st, -(y_st / 2), '#ffffff');
     write_text(ctx, x_st + x_off, y_st / 2, (i * gridsize + fv_time) + '' + time[0][1]);
     val += gridsize;
@@ -159,8 +159,8 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
       var wavecache = [];
       var ctx = canvas.getContext("2d");
       for (var i = findlastless(wave['time'], time_begin), endindex = findlastless(wave['time'], time_end) + 1; i < endindex; i++) {
-        xpos = (0 | (canvas.width - 0) * (wave['time'][i] - timerange[0]) / timediffval) + xmargin;
-        xend = (0 | (canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
+        xpos = Math.floor((canvas.width - 0) * (wave['time'][i] - timerange[0]) / timediffval) + xmargin;
+        xend = Math.floor((canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
         switch (wave['state'][i]) {
         case 0:
         case 1:

@@ -56,11 +56,11 @@ function addDrag(el) {
 }
 function addZoom() {
   this.onmouseup = function(event) {
-    var left = 0 | $(this).offset().left;
+    var left = Math.floor($(this).offset().left);
     WaveZoomHelperClosure().setstop(event.clientX - left);
   };
   this.onmousedown = function(event) {
-    var left = 0 | $(this).offset().left;
+    var left = Math.floor($(this).offset().left);
     WaveZoomHelperClosure().setstart(event.clientX - left);
   };
 }
@@ -74,7 +74,7 @@ function CursorMove() {
     var scrbar = scrollbarmove();
     var width = scrbar.width;
     var timerange = scrbar.t_end - scrbar.t_begin;
-    var newbeginoffset = 0 | (timerange / width * pos);
+    var newbeginoffset = Math.floor(timerange / width * pos);
     //console.log(timerange,newbeginoffset);
     this.$info.html(scrbar.t_begin + newbeginoffset + get_json_data()['time'][1]);
     this.$cursor.css({

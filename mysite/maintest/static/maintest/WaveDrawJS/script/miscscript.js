@@ -32,7 +32,7 @@ $(document).ready(function() {
   $("#width-")[0].onchange = function() {
     var p = this.value / this.max;
     var bar = scrollbarmove();
-    bar.width = 0 | p * $('#canvasl-').width();
+    bar.width = Math.floor(p * $('#canvasl-').width());
     if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
   };
   $("#propotion-")[0].oninput = function() {
@@ -43,6 +43,7 @@ $(document).ready(function() {
     var newleft = propotion * (totaltime - diff);
     bar.t_begin = newleft;
     bar.t_end = bar.t_begin + diff;
+    CursorMover.movetoX(CursorMover.nowpos);
     if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
   };
   $("#wavedraw-cursor")[0].onclick = function() {

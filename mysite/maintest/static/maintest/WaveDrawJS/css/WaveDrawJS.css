@@ -1,0 +1,80 @@
+div.wavedrawing- ul {
+	display:inline-block;
+	margin:0;
+	padding:0;
+}
+div.wavedrawing-container div {
+	display:inline-block;
+	margin:0;
+	list-style:none;
+	font-size:1em;
+}
+#cursor- {
+	background-color:gold;
+	float:left;
+	position:absolute;
+	height:0;
+	width:2px;
+	left:0;
+	visibility:hidden;
+}
+#wavedraw-cursor-info {
+	background-color:black;
+	color:aqua;
+	float:left;
+	outline:1px solid yellow;
+	position:absolute;
+	height:23px;
+	left:0;
+	visibility:hidden;
+}
+#namel- {
+	font-size:1em;
+	width:20%;
+	vertical-align:top;
+	padding-left:3%;
+	max-height:300px;
+	overflow-y:auto;
+	overflow-x:auto;
+}
+#wavedrawing-heading {
+	display:inline-block;
+}
+#wavedrawing-heading-text {
+	padding:0;
+	width:20%;
+	height:23px;
+	vertical-align:top;
+	display:inline-block;
+}
+#wavedrawing-gridc {
+	vertical-align:top;
+	background-color:black;
+}
+div.column-sep {
+	background:url(../img/sep.png) repeat-y;
+	width:1%;
+	height:0;
+	padding:0;
+	display:inline-block;
+	vertical-align:top;
+}
+#canvasl- {
+	vertical-align:top;
+	width:75%;
+	font-size:0;
+	padding:0;
+	max-height:300px;
+	overflow-y:auto;
+}
+div#namel- li[class] > span {
+	color:#000;
+}
+div#namel- li[class] {
+	height:35px;
+}
+div#canvasl- canvas {
+	background-color:black;
+	display:block;
+}
+

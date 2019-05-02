@@ -120,7 +120,7 @@ class allTask4user(models.Model):
 	ptn_name = models.CharField('ptn_file_name',max_length=30)
 	
 	def __str__(self):
-		return '%s - %.21s'%(self.user.username,self.submit_time)
+		return '%s - %.21s - %.21s'%(self.user.username,self.submit_time,self.finish_time)
 		
 class allTask4group(models.Model):
 	group = models.ForeignKey(Group, on_delete=models.CASCADE)

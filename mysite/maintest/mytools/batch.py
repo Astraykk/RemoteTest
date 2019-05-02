@@ -29,13 +29,11 @@ if __name__ == '__main__':
 else:
 	from maintest.mytools.patternGen import PatternGen
 	from maintest.mytools.mytools import vcd_merge
-	from filebrowser.sites import site
 
 if __name__ == '__main__':
 	FILE_ROOT_PATH = sys.path[0]
 else:
-	# FILE_ROOT_PATH = '/home/linaro/mysite/uploads'
-	FILE_ROOT_PATH = os.path.join(site.storage.location, "uploads")
+	FILE_ROOT_PATH = '/home/linaro/mysite/uploads'
 app_path = '/home/linaro/BR0101/z7_v4_com/z7_v4_ip_app'
 base_command = 'sudo {} {} {} 1 1 1'
 if not os.path.exists(app_path):
@@ -52,7 +50,7 @@ def name_check(file, name):
 
 
 def get_soup(path, file):
-	path = os.path.join(path, file)
+	path = os.path.join(FILE_ROOT_PATH, path, file)
 	# print(path)
 	with open(path, "r") as f:
 		soup = bs4.BeautifulSoup(f.read(), "xml")
@@ -70,7 +68,7 @@ def report(file, key='', value=''):
 
 
 def get_file_list(path, tfo):
-	tfo_path = os.path.join(path, tfo)
+	tfo_path = os.path.join(FILE_ROOT_PATH, path, tfo)
 	i_list = []
 	o_list = []
 	# print(path)
@@ -94,7 +92,6 @@ def tfo_parser(path, file):
 	# file_list_list = {}
 	# print(path)
 	file_list_list = []
-	print("-----------"+file+"s----------")
 	soup = get_soup(path, file)
 	name_check(file, soup.TFO['name'])
 	for test_tag in soup.find_all('TEST'):
@@ -111,10 +108,7 @@ def tfo_parser(path, file):
 				else:
 					file_list[child.name] = child['name'] + '.' + child.name.lower()
 		# file_list_list[test_tag['path']] = (project_name, file_list)
-		if test_tag['path'] == ".":
-			file_list_list.append([path, (project_name, file_list)])
-		else:
-			file_list_list.append([os.path.join(path, test_tag['path'][2:]), (project_name, file_list)])
+		file_list_list.append([os.path.join(path, test_tag['path']), (project_name, file_list)])
 		# file_list_list.append([test_tag['path'], (project_name, file_list)])
 	print(file_list_list)
 	return file_list_list
@@ -126,19 +120,16 @@ def batch_build(path, tfo):
 	print('Start batch build')
 	file_list_list = tfo_parser(path, tfo)
 	report_file = os.path.join(path, tfo.rstrip('.tfo') + '_report.log')
-	print('path =', path)
-	print('report_path =', report_file)
-	print('ROOT =', FILE_ROOT_PATH)
 	report(report_file, 'Batch build for '+tfo)
 	for project_path, file_list in file_list_list:
-		#try:
-		s_time = time.time()
-		pattern = PatternGen(project_path, file_list=file_list)
-		pattern.write()
-		e_time = time.time()
-		key = 'Build time for {:<30}:'.format(pattern.project_name)
-		value = e_time - s_time
-		report(report_file, key, value)
+		try:
+			s_time = time.time()
+			pattern = PatternGen(project_path, file_list=file_list)
+			pattern.write()
+			e_time = time.time()
+			key = 'Build time for {:<30}:'.format(pattern.project_name)
+			value = e_time - s_time
+			report(report_file, key, value)
 		# try:
 		# 	_thread.start_new_thread(pattern.write, ())
 		# except Exception:
@@ -146,9 +137,9 @@ def batch_build(path, tfo):
 		# proc = Process(target=pattern.write, args=())
 		# proc.start()
 		# proc.join()
-		# except Exception as err:
-			# key = 'An exception occurs in {}:'.format(project_path)
-			# report(report_file, key, err)
+		except Exception as err:
+			key = 'An exception occurs in {}:'.format(project_path)
+			report(report_file, key, err)
 	print('Batch build finished')
 	end_time = time.time()
 	report(report_file, 'Total build time:', end_time - start_time)
@@ -159,7 +150,7 @@ def batch_test(path, tfo):
 	i_file_list, o_file_list = get_file_list(path, tfo)
 	print('Start batch test')
 	start_time = time.time()
-	report_file = os.path.join(FILE_ROOT_PATH, path, tfo.rstrip('.tfo') + '_report.log')
+	report_file = os.path.join(path, tfo.rstrip('.tfo') + '_report.log')
 	report(report_file, 'Batch Test for ' + tfo)
 	for i in range(len(i_file_list)):
 		i_file = i_file_list[i]
@@ -187,27 +178,26 @@ def batch_trf2vcd(path, tfo):
 	file_list_list = tfo_parser(path, tfo)
 	print(file_list_list)
 	start_time = time.time()
-	#report_file = os.path.join(FILE_ROOT_PATH, path, tfo.rstrip('.tfo') + '_report.log')
 	report_file = os.path.join(path, tfo.rstrip('.tfo') + '_report.log')
 	report(report_file, 'Batch trf2vcd for ' + tfo)
 	for project_path, file_list in file_list_list:
-		# try:
-		temp_path = os.path.join(project_path, 'temp.json')
-		if os.path.isfile(temp_path):
-			s_time = time.time()
-			pattern = PatternGen(project_path, file_list=file_list)
-			trf = pattern.project_name + '.trf'
-			vcd = pattern.project_name + '_trf.vcd'
-			pattern.trf2vcd(trf, vcd, flag='bypass')
-			e_time = time.time()
-			key = 'Trf2vcd time for {:<30}:'.format(pattern.project_name)
-			value = e_time - s_time
-			report(report_file, key, value)
-		else:
-			print('temp.json not found. Please build ptn first.')
-		# except Exception as err:
-			# key = 'An exception occurs in {}:'.format(project_path)
-			# report(report_file, key, err)
+		try:
+			temp_path = os.path.join(project_path, 'temp.json')
+			if os.path.isfile(temp_path):
+				s_time = time.time()
+				pattern = PatternGen(project_path, file_list=file_list)
+				trf = pattern.project_name + '.trf'
+				vcd = pattern.project_name + '_trf.vcd'
+				pattern.trf2vcd(trf, vcd, flag='bypass')
+				e_time = time.time()
+				key = 'Trf2vcd time for {:<30}:'.format(pattern.project_name)
+				value = e_time - s_time
+				report(report_file, key, value)
+			else:
+				print('temp.json not found. Please build ptn first.')
+		except Exception as err:
+			key = 'An exception occurs in {}:'.format(project_path)
+			report(report_file, key, err)
 	print('Batch trf2vcd finished')
 	end_time = time.time()
 	report(report_file, 'Total trf2vcd time:', end_time - start_time)
@@ -219,27 +209,27 @@ def batch_merge(path, tfo):
 	file_list_list = tfo_parser(path, tfo)
 	# print(file_list_list)
 	start_time = time.time()
-	# report_file = os.path.join(FILE_ROOT_PATH, path, tfo.rstrip('.tfo') + '_report.log')
 	report_file = os.path.join(path, tfo.rstrip('.tfo') + '_report.log')
 	report(report_file, 'Batch merge for ' + tfo)
 	for project_path, file_list in file_list_list:
-		# try:
-		# pattern = PatternGen(os.path.join(path, project_path), file_list=file_list)
-		pattern = PatternGen(project_path, file_list=file_list)
-		s_time = time.time()
-		period = pattern.digital_param['period']
-		# print(type(period))
-		vcd1 = os.path.join(project_path, pattern.file_list['VCD'])
-		vcd2 = os.path.join(project_path, pattern.project_name + '_trf.vcd')
-		vcdm_path = os.path.join(project_path, pattern.project_name + '_merge.vcd')
-		vcd_merge(vcd1, vcd2, period, vcdm_path)
-		e_time = time.time()
-		key = 'Merge time for {:<30}:'.format(pattern.project_name)
-		value = e_time - s_time
-		report(report_file, key, value)
-		# except Exception as err:
-			# key = 'An exception occurs in {}:'.format(project_path)
-			# report(report_file, key, err)
+		try:
+			# pattern = PatternGen(os.path.join(path, project_path), file_list=file_list)
+			pattern = PatternGen(project_path, file_list=file_list)
+			s_time = time.time()
+			period1 = pattern.digital_param['period']
+			print(period1)
+			period2 = '1us'
+			vcd1 = os.path.join(project_path, pattern.file_list['VCD'])
+			vcd2 = os.path.join(project_path, pattern.project_name + '_trf.vcd')
+			vcdm_path = os.path.join(project_path, pattern.project_name + '_merge.vcd')
+			vcd_merge(vcd1, vcd2, period1, period2, vcdm_path)
+			e_time = time.time()
+			key = 'Merge time for {:<30}:'.format(pattern.project_name)
+			value = e_time - s_time
+			report(report_file, key, value)
+		except Exception as err:
+			key = 'An exception occurs in {}:'.format(project_path)
+			report(report_file, key, err)
 	print('Batch merge finished')
 	end_time = time.time()
 	report(report_file, 'Total merge time:', end_time - start_time)
@@ -255,9 +245,9 @@ like 01, 12, or 012)
 
 
 def test():
-	batch_merge('tfo', 'bugs2.tfo')
+	batch_merge('.', 'FLASH.tfo')
 	# batch_merge('.', 'bugs2.tfo')
-	batch_trf2vcd('tfo', 'chen.tfo')
+	# batch_trf2vcd('tfo', 'chen.tfo')
 
 
 if __name__ == "__main__":

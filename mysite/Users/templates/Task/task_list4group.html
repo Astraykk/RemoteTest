@@ -39,10 +39,10 @@ $(function(){
 					</div>
 					{% for task in task_list %}
 						<div class="row list-group-item">
-							<div class="col-md-2 col-sm-2 col-lg-2">{{ task.project_loc }}</div>
-							<div class="col-md-1 col-sm-1 col-lg-1">{{ task.ptn_name }}</div>
+							<div class="col-md-2 col-sm-2 col-lg-2" style="word-wrap:break-word">{{ task.project_loc }}</div>
+							<div class="col-md-1 col-sm-1 col-lg-1" style="word-wrap:break-word">{{ task.ptn_name }}</div>
 							<div class="col-md-2 col-sm-2 col-lg-2">{{ task.submitter }}</div>
-							<div class="col-md-3 col-sm-3 col-lg-3"><td>{{ task.submit_time|date:"Y-m-d H:i:s" }}</td></div>
+							<div class="col-md-3 col-sm-3 col-lg-3" style="word-wrap:break-word"><td>{{ task.submit_time|date:"Y-m-d H:i:s" }}</td></div>
 							<div class="col-md-1 col-sm-1 col-lg-1">
 								{% if task.finish_tag == False %}								
 									<span class="glyphicon glyphicon-time" style="color: rgb(100, 155, 119);"></span>
@@ -50,7 +50,7 @@ $(function(){
 									<span class="glyphicon glyphicon-ok" style="color: rgb(107, 255, 89);"></span>
 								{% endif %}
 							</div>
-							<div class="col-md-3 col-sm-3 col-lg-3">
+							<div class="col-md-3 col-sm-3 col-lg-3" style="word-wrap:break-word">
 								{% if task.finish_tag %}								
 									{{ task.finish_time|date:"Y-m-d H:i:s" }}
 								{% else %}

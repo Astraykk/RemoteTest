@@ -15,5 +15,6 @@ urlpatterns = [
 	url(r'^test/$', views.test, name='test'),
 	url(r'^report/$', views.report, name='report'),
 	url(r'^edit_file/$', views.edit_file, name='edit_file'),
+	url(r'^v2pj/$', views.vcd2picjson, name='vcd2picjson'),
 
 ]

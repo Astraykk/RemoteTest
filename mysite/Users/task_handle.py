@@ -66,14 +66,19 @@ def test_request(request):
 		project_loc = request.POST.get('tfo_loc',None)
 		tfo_name = request.POST.get('tfo_name',None)
 		if not project_loc:
-			project_loc = "/"+request.session.get("tfo_path",None).split(os.path.join("Users","all_users",username,""))[1]+"/"
+			project_loc = request.session.get("tfo_path",None).split(os.path.join("Users","all_users",username,""))[1]
 			tfo_name = request.session.get("tfo_name",None)
+		else:
+			pj_loc_os_path_join=""
+			for iter in project_loc.split("/"):
+				pj_loc_os_path_join = os.path.join(pj_loc_os_path_join,iter)
+			project_loc = pj_loc_os_path_join
 		tag = request.POST.get('user_or_group',None)
 		msg = check4waitingInfo()
 		if tag != 'group':
 			user_or_group = '0'
 			u_or_g = username
-			path = "Users/all_users/" + username + project_loc
+			path = os.path.join("Users","all_users",username,project_loc)
 			user_in_queue_item = user_in_queue(user=user,x=1)
 			request.session['stream_status'][2][1] = DONE
 		else:
@@ -87,7 +92,7 @@ def test_request(request):
 			user_in_queue_item = user_in_queue(group=group,x=1)
 			user_or_group = '1'
 			u_or_g = str(group_id)
-			path = "Users/all_groups/"+str(group_id)+project_loc
+			path = os.path.join("Users","all_groups",str(group_id),project_loc)
 		
 		# dir_list = os.listdir(path)
 		# tfo_list = []
@@ -105,11 +110,11 @@ def test_request(request):
 		
 		temp = project_loc
 		for key in file_list_list.keys():
-			if key != ".":
-				project_loc = temp + key[2:] + "/"
-				path4iter = path + key[2:] + "/"
-			else:
-				path4iter = path
+			# if key != ".":
+			project_loc = os.path.join(temp,key)
+			path4iter = os.path.join(path,key)
+			# else:
+				# path4iter = path
 			ptn_name = file_list_list[key][0]
 			
 			dir_list = os.listdir(path4iter)
@@ -195,15 +200,16 @@ def addIndb(request,username,project_loc,user_or_group,ptn_name):
 	if task_db.objects.count() == 1:
 		pro = multiprocessing.Process(target = minute_process)
 		pro.start()
+		#pro.join()
 	#create_history(task.username,"add testing task",task.project_loc,user_or_group)
 
 def minute_process():
 	times = 0
-	bata = 4
+	beta = 4
 	while(task_db.objects.count()>0):
+		time.sleep(1)
 		queue2serving()		
-		task_db2task()
-		time.sleep(1)             #
+		task_db2task()		             #
 		times = times + 1
 		if times % beta*4 == 0:
 			times = 0
@@ -228,7 +234,7 @@ def task_db2task():
 	FIFO_length = 2
 	task_num = Task.objects.count()
 	if task_num < FIFO_length and task_db.objects.count() > 0:
-		for i in range(task_num,FIFO_length+1):
+		for i in range(task_num,FIFO_length):
 			if task_db.objects.count() > 0 and user4serving.objects.count()>0:
 				task_db_item = choose_task()
 				if Task.objects.count() > 0:
@@ -241,6 +247,7 @@ def task_db2task():
 					#task = Task.objects.order_by('request_serial_num')[0]
 					pro = multiprocessing.Process(target = test_pack,args = (task_item,))
 					pro.start()
+					#pro.join()
 				
 				# if user4serving.objects.count()>0:
 				if task_db_item.user:
@@ -280,9 +287,12 @@ def choose_task():
 	
 def weight_update():
 	k = 1.3
+	alpha = 0.75
 	serving_set = user4serving.objects.all()
 	for iter in serving_set:
 		iter.w = iter.w * k
+		if iter.w > alpha:
+			iter.w = alpha
 		iter.save()
 
 
@@ -314,25 +324,26 @@ def test(task):
 	
 	tag = task.user_or_group
 	if task.user_or_group == "0":	
-		path = "Users/all_users/" + task.username + task.project_loc
-		file_loc = "Users/all_users/"
+		path = os.path.join("Users","all_users",task.username,task.project_loc)
+		file_loc = os.path.join("Users","all_users")
 	else:
-		path = "Users/all_groups/" + task.username + task.project_loc
-		file_loc = "Users/all_groups/"
+		path = os.path.join("Users","all_groups",task.username,task.project_loc)
+		file_loc = os.path.join("Users","all_groups")
 		
-	dir_list = os.listdir(file_loc+task.username+task.project_loc)
+	dir_list = os.listdir(os.path.join(file_loc,task.username,task.project_loc))
 	
 	input_ptn = task.ptn_name + ".ptn"
 	if input_ptn not in dir_list:
 		return False
 	output_trf = task.ptn_name + ".trf"
 	create_history(task.username,"testing",task.project_loc,tag)
-	
-	print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path + input_ptn + " " + path + output_trf + " 1 1 1")
-	#os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path + input_ptn + " " + path + output_trf + " 1 1 1")
-	for i in range(5):
-		time.sleep(1)
-		print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
+	path_in = os.path.join(path,input_ptn)
+	path_o = os.path.join(path,output_trf)
+	abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
+	print(abc)
+	#for i in range(5):
+		#time.sleep(1)
+		#print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
 	
 	print("finish testing "+task.username+" "+ task.project_loc + input_ptn +"....")
 	

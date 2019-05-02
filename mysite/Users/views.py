@@ -34,7 +34,7 @@ def identify(request):
 			# context = {'username': username,'dirs':dirs}
 			# return render(request, 'mysite/homepage.html', context)
 
-			return redirect("/")
+			return redirect("/maintest/index/")
 			# return redirect("/index")
 		else:
 			return HttpResponse("<script>alert(\"You entered an incorrect user name or password\");window.location.href=\"/Users/login/\";</script>")
@@ -63,7 +63,7 @@ def add_user(request):
 			os.mkdir(path)
 
 			html_add_user_str='''
-				<p>Successfully sign up! Click <a href="/">here</a> to login</p>
+				<p>Successfully sign up! Click <a href="/maintest/index/">here</a> to login</p>
 
 			'''
 	else:
@@ -139,7 +139,7 @@ def mkdir(request):
 
 def logout(request):
 	del request.session['username']
-	return redirect("/")
+	return redirect("/maintest/index/")
 
 
 

@@ -26,7 +26,7 @@ urlpatterns = [
 	url(r'^polls/', include('polls.urls')),
 	url(r'^files/', include('files.urls')),
 	url(r'^maintest/', include('maintest.urls',namespace="maintest")),
-	url(r'^',include('maintest.urls')),
+	#url(r'^',include('maintest.urls')),
 	url(r'^Nav/',include('Nav.urls')),
 	
 	#url(r'^admin/', admin.site.urls),

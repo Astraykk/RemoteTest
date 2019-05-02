@@ -2014,7 +2014,7 @@ class TabularInline(InlineModelAdmin):
 
 
 def del_file(obj):
-	if not hasattr(obj, 'request_serial_num'):
+	if hasattr(obj, 'password'):
 		path = "Users/all_users/" + obj.username
 		ls = os.listdir(path)
 		for i in ls:

@@ -1,16 +1,26 @@
-var get_json_data = (function() {
-  //use hard-coded json data during offline debug
-  var jsdata = JSON.parse('{"dat": [{"name": "clk", "width": "1", "wave": ["0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1"], "state": [10, 14, 11, 14, 11, 14, 11, 14, 11, 14, 11, 14, 11, 14], "time": ["0", "10000", "20000", "30000", "40000", "50000", "60000", "70000", "80000", "85000", "87500", "90000", "100000", "110000"]}, {"name": "ai[1:0]", "width": "2", "wave": ["0", "zz", "11", "xx"], "state": [18, 17, 17, 17], "time": ["0", "40000", "70000", "110000"]}, {"name": "ai[1]", "width": "1", "wave": ["0", "z", "1", "x"], "state": [10, 6, 13, 3], "time": ["0", "40000", "70000", "110000"]}, {"name": "ai[0]", "width": "1", "wave": ["0", "z", "1", "x"], "state": [10, 6, 13, 3], "time": ["0", "40000", "70000", "110000"]}], "time": ["120000", "ps", 10, "ns", 13]}');
-  return function() {
-    return jsdata;
-  }
-} ());
-function SignalProperty(name, jsonindex, visibility) {
+function SignalProperty(name, jsonindex, visibility, busattached) {
   this.name = name;
   this.jsonindex = jsonindex;
   this.visibility = visibility;
+  this.wavecolour = ['#ff0000', //for x
+  '#0000ff', //for z
+  '#00ff00', //for 01
+  '#000000' //hidden line
+  ];
+  //todo: add custom colour support in right click menu
+  if (busattached) {
+    this.issubbus = true;
+    this.bus = busattached;
+  } else if (name.includes(':')) {
+    this.issubbus = false;
+    this.bus = name.slice(0, name.indexOf('['));
+  } else {
+    this.issubbus = false;
+    this.bus = null;
+  }
 }
 function DisplaySignals() {
+  //manages signals that are on display
   var signals = new Array();
   this.getAllSignals = function() {
     return signals;
@@ -34,8 +44,16 @@ function DisplaySignals() {
     });
     return signals[index];
   };
-  this.AddSignal = function(name, jsonindex, visibility) {
-    signals.push(new SignalProperty(name, jsonindex, visibility));
+  this.AddSignal = function(name, jsonpos, visibility) {
+    if (name.includes('[')) {
+      if (!name.includes(':')) {
+        //adding part of a bus
+        var busname = name.slice(0, name.indexOf('['));
+        signals.push(new SignalProperty(name, jsonpos, visibility, busname));
+        return;
+      }
+    }
+    signals.push(new SignalProperty(name, jsonpos, visibility));
   };
 }
 var fun = (function() {
@@ -44,36 +62,211 @@ var fun = (function() {
     return signals;
   }
 } ());
-function findDOMByType(list, type) {
-  for (var i = 0; i < list.length; i++) {
-    if (list[i].nodeName == type) {
-      return list[i];
+var global_states = (function() {
+  var states = {
+    mode: 0
+  };
+  return function() {
+    return states;
+  }
+} ());
+function filterSignalWithPara(para, type) {
+  var p = para;
+  var t = type;
+  this.fliterfn = function(obj) {
+    if (obj[t] == p) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+  this.setcondition = function(para, type) {
+    p = para;
+    t = type;
+  };
+}
+function listall(l) {
+  for (var i = 0; i < l.length; i++) {
+    console.log(l[i]);
+  }
+}
+function createFilteredGroup(group, signal) {
+  var fil;
+  if (signal.bus && !signal.issubbus) {
+    fil = new filterSignalWithPara(signal.bus, 'bus');
+  } else {
+    fil = new filterSignalWithPara(signal.name, 'name');
+  }
+  return group.filter(fil.fliterfn);
+}
+function _DragImpl(start, stop) {
+  /*  if start and stop are 
+	    (a)parts of the same bus
+	    (b)independent signals:
+	      swap them
+        if one of start or stop is bus:
+	      if the rest is bus or independent signal:
+	        swap them together with their parts(if exists)
+        if none of above:
+	      do nothing*/
+  var startsig = fun().getSignalByName(start);
+  var stopsig = fun().getSignalByName(stop);
+  var isswappable = false;
+  if ((startsig.bus == stopsig.bus) && (startsig.issubbus == stopsig.issubbus)) {
+    isswappable = true;
+  } else if (startsig.bus || stopsig.bus) {
+    if (!startsig.issubbus && !stopsig.issubbus) {
+      isswappable = true;
     }
   }
-  return null;
-};
+  if (isswappable) {
+    var s = fun().getAllSignals();
+    var startpos = fun().getSignalIndexByName(start);
+    var stoppos = fun().getSignalIndexByName(stop);
+    if (startpos < stoppos) { [startpos, stoppos] = [stoppos, startpos]; [startsig, stopsig] = [stopsig, startsig];
+    }
+    var startgroup = createFilteredGroup(s, startsig);
+    var stopgroup = createFilteredGroup(s, stopsig);
+    var startlen = startgroup.length;
+    var stoplen = stopgroup.length;
+    stopgroup.unshift(startpos, startlen);
+    Array.prototype.splice.apply(s, stopgroup);
+    startgroup.unshift(stoppos, stoplen);
+    Array.prototype.splice.apply(s, startgroup);
+    var canvasNodes = $("#canvasl- canvas");
+    for (var i = 0; i < s.length; i++) {
+      var newclass = s[i].name;
+      canvasNodes.eq(i).attr('class', newclass);
+      if (s[i].visibility) {
+        canvasNodes.eq(i).show();
+      } else {
+        canvasNodes.eq(i).hide();
+      }
+    }
+  }
+  return isswappable;
+}
 function DragHelper() {
+  //Implements drag
   var start = '';
   var stop = '';
-  this.setstart = function(i) {
-    this.start = i;
+  this.setstart = function(name) {
+    this.start = name;
   };
-  this.setstop = function(i) {
-    this.stop = i;
-    var startel = findDOMByType(document.getElementsByClassName(this.start), 'CANVAS');
-    var stopel = findDOMByType(document.getElementsByClassName(i), 'CANVAS');
-    var startpos = fun().getSignalIndexByName(this.start);
-    var stoppos = fun().getSignalIndexByName(i);
-    var s = fun().getAllSignals();
-    var x = s[startpos];
-    s[startpos] = s[stoppos];
-    s[stoppos] = x;
-    startel.setAttribute('class', i);
-    stopel.setAttribute('class', this.start);
+  this.setstop = function(name) {
+    this.stop = name;
+    if (this.start == this.stop) {
+      if (name.includes(':')) {
+        bus_toggle(name.slice(0, name.search('\\[')));
+        /*maybe refresh the whole set is better?
+	--Sorry, elements will disappear
+   */
+      }
+      return;
+    }
+    var updateflag = _DragImpl(this.start, this.stop);
+    scrollbarmove().changecanvas(updateflag);
   };
 }
 var DragHelperClosure = (function() {
   var i = new DragHelper();
+  return function() {
+    return i;
+  }
+} ());
+function _WaveZoomImpl(start, stop) {
+  var scrbar = scrollbarmove();
+  var timebegin = scrbar.t_begin;
+  var timerange = scrbar.t_end - scrbar.t_begin;
+  var width = scrbar.width;
+  var jstime = get_json_data().time[0] - 0;
+  //convert px to actual time values
+  if (start > stop) {
+    //right to left, zoom out
+    var scalefactor = width / (start - stop);
+    timerange = Math.floor(timerange * scalefactor);
+    //now calculate new begin and end
+    var newbeginoffset = Math.floor(timerange / width * start);
+    scrbar.t_begin -= newbeginoffset;
+    if (scrbar.t_begin < 0) scrbar.t_begin = 0;
+    scrbar.t_end = scrbar.t_begin + timerange;
+    if (scrbar.t_end > jstime) scrbar.t_end = jstime;
+  }
+  //now calculate new begin and end
+  else {
+    var newbeginoffset = Math.floor(timerange / width * start);
+    scrbar.t_begin += newbeginoffset;
+    var newendoffset = Math.floor(timerange / width * stop);
+    scrbar.t_end = timebegin + newendoffset;
+  }
+  scrbar.changecanvas(false);
+  var propbar = $("#propotion-");
+  var propv = propbar.attr('max') * scrbar.t_begin / jstime;
+  propbar.attr('value', propv)
+}
+function WaveZoomHelper() {
+  //Implements zoom in/out
+  var start = 0;
+  var stop = 0;
+  //start and stop are in px
+  this.setstart = function(pos) {
+    this.start = pos;
+  };
+  this.setstop = function(pos) {
+    this.stop = pos;
+    if (global_states().mode == 1) {
+      //mode is cursor, move cursor to stop position
+      CursorMover.movetoX(pos);
+    } else {
+      //mode is zoom, do zoom in/out
+      if (this.start == this.stop) {
+        //no dragging detected
+        return;
+      }
+      _WaveZoomImpl(this.start, this.stop);
+    }
+  };
+}
+var WaveZoomHelperClosure = (function() {
+  var i = new WaveZoomHelper();
+  return function() {
+    return i;
+  }
+} ());
+function ScorllSyncHelper() {
+  //Implements sync of scorllbars
+  var currentTab = 0;
+  this.scale = 1;
+  this.setup = () => {
+    var $l = $('#namel-');
+    var $r = $('#canvasl-');
+    $l.scroll(() =>{
+      if (this.currentTab !== 1) return;
+      $r[0].scrollTop = $l[0].scrollTop * this.scale;
+    });
+    $r.scroll(() =>{
+      if (this.currentTab !== 2) return;
+      $l[0].scrollTop = $r[0].scrollTop / this.scale;
+    });
+    $l.mouseover(() =>{
+      this.currentTab = 1;
+    });
+    $r.mouseover(() =>{
+      this.currentTab = 2;
+    });
+    this.$l = $l;
+    this.$r = $r;
+  };
+  this.calibrateTracking = () =>{
+    var $lc = this.$l.children();
+    var $rc = this.$r.children();
+    this.scale = ($rc[0].offsetHeight - this.$r[0].offsetHeight) / ($lc[0].offsetHeight - this.$l[0].offsetHeight);
+  };
+}
+var ScorllSyncHelperClosure = (function() {
+  var i = new ScorllSyncHelper();
+  i.setup();
+  i.calibrateTracking();
   return function() {
     return i;
   }
@@ -98,10 +291,13 @@ function findMost(arr) {
   return maxEle;
 }
 function round_scale(timev) {
+  //rounds time values. using 1/2/5 as the only significant number
+  //e.g., 12345->10000, 23456->20000, 45678->50000, 78901->100000
   var ar = new Array();
+  var res;
   var judge = [Math.sqrt(50), Math.sqrt(10), Math.sqrt(2)];
   for (var i = 1; i <= 10; i++) {
-    var gridtime = 0 | (timev / i);
+    var gridtime = Math.floor(timev / i);
     var zeroes = '0'.repeat(('' + gridtime).length - 1);
     var gridtimelt10 = gridtime / ('1' + zeroes);
     if (gridtimelt10 >= judge[0]) res = 10;
@@ -114,15 +310,30 @@ function round_scale(timev) {
   i = ar.indexOf(num);
   return ar[i];
 }
-function convert_timescale(time, src_scale) {
-  t_grades = ['p', 'n', 'u', 'm', '', 'k', 'M', 'G'];
-  src_index = t_grades.indexOf(src_scale[0]);
-  grade_diff = Math.floor((time.length - 1) / 3);
-  dst_index = src_index + grade_diff;
-  return [0 | (time * Math.pow(0.001, grade_diff)), t_grades[dst_index]];
+function reduce_timescale(time, src_scale) {
+  var t_grades = ['p', 'n', 'u', 'm', '', 'k', 'M', 'G'];
+  var src_index = t_grades.indexOf(src_scale[0]);
+  var grade_diff = Math.floor((time.length - 1) / 3);
+  var dst_index = src_index + grade_diff;
+  return [time * Math.pow(0.001, grade_diff), t_grades[dst_index]];
 }
-function createinvisiablebr(parentel) {
-  var br = document.createElement('br');
-  br.setAttribute('style', 'font-size:0');
-  parentel.appendChild(br);
+function convert_timescale(time, dst_scale, src_scale) {
+  var t_grades = ['p', 'n', 'u', 'm', '', 'k', 'M', 'G'];
+  var src_index = t_grades.indexOf(src_scale[0]);
+  var dst_index = t_grades.indexOf(dst_scale[0]);
+  var grade_diff = dst_index - src_index;
+  return [time * Math.pow(0.001, grade_diff), dst_scale];
+}
+function findlastless(arr, el) {
+  var lo = 0,
+  hi = arr.length;
+  while (lo < hi - 1) {
+    var mid = Math.floor((lo + hi) / 2);
+    if (el >= arr[mid]) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
 }

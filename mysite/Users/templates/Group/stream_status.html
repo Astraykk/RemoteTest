@@ -1,0 +1,31 @@
+{% load static %}
+<table id="stream-table" class="table table-condensed" align="center">
+  <thead>
+  <tr>
+    <th>Action</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for action in stream_status %}
+    {% if not action.1 %}
+      <tr class="danger">
+        <td>{{action.0}}</td>
+        <td><span class="glyphicon glyphicon-remove"></span></td>
+      </tr>
+    {% else %}
+      {% if action.1 == 1 %}
+        <tr class="active">
+          <td>{{action.0}}</td>
+          <td><img src="{% static 'maintest/img/loading.gif' %}" height="15" width="15"></td>
+        </tr>
+      {% else %}
+        <tr class="success">
+          <td>{{action.0}}</td>
+          <td><span class="glyphicon glyphicon-ok"></span></td>
+        </tr>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  </tbody>
+</table>

@@ -1,0 +1,48 @@
+<div  >
+	
+	<div class="list-group">
+		<div class="row list-group-item">
+			<div class="col-md-4 col-sm-4 col-lg-4">pj admin&amp;ordinary member</div>
+			<div class="col-md-1 col-sm-1 col-lg-1">visit</div>
+			<div class="col-md-2 col-sm-2 col-lg-2">up&amp;download</div>
+			<div class="col-md-2 col-sm-2 col-lg-2">build&amp;test</div>
+			<div class="col-md-1 col-sm-1 col-lg-1">save</div>
+		</div>
+	{% for member in members %}	
+		{% if member.authority == "3" or member.authority == "4" %}
+		<div class="row list-group-item">
+			<div class="">
+				<form id="form_id_{{ member.username }}" action="/Users/au4pj_change/" method="post" onsubmit="return au4pj_change_pack(this);">
+					{% csrf_token %}
+					<input type="hidden" name="username" value="{{ member.username }}" >
+					<input type="hidden" id="file_loc_{{ member.username }}" name="file_loc" readonly="readonly" value="/"/>
+					<button type="submit" id="form_id_{{ member.username }}_click" style="display:none;"></button>
+					<div class="col-md-4 col-sm-4 col-lg-4">
+						{% if member.authority == "3" %}						
+							{% if au != "4" %}		
+								<span class="glyphicon glyphicon-user " style="color: rgb(15, 255, 17);" data-toggle="tooltip" data-placement="left" title="project admin"></span> {{ member.username }}										
+							{% endif %}
+						{% elif member.authority == "4" %}
+							<span class="glyphicon glyphicon-user " style="color: rgb(128, 128, 128);" data-toggle="tooltip" data-placement="left" title="ordinary member"></span> {{ member.username }}							
+						{% endif %}	
+					</div>
+					<div class="col-md-1 col-sm-1 col-lg-1">
+						<input type="checkbox" name="au4pj" id="{{ member.username }}_0" value="0">
+					</div>
+					<div class="col-md-2 col-sm-2 col-lg-2">
+						<input type="checkbox" name="au4pj" id="{{ member.username }}_1" value="1">
+					</div>
+					<div class="col-md-2 col-sm-2 col-lg-2">
+						<input type="checkbox" name="au4pj" id="{{ member.username }}_2" value="2">
+					</div>
+					<div class="col-md-1 col-sm-1 col-lg-1">
+						<span class="glyphicon glyphicon-floppy-disk" id="{{ member.username }}_span" onclick="span_click(this)"></span>
+					</div>
+				</form>
+			</div>
+			
+		</div>
+		{% endif %}
+	{% endfor %}
+	</div>
+</div>

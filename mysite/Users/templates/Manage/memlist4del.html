@@ -1,0 +1,31 @@
+<div class="col-md-3 col-sm-6 col-lg-3" >	
+	<ul class="list-group">
+	{% for member in members %}			
+		<div class="list-group-item">
+			<form id="form_id_{{ member.username }}" action="/Users/delete_member/" method="post" onsubmit="return del_mem_pack(this);">
+				{% csrf_token %}
+				<input type="hidden" name="username" value="{{ member.username }}" >
+				<button type="submit" id="form_id_{{ member.username }}_click" style="display:none;"></button>
+				{% if member.authority == "1" %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(212, 106, 64);" data-toggle="tooltip" data-placement="left" title="super admin"></span> {{ member.username }}
+				{% elif member.authority == "2" %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(0, 128, 0);" data-toggle="tooltip" data-placement="left" title="admin"></span> {{ member.username }}
+					{% if au == "1" %}
+						<span class="glyphicon glyphicon-trash pull-right" id="{{ member.username }}_span" onclick="span_click(this)"></span>
+					{% endif %}
+				{% elif member.authority == "3" %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(15, 255, 17);" data-toggle="tooltip" data-placement="left" title="project admin"></span> {{ member.username }}
+					{% if au == "1" or au == "2" %}			
+						<span class="glyphicon glyphicon-trash pull-right" id="{{ member.username }}_span" onclick="span_click(this)"></span>										
+					{% endif %}
+				{% else %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(128, 128, 128);" data-toggle="tooltip" data-placement="left" title="ordinary member"></span> {{ member.username }}
+					{% if au != "4" %}	
+						<span class="glyphicon glyphicon-trash pull-right" id="{{ member.username }}_span" onclick="span_click(this)"></span>
+					{% endif %}
+				{% endif %}	
+			</form>
+		</div>
+	{% endfor %}
+	</ul>
+</div>

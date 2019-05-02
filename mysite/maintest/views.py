@@ -12,6 +12,7 @@ from filebrowser.base import FileListing, FileObject
 import os, json, re
 from .mytools.patternGen import PatternGen
 from .mytools.mytools import VcdFile, vcd_merge
+from .vcd2pic_views import vcd2picjson
 
 import time
 
@@ -25,8 +26,8 @@ UNDONE = 0
 
 # Create your views here.
 
-DIRECTORY = os.path.join(site.storage.location, "uploads")  # /path/to/mysite/uploads/
-
+DIRECTORY = os.path.join(site.storage.location, "Users","all_users")  # /path/to/mysite/uploads/
+#DIRECTORY = os.path.join("Users","all_users")
 """
 Arithmetic app functions
 """
@@ -182,19 +183,25 @@ def report(request):
 
 
 def treeview_ajax(request):
-	query = request.GET
-	query_dir = query.get('dir', '')
-	query_flag = query.get('flag', '')
-	path = os.path.join(DIRECTORY, query_dir)
-	request.session['directory'] = path  # change root directory of the page
-	# print('ajax_path', request.session['directory'])
-	request.session['project_name'] = query_dir
-	request.session['wave_path'] = os.path.join(site.storage.location, "maintest/static/maintest/img", query_dir)
-	clr_status(request)
-	if not os.path.exists(request.session['wave_path']):
-		os.mkdir(request.session['wave_path'])
-	result = treeview_parser(path, flag=query_flag)
+	username = request.session.get("username",None)
+	if username:
+		query = request.GET
+		query_dir = query.get('dir', '')
+		query_flag = query.get('flag', '')
+		path = os.path.join(DIRECTORY, username ,query_dir)
+		request.session['directory'] = path  # change root directory of the page
+		# print('ajax_path', request.session['directory'])
+		request.session['project_name'] = query_dir
+		#request.session['wave_path'] = os.path.join(site.storage.location, "maintest/static/maintest/img", username ,query_dir)
+		#request.session['wave_path'] = os.path.join("maintest/static/maintest/img", username ,query_dir)
+		clr_status(request)
+		# if not os.path.exists(request.session['wave_path']):
+			# os.mkdir(request.session['wave_path'])
+		result = treeview_parser(path, flag=query_flag)
+	else:
+		result = [{"text":"login first!"}]
 	return HttpResponse(json.dumps(result), content_type='application/json')
+	
 
 
 def edit_file(file_path):
@@ -239,32 +246,41 @@ def index(request):
 		["Test", UNDONE],
 		["Report", UNDONE]
 	]
-	request.session.setdefault('directory', DIRECTORY)
 	request.session.setdefault('stream_status', status)
-	query = request.GET
-	query_file = query.get('file', 'open file')
-	# print('query_file(in index)=', query_file)
-	directory = request.session.get('directory', DIRECTORY)
-	file_path = os.path.join(directory, query_file)
-	# print('file_path(in index)=', file_path)
-	# print(query_file, file_path)
-	query_path = query.get('path', '')
-	obj = treeview_parser(directory, relpath=query_path)
-	# print(obj)
-	tv_dir = treeview_parser(DIRECTORY, flag='O')
-	# print(self.directory)
-	wave_path = os.path.join('maintest/img/', directory, '/wave.jpg')
-	return render(request, 'maintest/test.html', {
-		'DIRECTORY': DIRECTORY,
-		'current_path': directory,
-		'file_content': edit_file(file_path),  # file to display in <textarea>
-		'file_path': file_path,  # path of the above
-		'file_name': query_file,
-		'wave_path': wave_path,
-		'obj': json.dumps(obj),  # default treeview object
-		'tv_dir': json.dumps(tv_dir),
-		'stream_status': request.session.get('stream_status', [])  # stream status
-	})
+	username = request.session.get("username",None)
+	if username:
+		
+		#request.session.setdefault('directory', DIRECTORY)
+		
+		query = request.GET
+		query_file = query.get('file', 'open file')
+		# print('query_file(in index)=', query_file)
+		directory = request.session.get('directory', username)
+		file_path = os.path.join(directory, query_file)
+		# print('file_path(in index)=', file_path)
+		# print(query_file, file_path)
+		query_path = query.get('path', '')
+		obj = treeview_parser(directory, relpath=query_path)
+		# print(obj)
+		tv_dir = treeview_parser(os.path.join(DIRECTORY, username), flag='O')
+		# print(self.directory)
+		#wave_path = os.path.join('maintest/static/maintest/img', username, '/wave.jpg')
+		return render(request, 'maintest/test.html', {
+			'DIRECTORY': DIRECTORY,
+			'current_path': username,   # directory is Bad URL
+			'file_content': edit_file(file_path),  # file to display in <textarea>
+			'file_path': file_path,  # path of the above
+			'file_name': query_file,
+			# 'wave_path': request.session.get("wave_path",wave_path),  # can't deal with it
+			'obj': json.dumps(obj),  # default treeview object
+			'tv_dir': json.dumps(tv_dir),
+			'stream_status': request.session.get('stream_status', []),  # stream status
+			'username':username,
+		})
+	else:
+		return render(request, 'maintest/test.html', {
+			'stream_status': request.session.get('stream_status', [])  # stream status
+		})
 
 
 # class MainTest(object):

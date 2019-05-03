@@ -33,7 +33,7 @@ $(document).ready(function() {
     var p = this.value / this.max;
     var bar = scrollbarmove();
     bar.width = Math.floor(p * $('#canvasl-').width());
-    if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
+    bar.changecanvas(false);
   };
   $("#propotion-")[0].oninput = function() {
     var propotion = this.value / this.max;
@@ -44,7 +44,7 @@ $(document).ready(function() {
     bar.t_begin = newleft;
     bar.t_end = bar.t_begin + diff;
     CursorMover.movetoX(CursorMover.nowpos);
-    if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
+    bar.changecanvas(false);
   };
   $("#wavedraw-cursor")[0].onclick = function() {
     global_states().mode = 1;

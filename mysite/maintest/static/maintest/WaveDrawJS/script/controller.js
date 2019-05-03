@@ -6,22 +6,23 @@ function clearallchildren(parentel) {
 function bus_toggle(bus_name) {
   //shows or hides all branches of specific bus
   //note: all hidden branches are NOT updated
-  var fil = new filterSignalWithPara(bus_name, 'bus');
-  var toggled = fun().getAllSignals().filter(fil.fliterfn);
-  var $canvas = $('#canvasl- canvas').toArray();
-  var $nameli = $('#namel- li').toArray();
-  for (var i = 0; i < toggled.length; i++) {
+  var s = fun().getAllSignals();
+  var modified = [];
+  for (var i = 0; i < s.length; i++) {
     //change display list
-    if (toggled[i].name.includes(':')) continue;
-    toggled[i].visibility = !toggled[i].visibility;
-    //sync with DOM
-    fil.setcondition(toggled[i].name, 'className');
-    var toggledDOM = $canvas.filter(fil.fliterfn);
-    $(toggledDOM).toggle();
+    if (s[i].bus == bus_name) {
+      if (s[i].name.includes(':')) continue;
+      s[i].visibility = !s[i].visibility;
+      modified.push(i);
+    }
   }
-  //update the element '#namel- ul.inner-list'
-  //and refresh canvases that are set to visible
-  scrollbarmove().changecanvas();
+  var $lists = $('.inner-list');
+  console.log($lists);
+  for (var i = 0; i < modified.length; i++) {
+    //sync with DOM
+    $($lists[0].childNodes[modified[i]]).toggle();
+    $($lists[1].childNodes[modified[i]]).toggle();
+  }
 }
 var scrollbarmove = (function() {
   var states = {
@@ -75,7 +76,6 @@ function CursorMove() {
     var width = scrbar.width;
     var timerange = scrbar.t_end - scrbar.t_begin;
     var newbeginoffset = Math.floor(timerange / width * pos);
-    //console.log(timerange,newbeginoffset);
     this.$info.html(scrbar.t_begin + newbeginoffset + get_json_data()['time'][1]);
     this.$cursor.css({
       'left': this.cursoroffset + pos + 8
@@ -86,22 +86,39 @@ function CursorMove() {
   };
 }
 var CursorMover = new CursorMove();
-function addInputandJump(obj) {
-  var $children = $(obj).children();
-  if ($children.length) {
-    return;
-  } else {
-    obj.innerHTML = "<text></text><input type=\"text\"  style=\"display:none\">";
-    $children = $(obj).children();
-    $children[0].onclick = function() {
-      $children.toggle();
-      $children[1].value = $children[0].innerHTML;
-      $children[1].focus();
-    };
-    $children[1].onblur = function() {
-      $children[0].innerHTML = $children[1].value;
-      $children.toggle();
-
-    };
-  }
+function TimeBarManage() {
+  var $timebar = $(".\\.timebar span");
+  var $barelems = $timebar.children();
+  var state = false; //show:true hide:false
+  $barelems[1].onclick = function() {
+    if (!state) {
+      state = true;
+      $barelems[1].innerHTML = " to ";
+      $barelems.show();
+    }
+  };
+  $barelems[3].onclick = function() {
+    $barelems.hide();
+    var starttime = parseScaleText($barelems[0].value);
+    var stoptime = parseScaleText($barelems[2].value);
+    var scrbar = scrollbarmove();
+    var jstime = get_json_data().time[0] - 0;
+    scrbar.t_begin = starttime[0] - 0;
+    scrbar.t_end = stoptime[0] - 0;
+    scrbar.changecanvas(false);
+    var propbar = $("#propotion-");
+    var propv = propbar.attr('max') * scrbar.t_begin / jstime;
+    propbar.attr('value', propv);
+    $barelems[0].value = starttime.join("");
+    $barelems[2].value = stoptime.join("");
+    $barelems[1].innerHTML = $barelems[0].value + " to " + $barelems[2].value;
+    $($barelems[1]).show();
+    state = false;
+  };
+  this.sync = function(t_begin, t_end, scale) {
+    $barelems[0].value = t_begin + scale;
+    $barelems[2].value = t_end + scale;
+    $barelems[1].innerHTML = $barelems[0].value + " to " + $barelems[2].value;
+  };
 }
+var TimeBarManager = new TimeBarManage();

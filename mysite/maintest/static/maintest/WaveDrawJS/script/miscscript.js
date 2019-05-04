@@ -32,8 +32,8 @@ $(document).ready(function() {
   $("#width-")[0].onchange = function() {
     var p = this.value / this.max;
     var bar = scrollbarmove();
-    bar.width = 0 | p * $('#canvasl-').width();
-    if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
+    bar.width = Math.floor(p * $('#canvasl-').width());
+    bar.changecanvas(false);
   };
   $("#propotion-")[0].oninput = function() {
     var propotion = this.value / this.max;
@@ -43,7 +43,8 @@ $(document).ready(function() {
     var newleft = propotion * (totaltime - diff);
     bar.t_begin = newleft;
     bar.t_end = bar.t_begin + diff;
-    if ($("#wave-draw").attr('disabled') != 'disabled') bar.changecanvas(false);
+    CursorMover.movetoX(CursorMover.nowpos);
+    bar.changecanvas(false);
   };
   $("#wavedraw-cursor")[0].onclick = function() {
     global_states().mode = 1;

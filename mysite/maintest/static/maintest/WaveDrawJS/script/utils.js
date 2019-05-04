@@ -123,28 +123,39 @@ function _DragImpl(start, stop) {
     var s = fun().getAllSignals();
     var startpos = fun().getSignalIndexByName(start);
     var stoppos = fun().getSignalIndexByName(stop);
-    if (startpos < stoppos) { [startpos, stoppos] = [stoppos, startpos]; [startsig, stopsig] = [stopsig, startsig];
-    }
     var startgroup = createFilteredGroup(s, startsig);
-    var stopgroup = createFilteredGroup(s, stopsig);
     var startlen = startgroup.length;
-    var stoplen = stopgroup.length;
-    stopgroup.unshift(startpos, startlen);
-    Array.prototype.splice.apply(s, stopgroup);
-    startgroup.unshift(stoppos, stoplen);
-    Array.prototype.splice.apply(s, startgroup);
-    var canvasNodes = $("#canvasl- canvas");
-    for (var i = 0; i < s.length; i++) {
-      var newclass = s[i].name;
-      canvasNodes.eq(i).attr('class', newclass);
-      if (s[i].visibility) {
-        canvasNodes.eq(i).show();
+    startgroup.unshift(stoppos, 0);
+    if (startpos < stoppos) {
+      //dragging downwards
+      Array.prototype.splice.apply(s, startgroup);
+      s.splice(startpos, startlen);
+    } else {
+      //dragging upwards
+      s.splice(startpos, startlen);
+      Array.prototype.splice.apply(s, startgroup);
+    }
+    var $lists = $('.inner-list');
+    for (var i = 0; i < $lists.length; i++) {
+      var children = $($lists[i]).children().toArray();
+      startgroup = children.slice(startpos, startpos + startlen);
+      startgroup.unshift(stoppos, 0);
+      if (startpos < stoppos) {
+        //dragging downwards
+        Array.prototype.splice.apply(children, startgroup);
+        children.splice(startpos, startlen);
       } else {
-        canvasNodes.eq(i).hide();
+        //dragging upwards
+        children.splice(startpos, startlen);
+        Array.prototype.splice.apply(children, startgroup);
       }
+      var fragment = document.createDocumentFragment();
+      for (var j = 0; j < children.length; j++) {
+        fragment.appendChild(children[j]);
+      }
+      $lists[i].appendChild(fragment);
     }
   }
-  return isswappable;
 }
 function DragHelper() {
   //Implements drag
@@ -164,8 +175,7 @@ function DragHelper() {
       }
       return;
     }
-    var updateflag = _DragImpl(this.start, this.stop);
-    scrollbarmove().changecanvas(updateflag);
+    _DragImpl(this.start, this.stop);
   };
 }
 var DragHelperClosure = (function() {
@@ -184,9 +194,9 @@ function _WaveZoomImpl(start, stop) {
   if (start > stop) {
     //right to left, zoom out
     var scalefactor = width / (start - stop);
-    timerange = 0 | (timerange * scalefactor);
+    timerange = Math.floor(timerange * scalefactor);
     //now calculate new begin and end
-    var newbeginoffset = 0 | (timerange / width * start);
+    var newbeginoffset = Math.floor(timerange / width * start);
     scrbar.t_begin -= newbeginoffset;
     if (scrbar.t_begin < 0) scrbar.t_begin = 0;
     scrbar.t_end = scrbar.t_begin + timerange;
@@ -194,9 +204,9 @@ function _WaveZoomImpl(start, stop) {
   }
   //now calculate new begin and end
   else {
-    var newbeginoffset = 0 | (timerange / width * start);
+    var newbeginoffset = Math.floor(timerange / width * start);
     scrbar.t_begin += newbeginoffset;
-    var newendoffset = 0 | (timerange / width * stop);
+    var newendoffset = Math.floor(timerange / width * stop);
     scrbar.t_end = timebegin + newendoffset;
   }
   scrbar.changecanvas(false);
@@ -237,27 +247,29 @@ function ScorllSyncHelper() {
   //Implements sync of scorllbars
   var currentTab = 0;
   this.scale = 1;
-  this.setup = () => {
+  //use labmda to preserve 'this' state, do not replace with function(){...}
+  //some formatting tools may give erroneous result
+  this.setup = ()=>{
     var $l = $('#namel-');
     var $r = $('#canvasl-');
-    $l.scroll(() =>{
+    $l.scroll(()=>{
       if (this.currentTab !== 1) return;
       $r[0].scrollTop = $l[0].scrollTop * this.scale;
     });
-    $r.scroll(() =>{
+    $r.scroll(()=>{
       if (this.currentTab !== 2) return;
       $l[0].scrollTop = $r[0].scrollTop / this.scale;
     });
-    $l.mouseover(() =>{
+    $l.mouseover(()=>{
       this.currentTab = 1;
     });
-    $r.mouseover(() =>{
+    $r.mouseover(()=>{
       this.currentTab = 2;
     });
     this.$l = $l;
     this.$r = $r;
   };
-  this.calibrateTracking = () =>{
+  this.calibrateTracking = ()=>{
     var $lc = this.$l.children();
     var $rc = this.$r.children();
     this.scale = ($rc[0].offsetHeight - this.$r[0].offsetHeight) / ($lc[0].offsetHeight - this.$l[0].offsetHeight);
@@ -297,7 +309,7 @@ function round_scale(timev) {
   var res;
   var judge = [Math.sqrt(50), Math.sqrt(10), Math.sqrt(2)];
   for (var i = 1; i <= 10; i++) {
-    var gridtime = 0 | (timev / i);
+    var gridtime = Math.floor(timev / i);
     var zeroes = '0'.repeat(('' + gridtime).length - 1);
     var gridtimelt10 = gridtime / ('1' + zeroes);
     if (gridtimelt10 >= judge[0]) res = 10;
@@ -336,4 +348,12 @@ function findlastless(arr, el) {
     }
   }
   return lo;
+}
+function parseScaleText(scale) {
+  //first, find time value
+  var pat = new RegExp("[0-9]+");
+  var time = pat.exec(scale);
+  //next, find timescale value
+  var grade = scale.replace(time, '');
+  return convert_timescale(time, get_json_data()['time'][1], grade);
 }

@@ -17,10 +17,10 @@ function draw_vline(ctx, x_st, y_st, y_off, color) {
   ctx.stroke();
   ctx.closePath();
 }
-function write_text(ctx, x_st, y_st, textc) {
-  ctx.font = "12px Arial";
+function write_text(ctx, x_st, y_st, textc, maxWidth) {
+  ctx.font = "12px Courier";
   ctx.fillStyle = "#ffffff";
-  ctx.fillText(textc, x_st, y_st);
+  ctx.fillText(textc, x_st, y_st, maxWidth);
 }
 function check_canvas_availablity() {
   //简单地检测当前浏览器是否支持Canvas对象，以免在一些不支持html5的浏览器中提示语法错误
@@ -69,24 +69,24 @@ console.log(x1)
 function draw_grid(x_st, y_st, x_range, time) {
   var gridcanvas = $('#wavedrawing-gridc')[0];
   gridcanvas.width = x_range;
-  gridcanvas.height = 1 + 0 | y_st;
+  gridcanvas.height = Math.ceil(y_st);
   var ctx = gridcanvas.getContext("2d");
   draw_hline(ctx, x_st, y_st, x_range, '#ffffff');
   var timediff = (time[1][1] - time[1][0]).toFixed(0);
   //determine the size of a grid
   var gridsize = round_scale(timediff);
   var gridscale = reduce_timescale(gridsize, time[0][1]);
-  gridsize = 0 | gridsize;
+  gridsize = Math.floor(gridsize);
   //get the first gridline to draw
   //e.g. if starttime=1051ns and grid=10ns
   //then the first gridline is at 1050ns
   var first_visible_pos = (time[1][0] / gridsize);
-  var fv_time = (0 | first_visible_pos) * gridsize;
+  var fv_time = Math.floor(first_visible_pos) * gridsize;
   var fv_scale = reduce_timescale(round_scale(fv_time), time[0][1]);
   var scale_text = 0;
   for (var i = 0,
   val = fv_time; val < time[1][1]; i++) {
-    var x_off = 0 | ((x_range - 0) * (val - time[1][0]) / timediff);
+    var x_off = Math.floor((x_range - 0) * (val - time[1][0]) / timediff);
     draw_vline(ctx, x_st + x_off, y_st, -(y_st / 2), '#ffffff');
     write_text(ctx, x_st + x_off, y_st / 2, (i * gridsize + fv_time) + '' + time[0][1]);
     val += gridsize;
@@ -111,13 +111,6 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   if (flag_canvas_OK) {
     var jsdata = get_json_data();
     var timerange = [time_begin, time_end];
-    var $timebar = $(".\\.timebar");
-    //$timebar.show();
-    var timebarspan = $timebar.children('span').toArray();
-    addInputandJump(timebarspan[0]);
-    addInputandJump(timebarspan[1]);
-    timebarspan[0].childNodes[0].innerHTML = time_begin + jsdata.time[1];
-    timebarspan[1].childNodes[0].innerHTML = time_end + jsdata.time[1];
     draw_grid(0.5, 22.5, cwidth, [jsdata['time'], timerange]);
     for (var i = 0; i < jsdata.dat.length; i++) {
       //check if any new signals are added to json
@@ -159,8 +152,8 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
       var wavecache = [];
       var ctx = canvas.getContext("2d");
       for (var i = findlastless(wave['time'], time_begin), endindex = findlastless(wave['time'], time_end) + 1; i < endindex; i++) {
-        xpos = (0 | (canvas.width - 0) * (wave['time'][i] - timerange[0]) / timediffval) + xmargin;
-        xend = (0 | (canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
+        xpos = Math.floor((canvas.width - 0) * (wave['time'][i] - timerange[0]) / timediffval) + xmargin;
+        xend = Math.floor((canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
         switch (wave['state'][i]) {
         case 0:
         case 1:
@@ -195,21 +188,12 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
           wavecache.push([xend, ypos, 2]);
           break;
         case 16:
-          /*case 16:
-            cl = get_bus_color(wave['wave'][i - 1]);
-            draw_vline(canvas, xpos + xmargin - 1, 10.5, 5, cl);
-            draw_vline(canvas, xpos + xmargin - 1, 30.5, -5, cl);
-          case 17:
-            cl = get_bus_color(wave['wave'][i]);
-            draw_vline(canvas, xpos + xmargin, 15.5, 10, cl);
-            draw_vline(canvas, xpos + xmargin + 1, 10.5, 5, cl);
-            draw_vline(canvas, xpos + xmargin + 1, 30.5, -5, cl);
-            draw_hline(canvas, xpos + xmargin + 1, 10.5, xend - xpos - 2, cl);
-            draw_hline(canvas, xpos + xmargin + 1, 30.5, xend - xpos - 2, cl);*/
           cl = get_bus_color(wave['wave'][i - 1]);
           draw_vline(ctx, xpos - 1, 10.5, 5, cl);
           draw_vline(ctx, xpos - 1, 30.5, -5, cl);
         case 17:
+          //commented out actions provide better rendering effect (no blurring)
+          //but takes a little more time to complete
           cl = get_bus_color(wave['wave'][i]);
           wavecache.push([xend, 30.5, 3]);
           wavecache.push([xpos, 30.5, cl]);
@@ -221,7 +205,7 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
           wavecache.push([xpos, 10.5, cl]);
           wavecache.push([xend, 10.5, cl]);
           if (xpos < 0) xpos = 0;
-          write_text(ctx, xpos + 2, 24.5, wave['wave'][i]);
+          write_text(ctx, xpos + 2, 24.5, wave['wave'][i], xend - xpos);
           break;
         }
       }
@@ -247,13 +231,10 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
     }
   }
   var canvasl = $("#canvasl- ul")[0];
-  var namel = $("#namel-")[0];
+  var namel = $("#namel- ul")[0];
   //all elements are ready, add them to page
   if (flag_reset) {
-    var newnamel = document.createElement('ul');
-    newnamel.appendChild(namefragment);
-    newnamel.setAttribute('class', "inner-list");
-    namel.replaceChild(newnamel, namel.childNodes[0]);
+    namel.appendChild(namefragment);
   }
   canvasl.appendChild(canvasfragment);
   var seps = document.getElementsByClassName('column-sep');
@@ -262,4 +243,5 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   CursorMover.$cursor.css({
     'height': seps[1].parentNode.offsetHeight
   });
+  TimeBarManager.sync(time_begin, time_end, jsdata['time'][1]);
 }

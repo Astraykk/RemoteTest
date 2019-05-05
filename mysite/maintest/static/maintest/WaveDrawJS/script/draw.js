@@ -17,10 +17,12 @@ function draw_vline(ctx, x_st, y_st, y_off, color) {
   ctx.stroke();
   ctx.closePath();
 }
-function write_text(ctx, x_st, y_st, textc) {
-  ctx.font = "12px Arial";
+
+function write_text(ctx, x_st, y_st, textc, maxWidth) {
+  ctx.font = "12px Courier";
   ctx.fillStyle = "#ffffff";
-  ctx.fillText(textc, x_st, y_st);
+  ctx.fillText(textc, x_st, y_st, maxWidth);
+
 }
 function check_canvas_availablity() {
   //简单地检测当前浏览器是否支持Canvas对象，以免在一些不支持html5的浏览器中提示语法错误
@@ -111,13 +113,7 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   if (flag_canvas_OK) {
     var jsdata = get_json_data();
     var timerange = [time_begin, time_end];
-    var $timebar = $(".\\.timebar");
-    //$timebar.show();
-    var timebarspan = $timebar.children('span').toArray();
-    addInputandJump(timebarspan[0]);
-    addInputandJump(timebarspan[1]);
-    timebarspan[0].childNodes[0].innerHTML = time_begin + jsdata.time[1];
-    timebarspan[1].childNodes[0].innerHTML = time_end + jsdata.time[1];
+
     draw_grid(0.5, 22.5, cwidth, [jsdata['time'], timerange]);
     for (var i = 0; i < jsdata.dat.length; i++) {
       //check if any new signals are added to json
@@ -195,21 +191,15 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
           wavecache.push([xend, ypos, 2]);
           break;
         case 16:
-          /*case 16:
-            cl = get_bus_color(wave['wave'][i - 1]);
-            draw_vline(canvas, xpos + xmargin - 1, 10.5, 5, cl);
-            draw_vline(canvas, xpos + xmargin - 1, 30.5, -5, cl);
-          case 17:
-            cl = get_bus_color(wave['wave'][i]);
-            draw_vline(canvas, xpos + xmargin, 15.5, 10, cl);
-            draw_vline(canvas, xpos + xmargin + 1, 10.5, 5, cl);
-            draw_vline(canvas, xpos + xmargin + 1, 30.5, -5, cl);
-            draw_hline(canvas, xpos + xmargin + 1, 10.5, xend - xpos - 2, cl);
-            draw_hline(canvas, xpos + xmargin + 1, 30.5, xend - xpos - 2, cl);*/
+
           cl = get_bus_color(wave['wave'][i - 1]);
           draw_vline(ctx, xpos - 1, 10.5, 5, cl);
           draw_vline(ctx, xpos - 1, 30.5, -5, cl);
         case 17:
+
+          //commented out actions provide better rendering effect (no blurring)
+          //but takes a little more time to complete
+
           cl = get_bus_color(wave['wave'][i]);
           wavecache.push([xend, 30.5, 3]);
           wavecache.push([xpos, 30.5, cl]);
@@ -221,10 +211,18 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
           wavecache.push([xpos, 10.5, cl]);
           wavecache.push([xend, 10.5, cl]);
           if (xpos < 0) xpos = 0;
-          write_text(ctx, xpos + 2, 24.5, wave['wave'][i]);
+
+          write_text(ctx, xpos + 2, 24.5, wave['wave'][i], xend - xpos);
           break;
         }
+        ctx.lineTo(wavecache[i][0], wavecache[i][1]);
       }
+      ctx.stroke();
+      ctx.closePath();
+      if (!qcanvas[0]) {
+        canvasfragment.appendChild(canvas);
+      }
+
       var colourused = sig[ca].wavecolour;
       ctx.beginPath();
       ctx.strokeStyle = colourused[wavecache[0][2]];
@@ -247,13 +245,11 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
     }
   }
   var canvasl = $("#canvasl- ul")[0];
-  var namel = $("#namel-")[0];
+  var namel = $("#namel- ul")[0];
   //all elements are ready, add them to page
   if (flag_reset) {
-    var newnamel = document.createElement('ul');
-    newnamel.appendChild(namefragment);
-    newnamel.setAttribute('class', "inner-list");
-    namel.replaceChild(newnamel, namel.childNodes[0]);
+    namel.appendChild(namefragment);
+
   }
   canvasl.appendChild(canvasfragment);
   var seps = document.getElementsByClassName('column-sep');
@@ -262,4 +258,6 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   CursorMover.$cursor.css({
     'height': seps[1].parentNode.offsetHeight
   });
-}
+
+  TimeBarManager.sync(time_begin, time_end, jsdata['time'][1]);
+

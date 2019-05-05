@@ -30,13 +30,16 @@ class Group_item(models.Model):
 
 class Task(models.Model):
 	username = models.CharField('username',max_length=20)
+	user = models.ForeignKey(Users, on_delete=models.CASCADE,null=True)
+	group = models.ForeignKey(Group, on_delete=models.CASCADE,null=True)
 	user_or_group = models.CharField('user_or_group',max_length=1) # 0 for user, 1 for group
 	project_loc = models.CharField('project_loc',max_length=100)
 	# authority = models.CharField('authority',max_length=20)
 	request_serial_num = models.IntegerField('request_serial_num',primary_key=True, unique=True)
 	# task_priority = models.IntegerField('task_priority')
 	ptn_name = models.CharField('ptn_file_name',max_length=30,default="mul5")
-	
+	report_file = models.CharField('report_file',max_length=100,default="xxx")
+	end_tag = models.CharField('end_tag',max_length=10,default="not last")
 	def __str__(self):
 		return '%s'%(self.request_serial_num)
 	# class Meta:
@@ -76,7 +79,8 @@ class user_in_queue(models.Model):
 	group = models.ForeignKey(Group, on_delete=models.CASCADE,null=True)
 	x = models.IntegerField('x')
 	serial = models.AutoField('serial',primary_key=True, unique=True)
-	
+	report_file = models.CharField('report_file',max_length=100,default="xxx")
+	s_time = models.DateTimeField('start_time',auto_now_add=True)
 	def __str__(self):
 		if self.user:
 			return '%s'%(self.user.username)
@@ -90,7 +94,8 @@ class user4serving(models.Model):
 	x = models.IntegerField('x')
 	x_current = models.IntegerField('x_current')
 	w = models.FloatField('w')
-	
+	report_file = models.CharField('report_file',max_length=100,default="xxx")
+	s_time = models.DateTimeField('start_time')
 	def __str__(self):
 		if self.user:
 			return '%s'%(self.user.username)
@@ -107,7 +112,7 @@ class task_db(models.Model):
 	request_serial_num = models.IntegerField('request_serial_num')
 	#task_priority = models.IntegerField('task_priority',default=0)
 	ptn_name = models.CharField('ptn_file_name',max_length=30)
-	
+	report_file = models.CharField('report_file',max_length=100,default="xxx")
 	def __str__(self):
 		return '%s-%s   %s'%(self.username,self.user_or_group,self.project_loc)
 	

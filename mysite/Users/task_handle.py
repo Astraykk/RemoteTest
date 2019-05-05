@@ -7,14 +7,13 @@ django.setup()
 
 from Users.models import Users,Group,au4pj
 from Users.models import Task,allTask4user,allTask4group,task_db,user_in_queue,user4serving
-from Users.views import create_history
 #from Users.patternGen import tfo_parser
 
 from django.http import HttpResponse,JsonResponse
 from django.shortcuts import redirect,render
-
+from maintest.mytools.batch import report
 import multiprocessing
-import time
+import time,datetime,pytz
 import sys
 import functools
 import bs4
@@ -57,6 +56,7 @@ UNDONE = 0
 
 
 def test_request(request):
+	#
 	username = request.session.get("username",None)
 	group_id = request.session.get("group_id",None)
 	au = request.session.get("au",None)
@@ -65,6 +65,7 @@ def test_request(request):
 		user = Users.objects.get(username=username)
 		project_loc = request.POST.get('tfo_loc',None)
 		tfo_name = request.POST.get('tfo_name',None)
+		
 		if not project_loc:
 			project_loc = request.session.get("tfo_path",None).split(os.path.join("Users","all_users",username,""))[1]
 			tfo_name = request.session.get("tfo_name",None)
@@ -104,20 +105,19 @@ def test_request(request):
 			# return JsonResponse({"msg":"no tfo file or more than one tfo file in chosen location","type":"w"})
 		
 		file_list_list = tfo_parser(path,tfo_name)
+		report_file = os.path.splitext(os.path.join(path,tfo_name))[0] + '_report.log'
+
 		print(file_list_list)
 		user_in_queue_item.x = len(file_list_list)
+		user_in_queue_item.report_file=report_file
 		user_in_queue_item.save()
 		
-		temp = project_loc
-		for key in file_list_list.keys():
-			# if key != ".":
-			project_loc = os.path.join(temp,key)
-			path4iter = os.path.join(path,key)
-			# else:
-				# path4iter = path
-			ptn_name = file_list_list[key][0]
+		for iter in file_list_list:
+			project_loc = iter[0]
+
+			ptn_name = iter[1][0]
 			
-			dir_list = os.listdir(path4iter)
+			dir_list = os.listdir(project_loc)
 	
 			input_ptn = ptn_name + ".ptn"
 			if input_ptn not in dir_list:
@@ -125,7 +125,9 @@ def test_request(request):
 					return JsonResponse({"msg":"no ptn file called " + input_ptn + " in " + project_loc +". Please check tfo file!","type":"w"})
 				else:
 					return HttpResponse("no ptn file called " + input_ptn + " in " + project_loc +". Please check tfo file!")
-			addIndb(request,u_or_g,project_loc,user_or_group,ptn_name)
+			addIndb(request,u_or_g,project_loc,user_or_group,ptn_name,report_file)
+		
+		report(report_file, 'Batch Test for ' + tfo_name)
 			#msg = {"msg":"add test task successfully!","type":"s"}
 		
 
@@ -182,26 +184,25 @@ def task_create(request,username,project_loc,user_or_group,ptn_name):
 	
 
 	
-def addIndb(request,username,project_loc,user_or_group,ptn_name):
+def addIndb(request,username,project_loc,user_or_group,ptn_name,report_file):
 	if user_or_group == '0':
 		user = Users.objects.get(username=username)
 		task_record = allTask4user(user=user,project_loc=project_loc,ptn_name=ptn_name)
 		task_record.save()
 		request_serial_num = user.task_db_set.count() + 1
-		task_db_item = task_db(user=user,username=username,project_loc=project_loc,request_serial_num=request_serial_num,user_or_group=user_or_group,ptn_name=ptn_name)
+		task_db_item = task_db(user=user,username=username,project_loc=project_loc,request_serial_num=request_serial_num,user_or_group=user_or_group,ptn_name=ptn_name,report_file=report_file)
 		task_db_item.save()
 	else:
 		group = Group.objects.get(group_id=int(username))
 		task_record = allTask4group(group=group,submitter=request.session.get('username'),project_loc=project_loc,ptn_name=ptn_name)
 		task_record.save()
 		request_serial_num = group.task_db_set.count() + 1
-		task_db_item = task_db(group=group,username=username,project_loc=project_loc,request_serial_num=request_serial_num,user_or_group=user_or_group,ptn_name=ptn_name)
+		task_db_item = task_db(group=group,username=username,project_loc=project_loc,request_serial_num=request_serial_num,user_or_group=user_or_group,ptn_name=ptn_name,report_file=report_file)
 		task_db_item.save()
 	if task_db.objects.count() == 1:
 		pro = multiprocessing.Process(target = minute_process)
 		pro.start()
 		#pro.join()
-	#create_history(task.username,"add testing task",task.project_loc,user_or_group)
 
 def minute_process():
 	times = 0
@@ -224,7 +225,7 @@ def queue2serving():
 			if user_in_queue.objects.count() > 0:
 				queue_first = user_in_queue.objects.order_by('serial')[0]   #repeat
 				w = alpha ** queue_first.x
-				user4serving_item = user4serving(user=queue_first.user,group=queue_first.group,x=queue_first.x,x_current=queue_first.x,w=w)
+				user4serving_item = user4serving(user=queue_first.user,group=queue_first.group,x=queue_first.x,x_current=queue_first.x,w=w,report_file=queue_first.report_file,s_time=queue_first.s_time)
 				user4serving_item.save()
 				queue_first.delete()
 			else:
@@ -237,12 +238,27 @@ def task_db2task():
 		for i in range(task_num,FIFO_length):
 			if task_db.objects.count() > 0 and user4serving.objects.count()>0:
 				task_db_item = choose_task()
+				
+				if task_db_item.user:
+					user4serving_item = user4serving.objects.filter(user=task_db_item.user)[0]
+				else:
+					user4serving_item = user4serving.objects.filter(group=task_db_item.group)[0]
+					
+				if user4serving_item.x_current == 1:
+					#report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now().replace(tzinfo=pytz.timezone('UTC')) - user4serving_item.s_time).seconds)
+					#user4serving_item.delete()
+					end_tag = "last"
+				else:
+					user4serving_item.x_current -= 1
+					user4serving_item.save()
+					end_tag = "not last"
+				
 				if Task.objects.count() > 0:
 					request_serial_num = Task.objects.order_by('-request_serial_num')[0].request_serial_num + 1
-					task_item = Task(username=task_db_item.username,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=request_serial_num,ptn_name=task_db_item.ptn_name)
+					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=request_serial_num,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file,end_tag=end_tag)
 					task_item.save()
 				else:
-					task_item = Task(username=task_db_item.username,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=1,ptn_name=task_db_item.ptn_name)
+					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=1,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file)
 					task_item.save()
 					#task = Task.objects.order_by('request_serial_num')[0]
 					pro = multiprocessing.Process(target = test_pack,args = (task_item,))
@@ -250,16 +266,7 @@ def task_db2task():
 					#pro.join()
 				
 				# if user4serving.objects.count()>0:
-				if task_db_item.user:
-					user4serving_item = user4serving.objects.filter(user=task_db_item.user)[0]
-				else:
-					user4serving_item = user4serving.objects.filter(group=task_db_item.group)[0]
-					
-				if user4serving_item.x_current == 1:			
-					user4serving_item.delete()
-				else:
-					user4serving_item.x_current -= 1
-					user4serving_item.save()
+				
 					
 				task_db_item.delete()
 			else:
@@ -322,32 +329,48 @@ def complete_task(task):
 	
 def test(task):
 	
-	tag = task.user_or_group
-	if task.user_or_group == "0":	
-		path = os.path.join("Users","all_users",task.username,task.project_loc)
-		file_loc = os.path.join("Users","all_users")
-	else:
-		path = os.path.join("Users","all_groups",task.username,task.project_loc)
-		file_loc = os.path.join("Users","all_groups")
+	# tag = task.user_or_group
+	# if task.user_or_group == "0":	
+		# path = os.path.join("Users","all_users",task.username,task.project_loc)
+		# file_loc = os.path.join("Users","all_users")
+	# else:
+		# path = os.path.join("Users","all_groups",task.username,task.project_loc)
+		# file_loc = os.path.join("Users","all_groups")
 		
-	dir_list = os.listdir(os.path.join(file_loc,task.username,task.project_loc))
+	path = task.project_loc
+	dir_list = os.listdir(task.project_loc)
 	
 	input_ptn = task.ptn_name + ".ptn"
 	if input_ptn not in dir_list:
 		return False
 	output_trf = task.ptn_name + ".trf"
-	create_history(task.username,"testing",task.project_loc,tag)
+
+	
 	path_in = os.path.join(path,input_ptn)
 	path_o = os.path.join(path,output_trf)
-	abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
-	print(abc)
-	#for i in range(5):
-		#time.sleep(1)
-		#print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
-	
+	s_time = time.time()
+	#abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
+	print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1")
+	for i in range(2):
+		time.sleep(1)
+		print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
+	e_time = time.time()
+	#print(abc)
+
+	key = "Test time for " + task.ptn_name + ":"
+	value = e_time - s_time
+	report(task.report_file, key, value)
+	if task.end_tag == "last":
+		if task.user_or_group == "0":
+			user4serving_item = user4serving.objects.filter(user=task.user)[0]
+		else:
+			user4serving_item = user4serving.objects.filter(group=task.group)[0]
+		report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now() - user4serving_item.s_time).seconds)
+		
+		user4serving_item.delete()
+		
 	print("finish testing "+task.username+" "+ task.project_loc + input_ptn +"....")
 	
-	create_history(task.username,"finish testing",task.project_loc,tag)
 		
 
 def get_soup(path, file):
@@ -363,25 +386,27 @@ def tfo_parser(path, file):
 	:param file:
 	:return file_list_list:
 	"""
-	file_list_list = {}
+	file_list_list = []
 	soup = get_soup(path, file)
 	#name_check(file, soup.TFO['name'])
 	for test_tag in soup.find_all('TEST'):
 		file_list = {
 			'PTN': test_tag['name'] + '.ptn',
-			# 'LBF': soup.TFO.LBF['type'] + '.lbf',
-			# 'TCF': 'F93K.tcf'
+			'LBF': soup.TFO.LBF['type'] + '.lbf',
+			'TCF': 'F93K.tcf'
 		}
 		project_name = test_tag['name']
-		# for child in test_tag.children:
-			# if type(child) == bs4.element.Tag:
-				# if child.name == 'DWM' or child.name == 'BIT':
-					# file_list[child.name] = child['name']
-				# else:
-					# file_list[child.name] = child['name'] + '.' + child.name.lower()
-		file_list_list[test_tag['path']] = (project_name, file_list)
-	#print(file_list_list)
-	return file_list_list		
+		for child in test_tag.children:
+			if type(child) == bs4.element.Tag:
+				if child.name == 'DWM' or child.name == 'BIT':
+					file_list[child.name] = child['name']
+				else:
+					file_list[child.name] = child['name'] + '.' + child.name.lower()
+		# file_list_list[test_tag['path']] = (project_name, file_list)
+		file_list_list.append([os.path.join(path, test_tag['path']), (project_name, file_list)])
+		# file_list_list.append([test_tag['path'], (project_name, file_list)])
+	print(file_list_list)
+	return file_list_list
 	
 def task_list4user(request):
 	username = request.session.get('username',None)

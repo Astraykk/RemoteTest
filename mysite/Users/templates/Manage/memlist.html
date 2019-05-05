@@ -1,0 +1,61 @@
+<div class="col-md-3 col-sm-6 col-lg-3" >	
+	<ul class="list-group">
+	{% for member in members %}			
+		<div class="list-group-item">
+			<form id="form_id_{{ member.username }}" action="/Users/change_au4member/" method="post" onsubmit="return au4mem(this);">
+				{% csrf_token %}
+				<input type="hidden" name="username" value="{{ member.username }}" >
+				<input type="hidden" name="au4g_new" id="au4g_{{ member.username }}" value="">
+				<button type="submit" id="form_id_{{ member.username }}_click" style="display:none;"></button>
+				{% if member.authority == "1" %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(212, 106, 64);" data-toggle="tooltip" data-placement="left" title="super admin"></span> {{ member.username }}
+				{% elif member.authority == "2" %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(0, 128, 0);" data-toggle="tooltip" data-placement="left" title="admin"></span> {{ member.username }}
+					{% if au == "1" %}
+					<span class="glyphicon glyphicon-arrow-down pull-right" data-toggle="dropdown"></span>
+						<ul class="dropdown-menu" role="menu">
+							<li><button type="button" id="{{ member.username }}_d2pjad" class="list-group-item" onclick="d2pjad(this)">demote to project admin</button></li>
+							<li><button type="button" id="{{ member.username }}_d2odmem" class="list-group-item" onclick="d2odmem(this)">demote to ordinary member</button></li>
+						</ul>
+					{% else %}
+					{% endif %}
+				{% elif member.authority == "3" %}
+					
+					<span class="glyphicon glyphicon-user " style="color: rgb(15, 255, 17);" data-toggle="tooltip" data-placement="left" title="project admin"></span> {{ member.username }}
+					{% if au == "1" or au == "2" %}
+					
+						<div class="dropdown pull-right">
+							<span class="glyphicon glyphicon-arrow-up " data-toggle="dropdown"> </span>
+								<ul class="dropdown-menu list-group" role="menu">
+									<li><button type="button" id="{{ member.username }}_d2pjad" class="list-group-item" onclick="p2ad(this)">promote to admin</button></li>
+								</ul>
+						</div>
+						<div class="pull-right">&nbsp;&nbsp;&nbsp;</div>
+						<div class="dropdown pull-right">
+							<span class="glyphicon glyphicon-arrow-down dropdown" data-toggle="dropdown"> </span>
+								<ul class="dropdown-menu" role="menu">
+									<li><button type="button" id="{{ member.username }}_d2odmem" class="list-group-item" onclick="d2odmem(this)">demote to ordinary member</button></li>
+								</ul>
+						</div>
+					
+					{% else %}
+					{% endif %}
+				{% else %}
+					<span class="glyphicon glyphicon-user " style="color: rgb(128, 128, 128);" data-toggle="tooltip" data-placement="left" title="ordinary member"></span> {{ member.username }}
+					{% if au != "4" %}
+					<span class="glyphicon glyphicon-arrow-up pull-right" data-toggle="dropdown"></span>
+						<ul class="dropdown-menu" role="menu">
+							<li><button type="button" id="{{ member.username }}_d2pjad" class="list-group-item" onclick="d2pjad(this)">promote to project admin</button></li>
+							{% if au != "3"%}
+							<li><button type="button" id="{{ member.username }}_d2odmem" class="list-group-item" onclick="p2ad(this)">promote to admin</button></li>
+							{% else %}
+							{% endif %}	
+						</ul>
+					{% else %}
+					{% endif %}
+				{% endif %}	
+			</form>
+		</div>
+	{% endfor %}
+	</ul>
+</div>

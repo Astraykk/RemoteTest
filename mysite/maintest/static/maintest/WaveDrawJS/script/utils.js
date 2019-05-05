@@ -117,7 +117,17 @@ function _DragImpl(start, stop) {
   } else if (startsig.bus || stopsig.bus) {
     if (!startsig.issubbus && !stopsig.issubbus) {
       isswappable = true;
+
     }
+  };
+  this.setcondition = function(para, type) {
+    p = para;
+    t = type;
+  };
+}
+function listall(l) {
+  for (var i = 0; i < l.length; i++) {
+    console.log(l[i]);
   }
   if (isswappable) {
     var s = fun().getAllSignals();
@@ -247,6 +257,7 @@ function ScorllSyncHelper() {
   //Implements sync of scorllbars
   var currentTab = 0;
   this.scale = 1;
+
   //use labmda to preserve 'this' state, do not replace with function(){...}
   //some formatting tools may give erroneous result
   this.setup = ()=>{
@@ -269,6 +280,7 @@ function ScorllSyncHelper() {
     this.$l = $l;
     this.$r = $r;
   };
+
   this.calibrateTracking = ()=>{
     var $lc = this.$l.children();
     var $rc = this.$r.children();

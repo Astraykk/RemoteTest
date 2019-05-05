@@ -260,4 +260,4 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   });
 
   TimeBarManager.sync(time_begin, time_end, jsdata['time'][1]);
-
+}

@@ -5,23 +5,15 @@
 <meta charset="utf-8">
 <title>Test App in Bootstrap!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!--<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>-->
 <script type="text/javascript" src="{% static 'maintest/js/jquery.js' %}"></script>
-<!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
 <link rel="stylesheet" href="{% static 'maintest/bootstrap/css/bootstrap.css' %}">
-<!--<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 <script type="text/javascript" src="{% static 'maintest/bootstrap/js/bootstrap.min.js' %}"></script>
 
 
 <script type="text/javascript" src="{% static 'maintest/js/bootstrap-treeview.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/bootstrap-treeview.css' %}">
-<!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"></script>-->
-<!--<script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>-->
 
 <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
-<script type="text/javascript" src="{% static 'maintest/js/add4cre_up.js' %}"></script>
-<script src="{% static 'js/jquery.form.js' %}" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/WaveDrawJS/css/WaveDrawJS.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
 <script src="{% static 'maintest/WaveDrawJS/script/loadjson.js' %}"></script>
@@ -33,7 +25,7 @@
     var test_url = "{% url 'Users:test_request' %}";
     var report_url = "{% url 'maintest:report' %}";
     var tv_ajax_url = "{% url 'maintest:tv_ajax' %}";
-	var vcd2pic_url = "{% url 'maintest:vcd2picjson' %}";
+    var vcd2pic_url = "{% url 'maintest:vcd2picjson' %}";
     var uservcdfile = "{{ file_path }}";
 
 
@@ -65,13 +57,12 @@
 	
 
 </script>
-<script>  //unfinished
+<script>
     $(document).ready(function(){
       $(".expand-icon").click(function(){
         console.log('hello2');
         console.log($(this).attr("data-nodeid"));
         console.log('hello3');
-        //$(this).nextElementSibling.attr("class", "glyphicon-folder-open");
       });
     });
 
@@ -110,21 +101,9 @@
 
 
 </script>
-<script>
-    // FOR STUDY
-
-
-
-</script>
 </head>
 
 <body>
-<!--<div class="page-header">-->
-<!--<h1>&nbsp;Chip-Test App-->
-<!--<small>testing</small>-->
-<!--</h1>-->
-<!--</div>-->
-<div id="message"></div>
 <div class="container">
 	
 	<div>
@@ -145,13 +124,6 @@
       {% include "maintest/include/toolbar.html" %}
     </div>
     <div class="col-md-3">
-      <!--Search bar-->
-      <!--<div class="input-group">-->
-        <!--<input type="text" class="form-control">-->
-        <!--<span class="input-group-btn">-->
-                        <!--<button class="btn btn-default" type="button">Search!</button>-->
-                    <!--</span>-->
-      <!--</div>&lt;!&ndash; /input-group &ndash;&gt;-->
     </div><!-- /.col-lg-6 -->
   </div>
   <br>
@@ -204,17 +176,6 @@
             <li class="pull-right">
               <button id="submit-edit-text" type="submit" class="btn btn-default">submit</button>
             </li>
-            <!--<li><a href="#ios" data-toggle="tab">iOS</a></li>-->
-            <!--<li class="dropdown">-->
-            <!--<a href="#" id="myTabDrop1" class="dropdown-toggle"-->
-            <!--data-toggle="dropdown">Java-->
-            <!--<b class="caret"></b>-->
-            <!--</a>-->
-            <!--<ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">-->
-            <!--<li><a href="#jmeter" tabindex="-1" data-toggle="tab">jmeter</a></li>-->
-            <!--<li><a href="#ejb" tabindex="-1" data-toggle="tab">ejb</a></li>-->
-            <!--</ul>-->
-            <!--</li>-->
           </ul>
           <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade in active" id="home">
@@ -224,12 +185,6 @@
               <p>some comtent</p>
             </div>
           </div>
-          <!--<label for="name">edit area</label>-->
-          <!--&lt;!&ndash;<input type="text" class="form-control" id="name" placeholder="selected file">&ndash;&gt;-->
-          <!--<textarea id="edit-text" class="form-control" rows="10">{{ file_content }}</textarea>-->
-          <!--</div>-->
-          <!--<button id="submit-edit-text" type="submit" class="btn btn-default">submit</button>-->
-          <!--</form>-->
           <br>
         </div>
       </div>
@@ -254,35 +209,15 @@
           </div>
           <div id="wavedraw-cursor-info"></div>
           <br>
-          <p class='.timebar'>Now showing <span></span> to <span></span>.</p>
-          <!--p class='.timebar'>Now showing <span><input type="text"><span> to </span><input type="text"></span>.</p-->
+          <p class='.timebar'>Now showing <span><input type="text" style="display:none"><text> to </text><input type="text" style="display:none"><button style="display:none">Go</button></span> .</p>
           <p>propotion<input id="propotion-" type="range" min="0" max="1000" value="1000"></p>
           <p>width<input id="width-" type="range" min="0" max="1000" value="1000"></p>
         <script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>
         <script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>
         <script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>
         </div>
-        <!--<p id='#wavedrawing'>-->
-        <!--<div style='outline: 1px solid gray;'>-->
-          <!--<button id="load">Compile and Draw</button>-->
-          <!--<button id="draw" disabled='disabled'>Reload Image</button>-->
-        <!--</div>-->
-        <!--<div style='outline: 1px solid gray;'>-->
-          <!--<ul id="namel"-->
-              <!--style='outline: 1px solid green; width:20%;margin:0;display: inline-block;vertical-align:top;list-style-type: square;'></ul>-->
-          <!--<ul id='sep'-->
-              <!--style='background:url(../../static/maintest/WaveDrawJS/img/sep.png) repeat-y;display: inline-block;width:1%;height:0;margin: 0; padding: 0;list-style-type: none'></ul>-->
-          <!--&lt;!&ndash; canvas容器 &ndash;&gt;-->
-          <!--<ul id="canvasl"-->
-              <!--style='outline: 2px solid white;display: inline-block;width:70%;margin: 0; padding: 0;list-style-type: none;font-size:0'></ul>-->
-        <!--</div>-->
-        <!--<p>propotion<input id="propotion" type="range" min="0" max="1000" value="1000"></p>-->
-        <!--<p>width<input id="width" type="range" min="0" max="1000" value="1000"></p>-->
-        <!--<p>scale<input id="scale" type="range" min="0" max="1000" value="1000"></p>-->
-        <!--<script src="{% static 'maintest/WaveDrawJS/script/utils.js' %}"></script>-->
-        <!--<script src="{% static 'maintest/WaveDrawJS/script/draw.js' %}"></script>-->
-        <!--<script src="{% static 'maintest/WaveDrawJS/script/controller.js' %}"></script>-->
-        <!--</p>-->
+      </div>
+        
       </div>
     </div>
   </div>
@@ -350,9 +285,6 @@
 <script>
    generateFileTree({{obj|safe}});
    treeviewOpenProject({{tv_dir|safe}});
-   // waveform_path = "{% static 'maintest/img/' %}{{ current_path }}/";
-
-
 </script>
 <script>
 $(function() {

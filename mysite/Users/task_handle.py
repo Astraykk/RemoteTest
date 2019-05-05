@@ -57,6 +57,7 @@ UNDONE = 0
 
 
 def test_request(request):
+	#from maintest.mytools.patternGen import tfo_parser
 	username = request.session.get("username",None)
 	group_id = request.session.get("group_id",None)
 	au = request.session.get("au",None)
@@ -108,16 +109,12 @@ def test_request(request):
 		user_in_queue_item.x = len(file_list_list)
 		user_in_queue_item.save()
 		
-		temp = project_loc
-		for key in file_list_list.keys():
-			# if key != ".":
-			project_loc = os.path.join(temp,key)
-			path4iter = os.path.join(path,key)
-			# else:
-				# path4iter = path
-			ptn_name = file_list_list[key][0]
+		for iter in file_list_list:
+			project_loc = iter[0]
+
+			ptn_name = iter[1][0]
 			
-			dir_list = os.listdir(path4iter)
+			dir_list = os.listdir(project_loc)
 	
 			input_ptn = ptn_name + ".ptn"
 			if input_ptn not in dir_list:
@@ -363,25 +360,27 @@ def tfo_parser(path, file):
 	:param file:
 	:return file_list_list:
 	"""
-	file_list_list = {}
+	file_list_list = []
 	soup = get_soup(path, file)
-	#name_check(file, soup.TFO['name'])
+	name_check(file, soup.TFO['name'])
 	for test_tag in soup.find_all('TEST'):
 		file_list = {
 			'PTN': test_tag['name'] + '.ptn',
-			# 'LBF': soup.TFO.LBF['type'] + '.lbf',
-			# 'TCF': 'F93K.tcf'
+			'LBF': soup.TFO.LBF['type'] + '.lbf',
+			'TCF': 'F93K.tcf'
 		}
 		project_name = test_tag['name']
-		# for child in test_tag.children:
-			# if type(child) == bs4.element.Tag:
-				# if child.name == 'DWM' or child.name == 'BIT':
-					# file_list[child.name] = child['name']
-				# else:
-					# file_list[child.name] = child['name'] + '.' + child.name.lower()
-		file_list_list[test_tag['path']] = (project_name, file_list)
-	#print(file_list_list)
-	return file_list_list		
+		for child in test_tag.children:
+			if type(child) == bs4.element.Tag:
+				if child.name == 'DWM' or child.name == 'BIT':
+					file_list[child.name] = child['name']
+				else:
+					file_list[child.name] = child['name'] + '.' + child.name.lower()
+		# file_list_list[test_tag['path']] = (project_name, file_list)
+		file_list_list.append([os.path.join(path, test_tag['path']), (project_name, file_list)])
+		# file_list_list.append([test_tag['path'], (project_name, file_list)])
+	print(file_list_list)
+	return file_list_list
 	
 def task_list4user(request):
 	username = request.session.get('username',None)

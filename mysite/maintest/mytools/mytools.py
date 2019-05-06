@@ -7,6 +7,11 @@ import os
 import json
 
 
+ASCII_MIN = 33
+ASCII_MAX = 126
+ASCII_LEN = ASCII_MAX - ASCII_MIN + 1
+
+
 def merge_ptn(ptn, *ptn_tuple):
 	with open(ptn, 'rb+') as fw:
 		for file in ptn_tuple:
@@ -16,16 +21,19 @@ def merge_ptn(ptn, *ptn_tuple):
 
 def compare_ptn(file_1, file_2):
 	line_cnt = 0
-	with open(file_1, 'rb') as f1, open(file_2, 'rb') as f2:
+	with open(file_1, 'rb') as f1, open(file_2, 'rb') as f2, open('error.rpt', 'w') as fe:
 		while True:
 			line_cnt += 1
 			line1 = f1.read(16)
 			line2 = f2.read(16)
 			if line1 != line2:
-				print("Files differ at line %d\n" % line_cnt)
-				print("{}: {}\n".format(file_1, line1))
-				print("{}: {}\n".format(file_2, line2))
-				break
+				fe.write("Files differ at line %d\n" % line_cnt)
+				fe.write("{}:\t {}\n".format(file_1, line1))
+				fe.write("{}:\t {}\n".format(file_2, line2))
+				# print("Files differ at line %d\n" % line_cnt)
+				# print("{}: {}\n".format(file_1, line1))
+				# print("{}: {}\n".format(file_2, line2))
+				# break
 			if not line1:
 				break
 		print("Comparison finished!")
@@ -232,6 +240,10 @@ class VcdFile(object):
 			for sig_dict in self.vcd_info:
 				string = (sig_dict['width'] == 1) and '{}{}\n' or '{} {}\n'
 				content += string.format(sig_dict['wave_info'][0], sig_dict['symbol'])
+				# if sig_dict['symbol'] == 'S':
+				# 	print(sig_dict['width'])
+				# 	print(string)
+				# 	print(content)
 			f.write(content + '$end\n')
 			for i in range(1, len(self.vcd_info[0]['wave_info'])):
 				content = ''
@@ -239,14 +251,24 @@ class VcdFile(object):
 					wave_info = sig_dict['wave_info']
 					# print(wave_info, sig_dict['symbol'], len(wave_info))
 					if wave_info[i] != wave_info[i-1]:
-						content += '{}{}\n'.format(wave_info[i], sig_dict['symbol'])
+						string = (sig_dict['width'] == 1) and '{}{}\n' or '{} {}\n'
+						content += string.format(wave_info[i], sig_dict['symbol'])
 				if content:
 					content = '#{}\n'.format(i) + content
 					f.write(content)
 			f.write('$dumpoff\n')
 
 
-def _vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
+def int2ascii(x, default=None):
+	if type(x) is int:
+		if 0 < x <= ASCII_LEN:
+			return chr(x + ASCII_MIN - 1)
+		elif x > ASCII_LEN:
+			return chr(x // ASCII_LEN + ASCII_MIN - 1) + chr(x % ASCII_LEN + ASCII_MIN - 1)
+	return default
+
+
+def _vcd_merge_old(vcd_ref, vcd_file, path='.', compare=True):
 	"""
 	Merge vcd files.
 	"""
@@ -304,12 +326,99 @@ def _vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 	return vcd_m
 
 
-def vcd_merge(vcd1, vcd2='', period1='1us', period2='1us', path='.', compare=True):
+def _vcd_merge(vcd_ref, vcd_file, path='.', compare=True, flag='order'):
+	"""
+	Merge vcd files.
+	"""
+	time_cycle = vcd_ref.timescale
+	fr = open(os.path.splitext(path)[0] + '.rpt', 'w')
+	vcd_m = VcdFile(path, vcd_ref.period)
+	vcd_m.header['timescale'] = vcd_ref.header['timescale']
+	print(vcd_m.header['timescale'])
+	if flag == 'order':
+		for sig_dict in vcd_ref.vcd_info[:]:
+			if '[' in sig_dict['signal']:
+				sig = '_ref['.join(sig_dict['signal'].split('['))
+			else:
+				sig = sig_dict['signal'] + '_ref'
+			sym = int2ascii(ord(sig_dict['symbol']) + 2 - ASCII_MIN)
+			# print(sym)
+			# sym = chr(ord(sig_dict['symbol']) + 1)
+			new_dict = sig_dict.copy()
+			new_dict['signal'] = sig
+			new_dict['symbol'] = sym
+			vcd_m.vcd_info.append(new_dict)
+			vcd_m.sym2sig[sig_dict['symbol']] = sig
+		offset = len(vcd_ref.vcd_info) + 1
+		for sig_dict in vcd_file.vcd_info[:]:
+			sym = int2ascii(ord(sig_dict['symbol']) + offset + 1 - ASCII_MIN)
+			# sym = chr(ord(sig_dict['symbol']) + offset)
+			new_dict = sig_dict.copy()
+			new_dict['symbol'] = sym
+			vcd_m.sym2sig[sym] = new_dict['signal']
+			vcd_m.vcd_info.append(new_dict)
+	elif flag == 'alternate':
+		order = 2  # start from '"', '!' leave for error signal
+		for sig_dict in vcd_ref.vcd_info[:]:
+			if '[' in sig_dict['signal']:
+				sig = '_ref['.join(sig_dict['signal'].split('['))
+			else:
+				sig = sig_dict['signal'] + '_ref'
+			sym = int2ascii(order)  # ignore symbol order in ref.vcd
+			new_dict = sig_dict.copy()
+			new_dict['signal'] = sig
+			new_dict['symbol'] = sym
+			vcd_m.vcd_info.append(new_dict)
+			vcd_m.sym2sig[sig_dict['symbol']] = sig
+			if sig_dict['type'] == 'parameter':
+				# No parameter type in trf.vcd, skip to next signal in ref.vcd
+				order += 1
+			else:
+				# Add corresponding signal in trf.vcd to merge.vcd
+				sym_ref = sig_dict['symbol']
+				ord_file = vcd_file.sym2ord[sym_ref]
+				new_dict_file = vcd_file.vcd_info[ord_file].copy()
+				new_dict_file['symbol'] = int2ascii(order + 1)
+				vcd_m.vcd_info.append(new_dict_file)
+				vcd_m.sym2sig[sig_dict['symbol']] = new_dict_file['signal']
+				order += 2
+	if compare:  # generate error signal
+		sym = '!'  # chr(len(vcd_m.vcd_info) + 33)
+		sig = 'error'  # TODO: check signal name clash
+		wave_info = ['0'] * len(vcd_ref.vcd_info[0]['wave_info'])
+		# for i in range(len(vcd_ref.vcd_info)):  # directly compare 2 lists
+		# 	ref_dict = vcd_ref.vcd_info[i]['wave_info']
+		# 	act_dict = vcd_file.vcd_info[i]['wave_info']
+		# 	compare_result = list(map(compare_value, ref_dict, act_dict))
+		# 	wave_info = list(map(and_value, wave_info, compare_result))
+		# print(len(vcd_ref.vcd_info))
+		for i in range(len(vcd_file.vcd_info[0]['wave_info'])):  # tick
+			for j in range(len(vcd_file.vcd_info)):  # signal
+				ref_ord = vcd_ref.sym2ord[vcd_file.vcd_info[j]['symbol']]
+				x = vcd_ref.vcd_info[ref_ord]['wave_info'][i]
+				y = vcd_file.vcd_info[j]['wave_info'][i]
+				sig_ref = vcd_ref.vcd_info[j]['signal']
+				sig_act = vcd_file.vcd_info[j]['signal']
+				if x != 'x' and x != 'z' and x != y:
+					fr.write('Time #{}: {}_ref = {}, {} = {}\n'.format(i*time_cycle, sig_ref, x, sig_act, y))  # report
+					wave_info[i] = '1'  # generate wave info for error_dict
+		error_dict = {
+			'symbol': sym, 'signal': sig, 'type': 'wire', 'width': 1, 'wave_info': list(wave_info), 'wave_state': []
+		}
+		if '1' not in wave_info:
+			fr.write("Test pass!")
+		vcd_m.sym2sig[sym] = sig
+		vcd_m.vcd_info.insert(0, error_dict)
+	fr.close()
+	return vcd_m
+
+
+def vcd_merge(vcd1, vcd2='', period1='1us', period2='1us', path='.', compare=True, flag='order'):
 	vcd_ref = VcdFile(vcd1, period=period1)
 	vcd_ref.get_vcd_info()
 	vcd_file = VcdFile(vcd2, period=period2)
 	vcd_file.get_vcd_info()
-	vcd_merge = _vcd_merge(vcd_ref, vcd_file, path, compare)
+	vcd_merge = _vcd_merge(vcd_ref, vcd_file, path, compare, flag=flag)
 	vcd_merge.gen_vcd(path)
 
 
@@ -319,10 +428,10 @@ if __name__ == "__main__":
 	# vcd2 = 'vcd/stage1_2x_h_000_trf.vcd'
 	# vcd1 = 'Bugs/MULreg/MULreg.vcd'
 	# vcd2 = 'Bugs/MULreg/MULreg_trf.vcd'
-	vcd1 = 'FLASH/eras/eras.vcd'
-	vcd2 = 'FLASH/eras/eras_trf.vcd'
-	period1 = '100n'
-	period2 = '1us'
-	path = 'test1.vcd'
-	vcd_merge(vcd1, vcd2, period1, period2, path)
-	# compare_ptn('ram1/ram1.ptn', 'ram1/ram1.ptn.bak')
+	# vcd1 = 'FLASH/eras/eras.vcd'
+	# vcd2 = 'FLASH/eras/eras_trf.vcd'
+	# period1 = '100n'
+	# period2 = '1us'
+	# path = 'test1.vcd'
+	# vcd_merge(vcd1, vcd2, period1, period2, path)
+	compare_ptn('mul/mul5.ptn', 'mul/mul5_error.ptn')

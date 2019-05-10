@@ -258,7 +258,7 @@ def task_db2task():
 					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=request_serial_num,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file,end_tag=end_tag)
 					task_item.save()
 				else:
-					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=1,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file)
+					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=1,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file,end_tag=end_tag)
 					task_item.save()
 					#task = Task.objects.order_by('request_serial_num')[0]
 					pro = multiprocessing.Process(target = test_pack,args = (task_item,))
@@ -365,7 +365,7 @@ def test(task):
 			user4serving_item = user4serving.objects.filter(user=task.user)[0]
 		else:
 			user4serving_item = user4serving.objects.filter(group=task.group)[0]
-		report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now() - user4serving_item.s_time).seconds)
+		report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now() - user4serving_item.s_time).total_seconds())
 		
 		user4serving_item.delete()
 		
@@ -455,4 +455,11 @@ def check4waitingInfo():
 		wait_sec = sum(merge) * A_task_time
 		return "There are %d users in serving list, and %d users in queue.\n your tasks will get to platform in about %d seconds." % (serving_num,user_in_queue_num,wait_sec)
 		
-		
+for iter in user4serving.objects.all()
+	iter.delete()
+for iter in user_in_queue.objects.all()
+	iter.delete()
+for iter in task_db.objects.all()
+	iter.delete()
+for iter in Task.objects.all()
+	iter.delete()

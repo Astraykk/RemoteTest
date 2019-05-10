@@ -222,7 +222,8 @@ def batch_merge(path, tfo):
 			vcd1 = os.path.join(project_path, pattern.file_list['VCD'])
 			vcd2 = os.path.join(project_path, pattern.project_name + '_trf.vcd')
 			vcdm_path = os.path.join(project_path, pattern.project_name + '_merge.vcd')
-			vcd_merge(vcd1, vcd2, period1, period2, vcdm_path)
+			vcd_merge(vcd1, vcd2, period1, period2, vcdm_path, flag='alternate')
+			# vcd_merge(vcd1, vcd2, period1, period2, vcdm_path)
 			e_time = time.time()
 			key = 'Merge time for {:<30}:'.format(pattern.project_name)
 			value = e_time - s_time
@@ -245,7 +246,8 @@ like 01, 12, or 012)
 
 
 def test():
-	batch_merge('.', 'FLASH.tfo')
+	# batch_trf2vcd('tfo', 'DSP_4.tfo')
+	batch_merge('tfo', 'DSP_4.tfo')
 	# batch_merge('.', 'bugs2.tfo')
 	# batch_trf2vcd('tfo', 'chen.tfo')
 

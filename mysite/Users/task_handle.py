@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 
 from Users.models import Users,Group,au4pj
-from Users.models import Task,allTask4user,allTask4group,task_db,user_in_queue,user4serving
+from Users.models import Task,allTask4user,allTask4group,task_db,user_in_queue,user4serving,user4report
 #from Users.patternGen import tfo_parser
 
 from django.http import HttpResponse,JsonResponse
@@ -162,7 +162,7 @@ def test_pack(task):
 	new_task_number = Task.objects.count()
 	while new_task_number:
 		test(new_task)
-		complete_task(new_task)		
+		#complete_task(new_task)		
 		del_task(new_task)
 		new_task_number = Task.objects.count()
 		if new_task_number:
@@ -187,8 +187,8 @@ def task_create(request,username,project_loc,user_or_group,ptn_name):
 def addIndb(request,username,project_loc,user_or_group,ptn_name,report_file):
 	if user_or_group == '0':
 		user = Users.objects.get(username=username)
-		task_record = allTask4user(user=user,project_loc=project_loc,ptn_name=ptn_name)
-		task_record.save()
+		#task_record = allTask4user(user=user,project_loc=project_loc,ptn_name=ptn_name)
+		#task_record.save()
 		request_serial_num = user.task_db_set.count() + 1
 		task_db_item = task_db(user=user,username=username,project_loc=project_loc,request_serial_num=request_serial_num,user_or_group=user_or_group,ptn_name=ptn_name,report_file=report_file)
 		task_db_item.save()
@@ -208,7 +208,7 @@ def minute_process():
 	times = 0
 	beta = 4
 	while(task_db.objects.count()>0):
-		time.sleep(1)
+		time.sleep(1.5)
 		queue2serving()		
 		task_db2task()		             #
 		times = times + 1
@@ -246,7 +246,9 @@ def task_db2task():
 					
 				if user4serving_item.x_current == 1:
 					#report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now().replace(tzinfo=pytz.timezone('UTC')) - user4serving_item.s_time).seconds)
-					#user4serving_item.delete()
+					user4report_item = user4report(user=user4serving_item.user,s_time=user4serving_item.s_time)
+					user4report_item.save()
+					user4serving_item.delete()
 					end_tag = "last"
 				else:
 					user4serving_item.x_current -= 1
@@ -351,7 +353,7 @@ def test(task):
 	s_time = time.time()
 	#abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
 	print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1")
-	for i in range(2):
+	for i in range(4):
 		time.sleep(1)
 		print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
 	e_time = time.time()
@@ -362,12 +364,12 @@ def test(task):
 	report(task.report_file, key, value)
 	if task.end_tag == "last":
 		if task.user_or_group == "0":
-			user4serving_item = user4serving.objects.filter(user=task.user)[0]
+			user4report_item = user4report.objects.filter(user=task.user)[0]
 		else:
-			user4serving_item = user4serving.objects.filter(group=task.group)[0]
-		report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now() - user4serving_item.s_time).total_seconds())
-		
-		user4serving_item.delete()
+			user4report_item = user4report.objects.filter(group=task.group)[0]
+		report(task.report_file,'Total test time:', (datetime.datetime.now() - user4report_item.s_time).total_seconds())
+		record(task.username,(datetime.datetime.now() - user4report_item.s_time).seconds)
+		user4report_item.delete()
 		
 	print("finish testing "+task.username+" "+ task.project_loc + input_ptn +"....")
 	
@@ -405,7 +407,7 @@ def tfo_parser(path, file):
 		# file_list_list[test_tag['path']] = (project_name, file_list)
 		file_list_list.append([os.path.join(path, test_tag['path']), (project_name, file_list)])
 		# file_list_list.append([test_tag['path'], (project_name, file_list)])
-	print(file_list_list)
+	#print(file_list_list)
 	return file_list_list
 	
 def task_list4user(request):
@@ -454,12 +456,77 @@ def check4waitingInfo():
 			merge[merge.index(max(merge))] = 0
 		wait_sec = sum(merge) * A_task_time
 		return "There are %d users in serving list, and %d users in queue.\n your tasks will get to platform in about %d seconds." % (serving_num,user_in_queue_num,wait_sec)
+
+def record(username,time):
+	with open(os.path.join("Users","result.txt"),'a') as fp:
+		fp.write(username+"\t"+str(time)+"\n")
 		
-for iter in user4serving.objects.all()
+	fp.close()
+	print(username+"\t"+str(time)+"\n")
+		
+for iter in user4serving.objects.all():
 	iter.delete()
-for iter in user_in_queue.objects.all()
+for iter in user_in_queue.objects.all():
 	iter.delete()
-for iter in task_db.objects.all()
+for iter in task_db.objects.all():
 	iter.delete()
-for iter in Task.objects.all()
+for iter in Task.objects.all():
 	iter.delete()
+
+def run(request):	
+	for iter in user4serving.objects.all():
+		iter.delete()
+	for iter in user_in_queue.objects.all():
+		iter.delete()
+	for iter in task_db.objects.all():
+		iter.delete()
+	for iter in Task.objects.all():
+		iter.delete()
+	for iter in user4report.objects.all():
+		iter.delete()
+	m = 50
+	for index in range(31,m+31):
+		username = "user_" + str(index)
+		userf = Users.objects.filter(username=username)
+		if not userf:
+			user = Users(username=username,password="111111")
+			user.save()
+
+	for index in range(31,m+31):
+		username = "user_" + str(index)
+		path = os.path.join("Users","all_users",username,"Bugs")
+		tfo_name = "tfo_demo.tfo"
+		file_list_list = tfo_parser(path,tfo_name)
+		report_file = os.path.splitext(os.path.join(path,tfo_name))[0] + '_report.log'
+		while(user4serving.objects.count()+user_in_queue.objects.count()>=5):
+			time.sleep(10)
+		time.sleep(3)
+		user = Users.objects.get(username=username)
+		user_in_queue_item = user_in_queue(user=user,x=1)
+		user_in_queue_item.x = len(file_list_list)
+		user_in_queue_item.report_file=report_file
+		user_in_queue_item.save()
+		
+		for iter in file_list_list:
+			project_loc = iter[0]
+			ptn_name = iter[1][0]
+			
+			dir_list = os.listdir(project_loc)
+
+			input_ptn = ptn_name + ".ptn"
+			if input_ptn not in dir_list:
+				print("no ptn")
+			u_or_g = username
+			user_or_group = '0'
+			#request="request"
+			addIndb(request,u_or_g,project_loc,user_or_group,ptn_name,report_file)
+			time.sleep(0.1)
+		
+	return
+
+
+
+
+		
+	
+

@@ -5,37 +5,24 @@ import sys
 import json
 #constants for state shift
 class State(enum.Enum):
-	I_X_X = 0
-	I_Z_X = 1
-	I_0_X = 2
-	I_1_X = 3
-	I_X_Z = 4
-	I_Z_Z = 5
-	I_0_Z = 6
-	I_1_Z = 7
-	I_X_0 = 8
-	I_Z_0 = 9
-	I_0_0 = 10
-	I_1_0 = 11
-	I_X_1 = 12
-	I_Z_1 = 13
-	I_0_1 = 14
-	I_1_1 = 15
-	I_BUS_TRAN = 16
-	I_BUS_INIT = 17
-
+	I_SINGLE_X = 0
+	I_SINGLE_Z = 1
+	I_SINGLE_0 = 2
+	I_SINGLE_1 = 3
+	I_BUS_TRAN = 4
+	I_BUS_INIT = 5
 def read_dataline(line):
-	wave_data=''
-	wave_sign=''
-	#bus pattern: (b|o|d|h)(wave data)(white space)(sign)
-	if re.search(r'^(b|o|d|h)',line):
-		stoppos=len(line[:-2].strip())
-		wave_data = line[1:stoppos]
-		wave_sign=line[-2]
+	wave_data = ''
+	wave_sign = ''
+	#bus pattern: (b)(wave data)(white space)(sign)
+	if re.search(r'^b',line):
+		parts=re.split('\s+',line)
+		wave_data = parts[0][1:]
+		wave_sign = parts[1]
 	#non-bus pattern: (wave data)(sign)
 	else:
 		wave_data = line[0]
-		wave_sign=line[1:].strip()
+		wave_sign = line[1:].strip()
 	return wave_data, wave_sign
 
 def parsevcd(vcd_location):
@@ -90,53 +77,17 @@ def parsevcd(vcd_location):
 					line = vcd.readline()
 					continue
 	for i in range(len(waveout)):
-		if(waveout[i]['width'] == '1'):
+		if(waveout[i]['width'] == 1):
 			for j in range(len(waveout[i]['wave'])):
-				if j == 0:
-					now_wave = waveout[i]['wave'][j]
-					if now_wave == 'x':
-						waveout[i]['state'].append(State.I_X_X.value)
-					elif now_wave == 'z':
-						waveout[i]['state'].append(State.I_Z_Z.value)
-					elif now_wave == '0':
-						waveout[i]['state'].append(State.I_0_0.value)
-					elif now_wave == '1':
-						waveout[i]['state'].append(State.I_1_1.value)
-				else:
-					b_wave = waveout[i]['wave'][j - 1]
-					now_wave = waveout[i]['wave'][j]
-					if b_wave == 'x' and now_wave == 'x':
-						waveout[i]['state'].append(State.I_X_X.value)
-					elif b_wave == 'z' and now_wave == 'x':
-						waveout[i]['state'].append(State.I_Z_X.value)
-					elif b_wave == '0' and now_wave == 'x':
-						waveout[i]['state'].append(State.I_0_X.value)
-					elif b_wave == '1' and now_wave == 'x':
-						waveout[i]['state'].append(State.I_1_X.value)
-					elif b_wave == 'x' and now_wave == 'z':
-						waveout[i]['state'].append(State.I_X_Z.value)
-					elif b_wave == 'z' and now_wave == 'z':
-						waveout[i]['state'].append(State.I_Z_Z.value)
-					elif b_wave == '0' and now_wave == 'z':
-						waveout[i]['state'].append(State.I_0_Z.value)
-					elif b_wave == '1' and now_wave == 'z':
-						waveout[i]['state'].append(State.I_1_Z.value)
-					elif b_wave == 'x' and now_wave == '0':
-						waveout[i]['state'].append(State.I_X_0.value)
-					elif b_wave == 'z' and now_wave == '0':
-						waveout[i]['state'].append(State.I_Z_0.value)
-					elif b_wave == '0' and now_wave == '0':
-						waveout[i]['state'].append(State.I_0_0.value)
-					elif b_wave == '1' and now_wave == '0':
-						waveout[i]['state'].append(State.I_1_0.value)
-					elif b_wave == 'x' and now_wave == '1':
-						waveout[i]['state'].append(State.I_X_1.value)
-					elif b_wave == 'z' and now_wave == '1':
-						waveout[i]['state'].append(State.I_Z_1.value)
-					elif b_wave == '0' and now_wave == '1':
-						waveout[i]['state'].append(State.I_0_1.value)
-					elif b_wave == '1' and now_wave == '1':
-						waveout[i]['state'].append(State.I_1_1.value)
+				now_wave = waveout[i]['wave'][j]
+				if now_wave == 'x':
+					waveout[i]['state'].append(State.I_SINGLE_X.value)
+				elif now_wave == 'z':
+					waveout[i]['state'].append(State.I_SINGLE_Z.value)
+				elif now_wave == '0':
+					waveout[i]['state'].append(State.I_SINGLE_0.value)
+				elif now_wave == '1':
+					waveout[i]['state'].append(State.I_SINGLE_1.value)
 		else:
 			for j in range(len(waveout[i]['wave'])):
 				if j == 0:
@@ -150,10 +101,10 @@ def wave2json(waveout, *extra):
 	json parser. hence removed.'''
 	for i in range(len(waveout)):
 		del waveout[i]['sign']
-	jsdat=json.dumps(dict(dat=waveout,time=extra[0]))
+	jsdat = json.dumps(dict(dat=waveout,time=extra[0]))
 	return jsdat
 		
 def vcd2pic(vcd_location):
-	waveout, time=parsevcd(vcd_location)
-	jsdat=wave2json(waveout,time)
+	waveout, time = parsevcd(vcd_location)
+	jsdat = wave2json(waveout,time)
 	return jsdat

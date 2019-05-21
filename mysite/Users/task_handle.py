@@ -351,13 +351,13 @@ def test(task):
 	path_in = os.path.join(path,input_ptn)
 	path_o = os.path.join(path,output_trf)
 	s_time = time.time()
-	#abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
-	print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1")
-	for i in range(2):
-		time.sleep(1)
-		print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
+	abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
+	# print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1")
+	# for i in range(2):
+		# time.sleep(1)
+		# print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
 	e_time = time.time()
-	#print(abc)
+	print(abc)
 
 	key = "Test time for " + task.ptn_name + ":"
 	value = e_time - s_time
@@ -371,7 +371,7 @@ def test(task):
 		
 		user4report_item.delete()
 		
-	print("finish testing "+task.username+" "+ task.project_loc + input_ptn +"....")
+	print("finish testing "+task.username+" "+ task.project_loc +".... ptn---"+ input_ptn +"....")
 	
 		
 
@@ -457,13 +457,14 @@ def check4waitingInfo():
 		wait_sec = sum(merge) * A_task_time
 		return "There are %d users in serving list, and %d users in queue.\n your tasks will get to platform in about %d seconds." % (serving_num,user_in_queue_num,wait_sec)
 		
-for iter in user4serving.objects.all():
-	iter.delete()
-for iter in user_in_queue.objects.all():
-	iter.delete()
-for iter in task_db.objects.all():
-	iter.delete()
-for iter in Task.objects.all():
-	iter.delete()
-for iter in user4report.objects.all():
-	iter.delete()
+# for iter in user4serving.objects.all():
+	# iter.delete()
+# for iter in user_in_queue.objects.all():
+	# iter.delete()
+# for iter in task_db.objects.all():
+	# iter.delete()
+# for iter in Task.objects.all():
+	# iter.delete()
+# for iter in user4report.objects.all():
+	# iter.delete()
+	

@@ -34,8 +34,8 @@ div.wavedrawing-container div {
 	vertical-align:top;
 	padding-left:3%;
 	max-height:300px;
+	overflow-x:scroll;
 	overflow-y:auto;
-	overflow-x:auto;
 }
 #wavedrawing-heading {
 	display:inline-block;
@@ -65,16 +65,16 @@ div.column-sep {
 	font-size:0;
 	padding:0;
 	max-height:300px;
-	overflow-y:auto;
+	overflow-x:scroll;
+	overflow-y:hidden;
 }
-div#namel- li[class] > span {
+div#namel- li > span {
 	color:#000;
 }
-div#namel- li[class] {
+div#namel- li {
 	height:35px;
 }
 div#canvasl- canvas {
 	background-color:black;
 	display:block;
 }
-

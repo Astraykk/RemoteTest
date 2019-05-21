@@ -1,0 +1,111 @@
+<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel_1">project information</h4>
+			</div>
+			<form id="form4create" action="/Users/mkdir/" method="post" onsubmit="return user_submit_pack(this);">
+			{% csrf_token %}
+				<div class="modal-body">
+					dir location: <input type="text" id="dir_loc" name="dir_loc" value="/" readonly="readonly"/>
+					dir name: <input type="text" id="dir_name" name="dir_name" maxlength="30" required oninvalid="setCustomValidity('group name can\'t be empty')" oninput="setCustomValidity('')"/>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+					<button type="submit" class="btn btn-primary" >create</button>
+				</div>
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="myModal_2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_2" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel_2">project information</h4>
+			</div>
+			<form id="form4upload"  action="/Users/upload/" method="post" enctype="multipart/form-data" onsubmit="return user_submit_pack4up(this);">
+			{% csrf_token %}
+				<div class="modal-body">
+					<div class="input-group">
+						<label class="input-group-addon">to location:</label>
+						<input type="file" name="myfile" multiple="multiple" id="file" onchange="getFilename()" style="display:none"/>
+						<input class="form-control col-md-4" type="text" id="file_loc" name="file_loc" value="/" readonly="readonly"/>
+						
+						<span class="input-group-btn"><button class="btn btn-default" type="button" id="file_input_pack" onclick="clear_files()">choose file</button></span>
+						
+					</div>
+					<br><br>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">Selected files:</h3>
+						</div>
+						<div class="panel-body" id="filename">
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+					<button type="submit" class="btn btn-primary" >upload</button>
+				</div>
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="myModal_del" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_del" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel_add">Are you sure to delete?</h4>
+			</div>
+			<form id="del_loc_form" method="post" action="/Users/del_file4user/" onsubmit="return del_file4user_pack(this);">
+				{% csrf_token %}
+				<div class="modal-body">
+					<div class="input-group">
+						<span class="input-group-addon">location of file or dir to be deleted:</span>							
+						<input class="form-control col-md-4" type="text" id="loc4del" name="loc4del" value="" required />
+						<input type="hidden" name="user_or_group" value="group" />											
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+					<button type="submit" class="btn btn-primary" id="del_ex">delete</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="myModal_down" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_down" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel_down">Are you sure to download?</h4>
+			</div>
+			<form id="down_loc_form" method="post" action="/Users/down_fileofuser/" >
+				{% csrf_token %}
+				<div class="modal-body">
+					<div class="input-group">
+						<span class="input-group-addon">location of file to be downloaded:</span>							
+						<input class="form-control col-md-4" type="text" id="loc4down" name="loc4down" value="" required readonly="readonly"/>
+															
+					</div>
+					<div class="input-group">
+						<span class="input-group-addon">file:</span>							
+						<input class="form-control col-md-4" type="text" id="file_name4down" name="file_name4down" value="" required readonly="readonly"/>																	
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+					<button type="submit" class="btn btn-primary" id="down_ex" onclick="down_file_pack()">download</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

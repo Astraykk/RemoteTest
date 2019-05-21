@@ -5,7 +5,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
  
 django.setup()
 
-from Users.models import Users,Group,au4pj
+from Users.models import Users,Group,au4pj,user4report
 from Users.models import Task,allTask4user,allTask4group,task_db,user_in_queue,user4serving
 #from Users.patternGen import tfo_parser
 
@@ -246,7 +246,9 @@ def task_db2task():
 					
 				if user4serving_item.x_current == 1:
 					#report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now().replace(tzinfo=pytz.timezone('UTC')) - user4serving_item.s_time).seconds)
-					#user4serving_item.delete()
+					user4report_item = user4report(user=user4serving_item.user,group=user4serving_item.group,s_time=user4serving_item.s_time)
+					user4report_item.save()
+					user4serving_item.delete()
 					end_tag = "last"
 				else:
 					user4serving_item.x_current -= 1
@@ -362,10 +364,10 @@ def test(task):
 	report(task.report_file, key, value)
 	if task.end_tag == "last":
 		if task.user_or_group == "0":
-			user4serving_item = user4serving.objects.filter(user=task.user)[0]
+			user4report_item = user4report.objects.filter(user=task.user)[0]
 		else:
-			user4serving_item = user4serving.objects.filter(group=task.group)[0]
-		report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now() - user4serving_item.s_time).total_seconds())
+			user4report_item = user4report.objects.filter(group=task.group)[0]
+		report(task.report_file,'Total test time:', (datetime.datetime.now() - user4report_item.s_time).total_seconds())
 		
 		user4serving_item.delete()
 		
@@ -455,11 +457,11 @@ def check4waitingInfo():
 		wait_sec = sum(merge) * A_task_time
 		return "There are %d users in serving list, and %d users in queue.\n your tasks will get to platform in about %d seconds." % (serving_num,user_in_queue_num,wait_sec)
 		
-for iter in user4serving.objects.all()
+for iter in user4serving.objects.all():
 	iter.delete()
-for iter in user_in_queue.objects.all()
+for iter in user_in_queue.objects.all():
 	iter.delete()
-for iter in task_db.objects.all()
+for iter in task_db.objects.all():
 	iter.delete()
-for iter in Task.objects.all()
+for iter in Task.objects.all():
 	iter.delete()

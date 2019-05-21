@@ -14,6 +14,8 @@
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/bootstrap-treeview.css' %}">
 
 <script type="text/javascript" src="{% static 'maintest/js/maintest_js.js' %}"></script>
+<script type="text/javascript" src="{% static 'maintest/js/add4cre_up.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.form.js' %}" ></script>
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/WaveDrawJS/css/WaveDrawJS.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'maintest/css/maintest.css' %}">
 <script src="{% static 'maintest/WaveDrawJS/script/loadjson.js' %}"></script>
@@ -109,7 +111,7 @@
 	<div>
 		{% include "maintest/include/account.html" %}
 	</div>
-	
+	<div id ="message"></div>
   <div class="row">
     <div class="col-md-3" style="vertical-align:middle;font-size:20px">
       <p>&nbsp;Chip-Test App
@@ -234,7 +236,7 @@
 			<form id="form4create" action="/Users/mkdir/" method="post" onsubmit="return user_submit_pack(this);">
 			{% csrf_token %}
 				<div class="modal-body">
-					dir location: <input type="text" id="dir_loc" name="dir_loc" value="/" />
+					dir location: <input type="text" id="dir_loc" name="dir_loc" value="/" readonly="readonly"/>
 					dir name: <input type="text" id="dir_name" name="dir_name" maxlength="30" required oninvalid="setCustomValidity('group name can\'t be empty')" oninput="setCustomValidity('')"/>
 				</div>
 				<div class="modal-footer">
@@ -258,8 +260,8 @@
 				<div class="modal-body">
 					<div class="input-group">
 						<label class="input-group-addon">to location:</label>
-						<input type="file" name="myfile" multiple="multiple" id="file" onchange="getFilename()" multiple="multiple" style="display:none"/>
-						<input class="form-control col-md-4" type="text" id="file_loc" name="file_loc" value="/"/>
+						<input type="file" name="myfile" multiple="multiple" id="file" onchange="getFilename()" style="display:none"/>
+						<input class="form-control col-md-4" type="text" id="file_loc" name="file_loc" value="/" readonly="readonly"/>
 						
 						<span class="input-group-btn"><button class="btn btn-default" type="button" id="file_input_pack" onclick="clear_files()">choose file</button></span>
 						
@@ -281,7 +283,7 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal -->
 </div>
-
+{% include "maintest/include/tools.html" %}
 <script>
    generateFileTree({{obj|safe}});
    treeviewOpenProject({{tv_dir|safe}});

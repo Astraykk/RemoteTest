@@ -137,6 +137,7 @@ $(document).ready(function(){
 //    });
 //}
 function callFlowFunc(path){
+  var check_url = "/maintest/check/"
   var url = check_url;
   console.log("check func start");
   console.log(url);
@@ -177,6 +178,7 @@ function buildPattern(path){
 }
 
 function runTest(path){
+  var test_url = "/Users/test_request/";
   var url = test_url;
   var rpt_name = $("#rptName").val();
   // waveform_path = waveform_path + rpt_name + ".jpg"

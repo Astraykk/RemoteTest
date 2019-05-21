@@ -102,11 +102,13 @@ class user4serving(models.Model):
 		else:
 			return '%s'%(self.group.group_id)
 
+			
 class user4report(models.Model):
 	user = models.ForeignKey(Users, on_delete=models.CASCADE,null=True)
 	group = models.ForeignKey(Group, on_delete=models.CASCADE,null=True)
-	report_file = models.CharField('report_file',max_length=100,default="xxx")
+	report_file = models.CharField('report_file2',max_length=100,default="xxx")
 	s_time = models.DateTimeField('start_time')
+	
 	def __str__(self):
 		if self.user:
 			return '%s'%(self.user.username)

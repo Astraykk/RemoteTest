@@ -107,7 +107,7 @@ def test_request(request):
 		file_list_list = tfo_parser(path,tfo_name)
 		report_file = os.path.splitext(os.path.join(path,tfo_name))[0] + '_report.log'
 
-		print(file_list_list)
+		#print(file_list_list)
 		user_in_queue_item.x = len(file_list_list)
 		user_in_queue_item.report_file=report_file
 		user_in_queue_item.save()
@@ -369,7 +369,7 @@ def test(task):
 			user4report_item = user4report.objects.filter(group=task.group)[0]
 		report(task.report_file,'Total test time:', (datetime.datetime.now() - user4report_item.s_time).total_seconds())
 		
-		user4serving_item.delete()
+		user4report_item.delete()
 		
 	print("finish testing "+task.username+" "+ task.project_loc + input_ptn +"....")
 	
@@ -407,7 +407,7 @@ def tfo_parser(path, file):
 		# file_list_list[test_tag['path']] = (project_name, file_list)
 		file_list_list.append([os.path.join(path, test_tag['path']), (project_name, file_list)])
 		# file_list_list.append([test_tag['path'], (project_name, file_list)])
-	print(file_list_list)
+	#print(file_list_list)
 	return file_list_list
 	
 def task_list4user(request):
@@ -464,4 +464,6 @@ for iter in user_in_queue.objects.all():
 for iter in task_db.objects.all():
 	iter.delete()
 for iter in Task.objects.all():
+	iter.delete()
+for iter in user4report.objects.all():
 	iter.delete()

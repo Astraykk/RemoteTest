@@ -235,24 +235,51 @@ def download(request):
 	else:
 		return redirect('/Users/login/')
 	
-def zip_dir(dir):
+def zip_dir(dir,flag):
 	if dir[-1]==os.sep:
 		temp = os.path.split(dir[:-1])         #maybe buggy
 	else:
 		temp = os.path.split(dir) 
 	zipFileName = temp[1]
 	zf = zipfile.ZipFile(os.path.join(temp[0],zipFileName+'.zip'), "w", zipfile.ZIP_DEFLATED)
-	zip_in(zf,dir,dir,zipFileName)
+	zip_in(zf,dir,dir,zipFileName,flag)
 	zf.close()
 	return (os.path.join(temp[0],zipFileName+'.zip'),zipFileName+'.zip')
 
-def zip_in(zf,dir,replace_str,zipFileName):
+def zip_in(zf,dir,replace_str,zipFileName,flag="default"):
 	dir_list = os.listdir(dir)
 	for iter in dir_list:
 		path = os.path.join(dir,iter)
-		if os.path.isdir(path):
-			zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
-			zip_in(zf,path,replace_str,zipFileName)
+		if flag == "default":
+			if os.path.isdir(path):
+				zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
+				zip_in(zf,path,replace_str,zipFileName,flag)
+			else:
+				zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
+		elif flag == "trf":
+			if os.path.isdir(path):
+				#zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
+				zip_in(zf,path,replace_str,zipFileName,flag)
+			else:
+				if iter.endswith(".trf"):
+					zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
 		else:
-			zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
-			#zf.write(path)
+			if os.path.isdir(path):
+				#zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
+				zip_in(zf,path,replace_str,zipFileName,flag)
+			else:
+				if iter.endswith("_trf.vcd") or iter.endswith("_merge.vcd") or iter.endswith("_merge.rpt"):
+					zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
+			
+
+def download_spec(request,flag):
+	username = request.session.get('username',None)
+	if username:
+		path = request.session.get('directory',os.path.join("Users","all_users",username))
+		(path4zip,filename)=zip_dir(path,flag)
+		file = open(path4zip,'rb')
+		response = FileResponse(file)	
+		response['Content-Disposition']='attachment;filename='+'"'+filename+'"'
+		return response
+	else:
+		return redirect('/Users/login/')

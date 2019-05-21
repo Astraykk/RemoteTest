@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^logout/',views.logout,name='logout'),
 	url(r'^del_file4user/',views.del_file,name="del_file"),
 	url(r'^down_fileofuser/',views.download,name="download"),
+	url(r'^download_spec/(?P<flag>.*)/$',views.download_spec,name="download_spec"),
 	
 	#--------------------info--------------------------------
 	url(r'^info/', info.user_info, name='user_info'),

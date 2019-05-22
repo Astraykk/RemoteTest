@@ -17,12 +17,10 @@ function draw_vline(ctx, x_st, y_st, y_off, color) {
   ctx.stroke();
   ctx.closePath();
 }
-
 function write_text(ctx, x_st, y_st, textc, maxWidth) {
-  ctx.font = "12px Courier";
+  ctx.font = "12px Monospace";
   ctx.fillStyle = "#ffffff";
   ctx.fillText(textc, x_st, y_st, maxWidth);
-
 }
 function check_canvas_availablity() {
   //简单地检测当前浏览器是否支持Canvas对象，以免在一些不支持html5的浏览器中提示语法错误
@@ -31,35 +29,11 @@ function check_canvas_availablity() {
   else return false;
 }
 function query_canvas(canvasname, height, width) {
-  /*for bus signal serach
-var x1=canvasname.replace('[','\\[');
-x1=x1.replace(']','\\]');
-  var ret = $('canvas.'+x1);
-console.log(ret)
-  if (ret.length) {
-    ret[0].height = height;
-    ret[0].width = width;
-  return ret[0];
-  } else {
-console.log(x1)
-    var ret = document.createElement('canvas');
-    ret.setAttribute('class', canvasname);
-    parentnode.appendChild(ret);
-    ret.height = height;
-    ret.width = width;
-  return ret;
-  }*/
-  var canvasl = document.getElementsByClassName(canvasname);
+  var canvasl = document.getElementsByTagName('CANVAS');
   var ret;
-  if (!canvasl.length) {
-    var ret = document.createElement('canvas');
-    ret.setAttribute('class', canvasname);
-    ret.height = height;
-    ret.width = width;
-    return [false, ret];
-  } else {
+  if (canvasl.length){
     for (var i = 0; i < canvasl.length; i++) {
-      if (canvasl[i].nodeName == 'CANVAS') {
+      if (canvasl[i].getAttribute("data-canvasname") == canvasname) {
         ret = canvasl[i];
         ret.height = height;
         ret.width = width;
@@ -67,6 +41,11 @@ console.log(x1)
       }
     }
   }
+    ret = document.createElement('canvas');
+    ret.setAttribute('data-canvasname', canvasname);
+    ret.height = height;
+    ret.width = width;
+    return [false, ret];
 }
 function draw_grid(x_st, y_st, x_range, time) {
   var gridcanvas = $('#wavedrawing-gridc')[0];
@@ -113,7 +92,6 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   if (flag_canvas_OK) {
     var jsdata = get_json_data();
     var timerange = [time_begin, time_end];
-
     draw_grid(0.5, 22.5, cwidth, [jsdata['time'], timerange]);
     for (var i = 0; i < jsdata.dat.length; i++) {
       //check if any new signals are added to json
@@ -133,7 +111,8 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
       var canvas = qcanvas[1];
       if (flag_reset) {
         var nametag = document.createElement('li');
-        nametag.setAttribute('class', wave['name'] + ' list-group-item');
+        nametag.setAttribute('data-canvasname', wave['name']);
+        nametag.setAttribute('class', 'list-group-item');
         if (wave['width'] > 1) {
           nametag.innerHTML = "<span class=\"icon node-icon glyphicon glyphicon-plus\"></span>";
         } else {
@@ -154,52 +133,38 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
       var cwidth = canvas.width - 0;
       var wavecache = [];
       var ctx = canvas.getContext("2d");
-      for (var i = findlastless(wave['time'], time_begin), endindex = findlastless(wave['time'], time_end) + 1; i < endindex; i++) {
-        xpos = Math.floor((canvas.width - 0) * (wave['time'][i] - timerange[0]) / timediffval) + xmargin;
+      var beginindex = findlastless(wave['time'], time_begin);
+      xpos = Math.floor((canvas.width - 0) * (wave['time'][beginindex] - timerange[0]) / timediffval) + xmargin;
+      for (var i = beginindex, endindex = findlastless(wave['time'], time_end) + 1; i < endindex; i++) { 
         xend = Math.floor((canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
         switch (wave['state'][i]) {
         case 0:
-        case 1:
-        case 2:
-        case 3:
           ypos = 20.5;
           wavecache.push([xpos, ypos, 0]);
           wavecache.push([xend, ypos, 0]);
           break;
-        case 4:
-        case 5:
-        case 6:
-        case 7:
+        case 1:
           ypos = 20.5;
           wavecache.push([xpos, ypos, 1]);
           wavecache.push([xend, ypos, 1]);
           break;
-        case 8:
-        case 9:
-        case 10:
-        case 11:
+        case 2:
           ypos = 30.5;
           wavecache.push([xpos, ypos, 2]);
           wavecache.push([xend, ypos, 2]);
           break;
-        case 12:
-        case 13:
-        case 14:
-        case 15:
+        case 3:
           ypos = 10.5;
           wavecache.push([xpos, ypos, 2]);
           wavecache.push([xend, ypos, 2]);
           break;
-        case 16:
-
+        case 4:
           cl = get_bus_color(wave['wave'][i - 1]);
           draw_vline(ctx, xpos - 1, 10.5, 5, cl);
           draw_vline(ctx, xpos - 1, 30.5, -5, cl);
-        case 17:
-
+        case 5:
           //commented out actions provide better rendering effect (no blurring)
           //but takes a little more time to complete
-
           cl = get_bus_color(wave['wave'][i]);
           wavecache.push([xend, 30.5, 3]);
           wavecache.push([xpos, 30.5, cl]);
@@ -211,24 +176,20 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
           wavecache.push([xpos, 10.5, cl]);
           wavecache.push([xend, 10.5, cl]);
           if (xpos < 0) xpos = 0;
-
           write_text(ctx, xpos + 2, 24.5, wave['wave'][i], xend - xpos);
           break;
         }
-        ctx.lineTo(wavecache[i][0], wavecache[i][1]);
+xpos=xend;
       }
-      ctx.stroke();
-      ctx.closePath();
-      if (!qcanvas[0]) {
-        canvasfragment.appendChild(canvas);
-      }
-
       var colourused = sig[ca].wavecolour;
       ctx.beginPath();
       ctx.strokeStyle = colourused[wavecache[0][2]];
       ctx.moveTo(wavecache[0][0], wavecache[0][1]);
       for (var i = 1; i < wavecache.length; i++) {
-        if (wavecache[i][2] != ctx.strokeStyle) {
+        if (wavecache[i][2] == 3) {
+          ctx.moveTo(wavecache[i][0], wavecache[i][1]);
+        }
+        else if (wavecache[i][2] != wavecache[i-1][2]) {
           ctx.stroke();
           ctx.closePath();
           ctx.beginPath();
@@ -249,7 +210,6 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   //all elements are ready, add them to page
   if (flag_reset) {
     namel.appendChild(namefragment);
-
   }
   canvasl.appendChild(canvasfragment);
   var seps = document.getElementsByClassName('column-sep');
@@ -258,6 +218,5 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
   CursorMover.$cursor.css({
     'height': seps[1].parentNode.offsetHeight
   });
-
   TimeBarManager.sync(time_begin, time_end, jsdata['time'][1]);
-
+}

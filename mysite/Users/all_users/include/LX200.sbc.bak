@@ -1,0 +1,59 @@
+<SBC name = "LX200" comment = "nothing" author = "dh" date = "2018/05/07">
+	<SIG name = "CCLK" value = "square2000000T" default = "0"/>
+	<SIG name = "D_IN" value = "const0" default = "0"/>
+	<SIG name = "M2" value = "const0" default = "0"/>
+	<SIG name = "M1" value = "const0" default = "0"/>
+	<SIG name = "M0" value = "const1" default = "1"/>
+	<SIG name = "M0" value = "const1" default = "1"/>
+	<SIG name = "PROG_B" value = "100T0,200T1" default = "1"/>
+	<SIG name = "RDWR_B" value = "300T0" default = "1"/>
+	<SIG name = "CS_B" value = "350T0" default = "1"/>
+	<SIG name = "PWRDWN_B" value = "const1" default = "1"/>
+	
+	<SIG name = "TDI" value = "const0" default = "0"/>
+	<SIG name = "TCK" value = "const0" default = "0"/>
+	<SIG name = "TMS" value = "const0" default = "0"/>
+	
+	<BTC start = "1400T" type = "RBT" width = "32">
+		<DATA name = "D0" byte = "1" bit = "7" default = "0"/>
+		<DATA name = "D1" byte = "1" bit = "6" default = "0"/>
+		<DATA name = "D2" byte = "1" bit = "5" default = "0"/>
+		<DATA name = "D3" byte = "1" bit = "4" default = "0"/>
+		<DATA name = "D4" byte = "1" bit = "3" default = "0"/>
+		<DATA name = "D5" byte = "1" bit = "2" default = "0"/>
+		<DATA name = "D6" byte = "1" bit = "1" default = "0"/>
+		<DATA name = "D7" byte = "1" bit = "0" default = "0"/>
+		
+		<DATA name = "D8" byte = "2" bit = "7" default = "0"/>
+		<DATA name = "D9" byte = "2" bit = "6" default = "0"/>
+		<DATA name = "D10" byte = "2" bit = "5" default = "0"/>
+		<DATA name = "D11" byte = "2" bit = "4" default = "0"/>
+		<DATA name = "D12" byte = "2" bit = "3" default = "0"/>
+		<DATA name = "D13" byte = "2" bit = "2" default = "0"/>
+		<DATA name = "D14" byte = "2" bit = "1" default = "0"/>
+		<DATA name = "D15" byte = "2" bit = "0" default = "0"/>
+		
+		<DATA name = "D16" byte = "3" bit = "7" default = "0"/>
+		<DATA name = "D17" byte = "3" bit = "6" default = "0"/>
+		<DATA name = "D18" byte = "3" bit = "5" default = "0"/>
+		<DATA name = "D19" byte = "3" bit = "4" default = "0"/>
+		<DATA name = "D20" byte = "3" bit = "3" default = "0"/>
+		<DATA name = "D21" byte = "3" bit = "2" default = "0"/>
+		<DATA name = "D22" byte = "3" bit = "1" default = "0"/>
+		<DATA name = "D23" byte = "3" bit = "0" default = "0"/>
+		
+		<DATA name = "D24" byte = "4" bit = "7" default = "0"/>
+		<DATA name = "D25" byte = "4" bit = "6" default = "0"/>
+		<DATA name = "D26" byte = "4" bit = "5" default = "0"/>
+		<DATA name = "D27" byte = "4" bit = "4" default = "0"/>
+		<DATA name = "D28" byte = "4" bit = "3" default = "0"/>
+		<DATA name = "D29" byte = "4" bit = "2" default = "0"/>
+		<DATA name = "D30" byte = "4" bit = "1" default = "0"/>
+		<DATA name = "D31" byte = "4" bit = "0" default = "0"/>
+	</BTC>
+	
+	<NOP start = "AFB" cycle = "100T"/>
+	
+</SBC>
+		
+	

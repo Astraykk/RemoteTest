@@ -234,13 +234,15 @@ class VcdFile(object):
 				content += string.format(sig_dict['wave_info'][0], sig_dict['symbol'])
 			f.write(content + '$end\n')
 			for i in range(1, len(self.vcd_info[0]['wave_info'])):
-				content = '#{}\n'.format(i)
+				content = ''
 				for sig_dict in self.vcd_info:
 					wave_info = sig_dict['wave_info']
 					# print(wave_info, sig_dict['symbol'], len(wave_info))
 					if wave_info[i] != wave_info[i-1]:
 						content += '{}{}\n'.format(wave_info[i], sig_dict['symbol'])
-				f.write(content)
+				if content:
+					content = '#{}\n'.format(i) + content
+					f.write(content)
 			f.write('$dumpoff\n')
 
 
@@ -302,10 +304,10 @@ def _vcd_merge(vcd_ref, vcd_file, path='.', compare=True):
 	return vcd_m
 
 
-def vcd_merge(vcd1, vcd2='', period='1us', path='.', compare=True):
-	vcd_ref = VcdFile(vcd1, period=period)
+def vcd_merge(vcd1, vcd2='', period1='1us', period2='1us', path='.', compare=True):
+	vcd_ref = VcdFile(vcd1, period=period1)
 	vcd_ref.get_vcd_info()
-	vcd_file = VcdFile(vcd2, period=period)
+	vcd_file = VcdFile(vcd2, period=period2)
 	vcd_file.get_vcd_info()
 	vcd_merge = _vcd_merge(vcd_ref, vcd_file, path, compare)
 	vcd_merge.gen_vcd(path)
@@ -313,10 +315,14 @@ def vcd_merge(vcd1, vcd2='', period='1us', path='.', compare=True):
 
 if __name__ == "__main__":
 	'''vcd test'''
-	vcd1 = 'vcd/stage1_2x_h_000.vcd'
+	# vcd1 = 'vcd/stage1_2x_h_000.vcd'
+	# vcd2 = 'vcd/stage1_2x_h_000_trf.vcd'
 	# vcd1 = 'Bugs/MULreg/MULreg.vcd'
-	vcd2 = 'vcd/stage1_2x_h_000_trf.vcd'
 	# vcd2 = 'Bugs/MULreg/MULreg_trf.vcd'
-	period = '1us'
+	vcd1 = 'FLASH/eras/eras.vcd'
+	vcd2 = 'FLASH/eras/eras_trf.vcd'
+	period1 = '100n'
+	period2 = '1us'
 	path = 'test1.vcd'
-	vcd_merge(vcd1, vcd2, period, path)
+	vcd_merge(vcd1, vcd2, period1, period2, path)
+	# compare_ptn('ram1/ram1.ptn', 'ram1/ram1.ptn.bak')

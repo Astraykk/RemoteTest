@@ -1,0 +1,17 @@
+<TFO name = "tfo_demo" path = "E:/counter/" comment = "1" author = "xy" date = "2018/04/08">
+	<LBF type = "LB0101">
+	<LIST>
+		<DUT name = "1" type = "LX200">
+		<TEST name = "counter" path = "."> 
+			<DWM name = "SelectMAP32"/>
+			<ITM name = "counter"/>
+			<ATF name = "counter"/>
+			<PIO name = "counter"/>
+			<BIT name = "counter"/>
+			<VCD name = "counter"/>
+			<UCF name = "counter"/>
+			<RPT name = "counter"/>
+			<WAV name = "counter" type = "" compare = "yes"/>
+		</TEST>
+	</LIST>
+</TFO>

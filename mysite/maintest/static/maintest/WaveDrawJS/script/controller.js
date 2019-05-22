@@ -6,6 +6,7 @@ function clearallchildren(parentel) {
 function bus_toggle(bus_name) {
   //shows or hides all branches of specific bus
   //note: all hidden branches are NOT updated
+
   var s = fun().getAllSignals();
   var modified = [];
   for (var i = 0; i < s.length; i++) {
@@ -23,6 +24,7 @@ function bus_toggle(bus_name) {
     $($lists[0].childNodes[modified[i]]).toggle();
     $($lists[1].childNodes[modified[i]]).toggle();
   }
+
 }
 var scrollbarmove = (function() {
   var states = {
@@ -76,6 +78,7 @@ function CursorMove() {
     var width = scrbar.width;
     var timerange = scrbar.t_end - scrbar.t_begin;
     var newbeginoffset = Math.floor(timerange / width * pos);
+
     this.$info.html(scrbar.t_begin + newbeginoffset + get_json_data()['time'][1]);
     this.$cursor.css({
       'left': this.cursoroffset + pos + 8
@@ -86,6 +89,7 @@ function CursorMove() {
   };
 }
 var CursorMover = new CursorMove();
+
 function TimeBarManage() {
   var $timebar = $(".\\.timebar span");
   var $barelems = $timebar.children();

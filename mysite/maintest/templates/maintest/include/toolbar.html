@@ -33,14 +33,14 @@
         <li role="presentation">
           <a role="menuitem" tabindex="-1" data-toggle="modal" onclick="callFlowFunc(currentTVPath)">Check</a>
         </li>
-        <li role="presentation">
-          <a role="menuitem" tabindex="-1" data-toggle="modal" onclick="buildPattern(currentTVPath)">Build</a>
-        </li>
+        <!--<li role="presentation" class="disabled">
+          <a role="menuitem" tabindex="-1" data-toggle="modal" onclick="buildPattern(currentTVPath)" disabled="disabled">Build</a>
+        </li>-->
         <li role="presentation">
           <!--<a role="menuitem" tabindex="-1" data-toggle="modal" onclick="runTest(currentTVPath)">Test</a>-->
           <a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#testModal">Test</a>
         </li>
-        <li role="presentation">
+		<li role="presentation">
           <!--<a role="menuitem" tabindex="-1" data-toggle="modal" onclick="runTest(currentTVPath)">Test</a>-->
           <a role="menuitem" tabindex="-1" data-toggle="modal" onclick="genTestReport(currentTVPath)">Report</a>
         </li>
@@ -70,9 +70,10 @@
     <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span>
       tool
     </button>
-    <button type="button" class="btn btn-default"><span
-        class="glyphicon glyphicon-eye-open"></span> view
-    </button>
+    <a href="/Users/task_list4user/" target="_blank">
+		<button type="button" class="btn btn-default"><span
+			class="glyphicon glyphicon-eye-open"></span> view
+		</button></a>
     <button type="button" class="btn btn-default">
       <span class="glyphicon glyphicon-user"></span> User
     </button>

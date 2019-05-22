@@ -1,0 +1,16 @@
+{% if username %}
+	<div class="btn-group pull-right">
+		<button type="button" class="btn btn-default "><span class="glyphicon glyphicon-user"></span>   {{ username }}</button>
+		<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+			<span class="caret"></span> </button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a href="/Users/info">Settings</a></li>
+				<li><a href="/Users/group_page">Groups</a></li>
+				<li><a href="/Users/logout">Logout</a></li>
+			</ul>
+	</div>
+{% else %}
+	<p align="right"><a href="/Users/login">login</a> | <a href="/Users/sign_up">sign up</a></p> 
+{% endif %}
+<br><br>
+<hr>

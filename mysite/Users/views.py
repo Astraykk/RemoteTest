@@ -235,7 +235,7 @@ def download(request):
 	else:
 		return redirect('/Users/login/')
 	
-def zip_dir(dir,flag):
+def zip_dir(dir,flag="default"):
 	if dir[-1]==os.sep:
 		temp = os.path.split(dir[:-1])         #maybe buggy
 	else:

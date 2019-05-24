@@ -251,7 +251,6 @@ def index(request):
 	if username:
 		
 		#request.session.setdefault('directory', DIRECTORY)
-		
 		query = request.GET
 		query_file = query.get('file', 'open file')
 		# print('query_file(in index)=', query_file)
@@ -261,6 +260,7 @@ def index(request):
 		# print(query_file, file_path)
 		query_path = query.get('path', '')
 		obj = treeview_parser(directory, relpath=query_path)
+
 		# print(obj)
 		tv_dir = treeview_parser(os.path.join(DIRECTORY, username), flag='O')
 		# print(self.directory)

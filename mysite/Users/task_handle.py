@@ -5,7 +5,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
  
 django.setup()
 
-from Users.models import Users,Group,au4pj
+from Users.models import Users,Group,au4pj,user4report
 from Users.models import Task,allTask4user,allTask4group,task_db,user_in_queue,user4serving
 #from Users.patternGen import tfo_parser
 
@@ -107,7 +107,7 @@ def test_request(request):
 		file_list_list = tfo_parser(path,tfo_name)
 		report_file = os.path.splitext(os.path.join(path,tfo_name))[0] + '_report.log'
 
-		print(file_list_list)
+		#print(file_list_list)
 		user_in_queue_item.x = len(file_list_list)
 		user_in_queue_item.report_file=report_file
 		user_in_queue_item.save()
@@ -246,7 +246,9 @@ def task_db2task():
 					
 				if user4serving_item.x_current == 1:
 					#report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now().replace(tzinfo=pytz.timezone('UTC')) - user4serving_item.s_time).seconds)
-					#user4serving_item.delete()
+					user4report_item = user4report(user=user4serving_item.user,group=user4serving_item.group,s_time=user4serving_item.s_time)
+					user4report_item.save()
+					user4serving_item.delete()
 					end_tag = "last"
 				else:
 					user4serving_item.x_current -= 1
@@ -258,7 +260,7 @@ def task_db2task():
 					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=request_serial_num,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file,end_tag=end_tag)
 					task_item.save()
 				else:
-					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=1,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file)
+					task_item = Task(username=task_db_item.username,user=task_db_item.user,group=task_db_item.group,user_or_group=task_db_item.user_or_group,project_loc=task_db_item.project_loc,request_serial_num=1,ptn_name=task_db_item.ptn_name,report_file=task_db_item.report_file,end_tag=end_tag)
 					task_item.save()
 					#task = Task.objects.order_by('request_serial_num')[0]
 					pro = multiprocessing.Process(target = test_pack,args = (task_item,))
@@ -349,27 +351,27 @@ def test(task):
 	path_in = os.path.join(path,input_ptn)
 	path_o = os.path.join(path,output_trf)
 	s_time = time.time()
-	#abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
-	print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1")
-	for i in range(2):
-		time.sleep(1)
-		print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
+	abc = os.popen("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1").read()
+	# print("sudo /home/linaro/BR0101/z7_v4_com/z7_v4_ip_app " + path_in + " " + path_o + " 1 1 1")
+	# for i in range(2):
+		# time.sleep(1)
+		# print("testing "+task.username+" "+ task.project_loc + input_ptn + ".....")
 	e_time = time.time()
-	#print(abc)
+	print(abc)
 
 	key = "Test time for " + task.ptn_name + ":"
 	value = e_time - s_time
 	report(task.report_file, key, value)
 	if task.end_tag == "last":
 		if task.user_or_group == "0":
-			user4serving_item = user4serving.objects.filter(user=task.user)[0]
+			user4report_item = user4report.objects.filter(user=task.user)[0]
 		else:
-			user4serving_item = user4serving.objects.filter(group=task.group)[0]
-		report(user4serving_item.report_file,'Total test time:', (datetime.datetime.now() - user4serving_item.s_time).seconds)
+			user4report_item = user4report.objects.filter(group=task.group)[0]
+		report(task.report_file,'Total test time:', (datetime.datetime.now() - user4report_item.s_time).total_seconds())
 		
-		user4serving_item.delete()
+		user4report_item.delete()
 		
-	print("finish testing "+task.username+" "+ task.project_loc + input_ptn +"....")
+	print("finish testing "+task.username+" "+ task.project_loc +".... ptn---"+ input_ptn +"....")
 	
 		
 
@@ -405,7 +407,7 @@ def tfo_parser(path, file):
 		# file_list_list[test_tag['path']] = (project_name, file_list)
 		file_list_list.append([os.path.join(path, test_tag['path']), (project_name, file_list)])
 		# file_list_list.append([test_tag['path'], (project_name, file_list)])
-	print(file_list_list)
+	#print(file_list_list)
 	return file_list_list
 	
 def task_list4user(request):
@@ -455,4 +457,14 @@ def check4waitingInfo():
 		wait_sec = sum(merge) * A_task_time
 		return "There are %d users in serving list, and %d users in queue.\n your tasks will get to platform in about %d seconds." % (serving_num,user_in_queue_num,wait_sec)
 		
-		
+# for iter in user4serving.objects.all():
+	# iter.delete()
+# for iter in user_in_queue.objects.all():
+	# iter.delete()
+# for iter in task_db.objects.all():
+	# iter.delete()
+# for iter in Task.objects.all():
+	# iter.delete()
+# for iter in user4report.objects.all():
+	# iter.delete()
+	

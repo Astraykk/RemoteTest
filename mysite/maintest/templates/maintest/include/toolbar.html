@@ -67,9 +67,26 @@
     <button type="button" class="btn btn-default">
       <span class="glyphicon glyphicon-pencil"></span> edit
     </button>
-    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span>
-      tool
-    </button>
+    <div class="btn-group">
+			<button type="button" class="btn btn-default dropdown-toggle" id="dropdown4tool"
+				data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span>
+				tool <span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdown4tool">
+				<li role="presentation">
+					<a data-toggle="modal" data-target="#myModal_down">download</a>
+				</li>
+				<li role="presentation">
+					<a href="/Users/download_spec/trf/">download all trfs</a>
+				</li>
+				<li role="presentation">
+					<a href="/Users/download_spec/rpt/">download report files</a>
+				</li>
+				<li role="presentation">
+					<a type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal_del">delete</a>
+				</li>
+			</ul>
+		</div>
     <a href="/Users/task_list4user/" target="_blank">
 		<button type="button" class="btn btn-default"><span
 			class="glyphicon glyphicon-eye-open"></span> view

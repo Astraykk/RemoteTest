@@ -6,6 +6,7 @@ import django.db
 import time
 import os
 import shutil
+import zipfile
 #def index(request):
     #return HttpResponse("Hello, world. You're at the polls index.")
 # Create your views here.
@@ -23,7 +24,7 @@ def identify(request):
 	if request.method == 'POST':
 		username = request.POST.get('username',None)
 		password = request.POST.get('password',None)
-		user = Users.objects.get(username=username)		
+		user = Users.objects.filter(username=username).first()		
 
 		if user and user.password == password:
 			#
@@ -80,11 +81,13 @@ def upload(request):
 
 	username = request.session.get('username',None)
 	if username:
-		file_loc = request.POST.get('file_loc',None)
-		path = username + file_loc;
+		path = request.session.get('directory',os.path.join("Users","all_users",username))	
+		file_loc = request.POST.get('file_loc',"/").split("/")
+		for iter in file_loc:
+			path=os.path.join(path,iter)
 		files = request.FILES.getlist("myfile")
 		for file in files:
-			with open("Users/all_users/%s%s" % (path,file.name),'wb') as fp:
+			with open(os.path.join(path,file.name),'wb') as fp:
 				for chunk in file.chunks():
 					fp.write(chunk)
 				fp.close()
@@ -119,9 +122,12 @@ def upload(request):
 def mkdir(request):
 	username = request.session.get('username',None)
 	if username:
-		dir_loc = request.POST.get("dir_loc", None)
-		dir_name = request.POST.get("dir_name", None)
-		path = "Users/all_users/" + username + dir_loc + dir_name
+		path = request.session.get('directory',os.path.join("Users","all_users",username))
+		dir_loc = request.POST.get("dir_loc","/").split("/")
+		dir_name = request.POST.get("dir_name",'')
+		for iter in dir_loc:
+			path = os.path.join(path,iter)
+		path = os.path.join(path,dir_name)
 		try:
 			os.mkdir(path)				
 		except OSError:
@@ -138,7 +144,7 @@ def mkdir(request):
 
 
 def logout(request):
-	del request.session['username']
+	request.session.flush()
 	return redirect("/maintest/index/")
 
 
@@ -146,9 +152,10 @@ def logout(request):
 def del_file(request):
 	username = request.session.get("username",None)
 	if username:
-			
-		loc4del = request.POST.get("loc4del")
-		path = "Users/all_users/" + username + loc4del
+		path = request.session.get('directory',os.path.join("Users","all_users",username))	
+		loc4del = request.POST.get("loc4del").split("/")
+		for iter in loc4del:
+			path = os.path.join(path,iter)
 		if os.path.isdir(path):
 			ls = os.listdir(path)
 			for i in ls:
@@ -211,13 +218,68 @@ def invitations(request):
 def download(request):
 	username = request.session.get('username',None)
 	if username:
-		loc4down = request.POST.get('loc4down',None)
-		filename = request.POST.get('file_name4down',None)
-		path = "Users/all_users/"+ username + loc4down + filename;
-		file = open(path,'rb')
+		path = request.session.get('directory',os.path.join("Users","all_users",username))
+		loc4down = request.POST.get('loc4down',"/").split("/")
+		filename = request.POST.get('file_name4down')
+		for iter in loc4down:
+			path = os.path.join(path,iter)
+		path = os.path.join(path,filename)
+		if filename:
+			file = open(path,'rb')
+		else:
+			(path4zip,filename)=zip_dir(path)
+			file = open(path4zip,'rb')
 		response = FileResponse(file)	
 		response['Content-Disposition']='attachment;filename='+'"'+filename+'"'
 		return response
 	else:
 		return redirect('/Users/login/')
 	
+def zip_dir(dir,flag="default"):
+	if dir[-1]==os.sep:
+		temp = os.path.split(dir[:-1])         #maybe buggy
+	else:
+		temp = os.path.split(dir) 
+	zipFileName = temp[1]
+	zf = zipfile.ZipFile(os.path.join(temp[0],zipFileName+'.zip'), "w", zipfile.ZIP_DEFLATED)
+	zip_in(zf,dir,dir,zipFileName,flag)
+	zf.close()
+	return (os.path.join(temp[0],zipFileName+'.zip'),zipFileName+'.zip')
+
+def zip_in(zf,dir,replace_str,zipFileName,flag="default"):
+	dir_list = os.listdir(dir)
+	for iter in dir_list:
+		path = os.path.join(dir,iter)
+		if flag == "default":
+			if os.path.isdir(path):
+				zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
+				zip_in(zf,path,replace_str,zipFileName,flag)
+			else:
+				zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
+		elif flag == "trf":
+			if os.path.isdir(path):
+				#zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
+				zip_in(zf,path,replace_str,zipFileName,flag)
+			else:
+				if iter.endswith(".trf"):
+					zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
+		else:
+			if os.path.isdir(path):
+				#zf.write(path,os.path.join(zipFileName,path.replace(replace_str,''))+os.sep)
+				zip_in(zf,path,replace_str,zipFileName,flag)
+			else:
+				if iter.endswith("_trf.vcd") or iter.endswith("_merge.vcd") or iter.endswith("_merge.rpt"):
+					zf.write(path,os.path.join(zipFileName,path.replace(replace_str,'')))
+			
+
+def download_spec(request,flag):
+	username = request.session.get('username',None)
+	if username:
+		path = request.session.get('directory',os.path.join("Users","all_users",username))
+		(path4zip,filename)=zip_dir(path,flag)
+		file = open(path4zip,'rb')
+		response = FileResponse(file)	
+		response['Content-Disposition']='attachment;filename='+'"'+filename+'"'
+		return response
+	else:
+		return redirect('/Users/login/')

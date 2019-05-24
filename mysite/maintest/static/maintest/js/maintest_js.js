@@ -32,6 +32,7 @@ xmlhttp.send();
 
 // file tree function
 function loadTreeview(path, flag='C'){
+  var tv_ajax_url="/maintest/tv_ajax/";
   $.ajax({
     url: tv_ajax_url,
     async: true,
@@ -48,7 +49,38 @@ function loadTreeview(path, flag='C'){
 function generateFileTree(tv_data){
   $("#tree").treeview({
     data: tv_data,
-    enableLinks: true
+    enableLinks: true,
+	onNodeSelected:function(event, data) {				
+		//var addon = document.getElementById("project4open").value.replace(/\/[^\/]*\/$/,"");
+		//var addon = document.getElementById("project4open").value;
+		var path = "";
+		var path4del="";
+		parentNode = $('#tree').treeview('getParent', data);
+		while(parentNode.nodes){
+			path = parentNode.text + "/" +path;
+			Node = parentNode;
+			parentNode = $('#tree').treeview('getParent', Node);
+			
+		}
+		if(data.nodes){
+			path += data.text + '/';
+			path4del = path;
+			document.getElementById("file_name4down").value = "";
+		}else{
+			path4del = path + data.text;
+			document.getElementById("file_name4down").value = data.text;
+			//document.getElementById("loc4edit").value = addon + "/" + path4del;
+			//edit(addon + "/" + path,data.text);
+		}
+		/* path = "/" + path;
+		path4del = "/" + path4del; */
+
+		//document.getElementById("tfo_loc").value = addon + path;
+		document.getElementById("file_loc").value = path;
+		document.getElementById("dir_loc").value = path;
+		document.getElementById("loc4del").value = path4del;
+		document.getElementById("loc4down").value = path;
+	},
   });
   $('#tree').treeview('collapseAll', { silent: true });
 }
@@ -56,7 +88,24 @@ function generateFileTree(tv_data){
 function treeviewOpenProject(tv_data_dir){
   $("#o-p-body").treeview({
     data: tv_data_dir,
-    enableLinks: true
+    enableLinks: true,
+	onNodeSelected:function(event, data) {
+		var path = "";
+		parentNode = $('#o-p-body').treeview('getParent', data);
+		while(parentNode.nodes){
+			path = parentNode.text + "/" +path;
+			Node = parentNode;
+			parentNode = $('#o-p-body').treeview('getParent', Node);
+			
+		}
+		if(data.nodes){
+			path += data.text + '/';
+		}
+		path = "/" + path;
+		
+		document.getElementById("project4open").value = path;
+	}
+	
   });
   $('#o-p-body').treeview('collapseAll', { silent: true });
 }
@@ -88,6 +137,7 @@ $(document).ready(function(){
 //    });
 //}
 function callFlowFunc(path){
+  var check_url = "/maintest/check/"
   var url = check_url;
   console.log("check func start");
   console.log(url);
@@ -128,6 +178,7 @@ function buildPattern(path){
 }
 
 function runTest(path){
+  var test_url = "/Users/test_request/";
   var url = test_url;
   var rpt_name = $("#rptName").val();
   // waveform_path = waveform_path + rpt_name + ".jpg"

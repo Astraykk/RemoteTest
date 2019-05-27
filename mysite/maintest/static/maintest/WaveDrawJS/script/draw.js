@@ -17,10 +17,30 @@ function draw_vline(ctx, x_st, y_st, y_off, color) {
   ctx.stroke();
   ctx.closePath();
 }
-function write_text(ctx, x_st, y_st, textc, maxWidth) {
+function write_text(ctx, x_st, y_st, textcontent, maxWidth) {
   ctx.font = "12px Monospace";
   ctx.fillStyle = "#ffffff";
-  ctx.fillText(textc, x_st, y_st, maxWidth);
+  var maxcharallowed = Math.floor(maxWidth / getTextWidth('12px', 'Monospace', 'm'));
+  if (maxcharallowed < textcontent.length) {
+    switch (maxcharallowed) {
+    case 0:
+      textcontent = '';
+      break;
+    case 1:
+      textcontent = '.';
+      break;
+    case 2:
+      textcontent = textcontent[0] + '.';
+      break;
+    case 3:
+      textcontent = textcontent[0] + '..';
+      break;
+    default:
+      textcontent = textcontent.substr(0, maxcharallowed - 3) + '...';
+      break;
+    }
+  }
+  ctx.fillText(textcontent, x_st, y_st);
 }
 function check_canvas_availablity() {
   //简单地检测当前浏览器是否支持Canvas对象，以免在一些不支持html5的浏览器中提示语法错误
@@ -31,7 +51,7 @@ function check_canvas_availablity() {
 function query_canvas(canvasname, height, width) {
   var canvasl = document.getElementsByTagName('CANVAS');
   var ret;
-  if (canvasl.length){
+  if (canvasl.length) {
     for (var i = 0; i < canvasl.length; i++) {
       if (canvasl[i].getAttribute("data-canvasname") == canvasname) {
         ret = canvasl[i];
@@ -41,11 +61,11 @@ function query_canvas(canvasname, height, width) {
       }
     }
   }
-    ret = document.createElement('canvas');
-    ret.setAttribute('data-canvasname', canvasname);
-    ret.height = height;
-    ret.width = width;
-    return [false, ret];
+  ret = document.createElement('canvas');
+  ret.setAttribute('data-canvasname', canvasname);
+  ret.height = height;
+  ret.width = width;
+  return [false, ret];
 }
 function draw_grid(x_st, y_st, x_range, time) {
   var gridcanvas = $('#wavedrawing-gridc')[0];
@@ -135,7 +155,8 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
       var ctx = canvas.getContext("2d");
       var beginindex = findlastless(wave['time'], time_begin);
       xpos = Math.floor((canvas.width - 0) * (wave['time'][beginindex] - timerange[0]) / timediffval) + xmargin;
-      for (var i = beginindex, endindex = findlastless(wave['time'], time_end) + 1; i < endindex; i++) { 
+      for (var i = beginindex,
+      endindex = findlastless(wave['time'], time_end) + 1; i < endindex; i++) {
         xend = Math.floor((canvas.width - 0) * (wave['time'][i + 1] - timerange[0]) / timediffval) + xmargin;
         switch (wave['state'][i]) {
         case 0:
@@ -176,10 +197,10 @@ function draw(cwidth, time_begin, time_end, flag_reset) {
           wavecache.push([xpos, 10.5, cl]);
           wavecache.push([xend, 10.5, cl]);
           if (xpos < 0) xpos = 0;
-          write_text(ctx, xpos + 2, 24.5, wave['wave'][i], xend - xpos);
+          write_text(ctx, xpos + 1, 24.5, wave['wave'][i], xend - xpos);
           break;
         }
-xpos=xend;
+        xpos = xend;
       }
       var colourused = sig[ca].wavecolour;
       ctx.beginPath();
@@ -188,8 +209,7 @@ xpos=xend;
       for (var i = 1; i < wavecache.length; i++) {
         if (wavecache[i][2] == 3) {
           ctx.moveTo(wavecache[i][0], wavecache[i][1]);
-        }
-        else if (wavecache[i][2] != wavecache[i-1][2]) {
+        } else if (wavecache[i][2] != wavecache[i - 1][2]) {
           ctx.stroke();
           ctx.closePath();
           ctx.beginPath();

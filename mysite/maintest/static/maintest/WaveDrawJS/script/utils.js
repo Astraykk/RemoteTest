@@ -117,17 +117,7 @@ function _DragImpl(start, stop) {
   } else if (startsig.bus || stopsig.bus) {
     if (!startsig.issubbus && !stopsig.issubbus) {
       isswappable = true;
-
     }
-  };
-  this.setcondition = function(para, type) {
-    p = para;
-    t = type;
-  };
-}
-function listall(l) {
-  for (var i = 0; i < l.length; i++) {
-    console.log(l[i]);
   }
   if (isswappable) {
     var s = fun().getAllSignals();
@@ -194,12 +184,7 @@ var DragHelperClosure = (function() {
     return i;
   }
 } ());
-function _WaveZoomImpl(start, stop) {
-  var scrbar = scrollbarmove();
-  var timebegin = scrbar.t_begin;
-  var timerange = scrbar.t_end - scrbar.t_begin;
-  var width = scrbar.width;
-  var jstime = get_json_data().time[0] - 0;
+function _WaveZoomImpl(scrbar, start, stop, timerange, width, jstime) {
   //convert px to actual time values
   if (start > stop) {
     //right to left, zoom out
@@ -214,18 +199,43 @@ function _WaveZoomImpl(start, stop) {
   }
   //now calculate new begin and end
   else {
+    var timebegin = scrbar.t_begin;
     var newbeginoffset = Math.floor(timerange / width * start);
     scrbar.t_begin += newbeginoffset;
     var newendoffset = Math.floor(timerange / width * stop);
     scrbar.t_end = timebegin + newendoffset;
   }
+}
+function _PanImpl(scrbar, start, stop, timerange, width, jstime) {
+  //convert px to actual time values
+  var scalefactor = (start - stop) / width;
+  var dist = Math.floor(timerange * scalefactor);
+  //now calculate new begin and end
+  var newtime = [scrbar.t_begin + dist, scrbar.t_end + dist];
+  if (newtime[0] < 0) {
+    newtime[0] = 0;
+    newtime[1] = newtime[0] + timerange;
+  } else if (newtime[1] > jstime) {
+    newtime[1] = jstime;
+    newtime[0] = newtime[1] - timerange;
+  }
+  scrbar.t_begin = newtime[0];
+  scrbar.t_end = newtime[1];
+}
+function CanvasMouseClickCommon(start, stop, func) {
+  var scrbar = scrollbarmove();
+  var timerange = scrbar.t_end - scrbar.t_begin;
+  var width = scrbar.width;
+  var jstime = get_json_data().time[0] - 0;
+  func(scrbar, start, stop, timerange, width, jstime);
   scrbar.changecanvas(false);
   var propbar = $("#propotion-");
   var propv = propbar.attr('max') * scrbar.t_begin / jstime;
+  CursorMover.movetoX(CursorMover.nowpos);
   propbar.attr('value', propv)
 }
-function WaveZoomHelper() {
-  //Implements zoom in/out
+function CanvasMouseClickHelper() {
+  //Dispatches mouseclick events on canvases
   var start = 0;
   var stop = 0;
   //start and stop are in px
@@ -234,21 +244,24 @@ function WaveZoomHelper() {
   };
   this.setstop = function(pos) {
     this.stop = pos;
-    if (global_states().mode == 1) {
+    if (global_states().mode == 0) {
+      //mode is zoom, do zoom in/out
+      if (this.start == this.stop) {
+        //single click on canvas does not trigger zooming
+        return;
+      }
+      CanvasMouseClickCommon(this.start, this.stop, _WaveZoomImpl);
+    } else if (global_states().mode == 1) {
       //mode is cursor, move cursor to stop position
       CursorMover.movetoX(pos);
     } else {
-      //mode is zoom, do zoom in/out
-      if (this.start == this.stop) {
-        //no dragging detected
-        return;
-      }
-      _WaveZoomImpl(this.start, this.stop);
+      //mode is pan, move the canvas contents
+      CanvasMouseClickCommon(this.start, this.stop, _PanImpl);
     }
   };
 }
-var WaveZoomHelperClosure = (function() {
-  var i = new WaveZoomHelper();
+var CanvasMouseClickHelperClosure = (function() {
+  var i = new CanvasMouseClickHelper();
   return function() {
     return i;
   }
@@ -257,7 +270,6 @@ function ScorllSyncHelper() {
   //Implements sync of scorllbars
   var currentTab = 0;
   this.scale = 1;
-
   //use labmda to preserve 'this' state, do not replace with function(){...}
   //some formatting tools may give erroneous result
   this.setup = ()=>{
@@ -280,7 +292,6 @@ function ScorllSyncHelper() {
     this.$l = $l;
     this.$r = $r;
   };
-
   this.calibrateTracking = ()=>{
     var $lc = this.$l.children();
     var $rc = this.$r.children();
@@ -368,4 +379,21 @@ function parseScaleText(scale) {
   //next, find timescale value
   var grade = scale.replace(time, '');
   return convert_timescale(time, get_json_data()['time'][1], grade);
+}
+function getTextWidth(fontSize, fontFamily, text) {
+  var span = document.createElement("span");
+  var result = span.offsetWidth;
+  span.style.visibility = "hidden";
+  span.style.fontSize = fontSize;
+  span.style.fontFamily = fontFamily;
+  span.style.display = "inline-block";
+  document.body.appendChild(span);
+  if (typeof span.textContent != "undefined") {
+    span.textContent = text;
+  } else {
+    span.innerText = text;
+  }
+  result = parseFloat(window.getComputedStyle(span).width) - result;
+  span.parentNode.removeChild(span);
+  return result;
 }

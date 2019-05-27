@@ -65,6 +65,9 @@ $(document).ready(function() {
       'visibility': 'hidden'
     });
   };
+  $("#wavedraw-pan")[0].onclick = function() {
+    global_states().mode = 2;
+  };
   $(window).resize(function() {
     $("#width-")[0].onchange();
   });

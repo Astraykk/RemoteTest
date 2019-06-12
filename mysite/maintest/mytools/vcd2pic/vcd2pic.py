@@ -48,7 +48,7 @@ def parsevcd(vcd_location):
 				signame = word[4]
 				if word[5] != '$end':
 					signame += word[5]
-				sigdat = {'name':signame,'sign':word[3],'width':word[2],'wave':[],'state':[],'time':[]}
+				sigdat = {'name':signame,'sign':word[3],'width':int(word[2]),'wave':[],'state':[],'time':[]}
 				if word[1] == "reg":
 					inputs.append(sigdat)
 				elif word[1] == "wire":
